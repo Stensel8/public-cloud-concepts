@@ -2,7 +2,7 @@
 
 > **Under Development** — Individual repository for the HBO specialisation *Cloud Engineering* (Spring 2026, Q3/Q4).
 
-This repository is maintained by [Stensel8](https://github.com/Stensel8) and covers the individual modules of the Cloud Engineering specialisation.
+This repository is maintained by [Stensel8](https://github.com/Stensel8) and covers the individual module of the Cloud Engineering specialisation.
 
 ## Modules
 
