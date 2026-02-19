@@ -1,18 +1,18 @@
-# Spring 2026 — Cloud Engineering
+# Spring 2026 — Public Cloud Concepts
 
-> **Under Development** — Collaborative repository for the HBO specialisation *Cloud Engineering* (Spring 2026, Q3/Q4).
+> **Under Development** — Individual repository for the HBO specialisation *Cloud Engineering* (Spring 2026, Q3/Q4).
 
-This repository is maintained by [Stensel8](https://github.com/Stensel8) and [Hintenhaus04](https://github.com/Hintenhaus04) and covers the shared modules of the Cloud Engineering specialisation.
+This repository is maintained by [Stensel8](https://github.com/Stensel8) and covers the individual modules of the Cloud Engineering specialisation.
 
 ## Modules
 
-| Module | EC | Quarter | Folder |
-|--------|-----|---------|--------|
-| Cloud Automation Concepts | 5 EC | Q3 | [cloud-automation-concepts/](cloud-automation-concepts/) |
-| Architecting the Cloud | 5 EC | Q3 | [architecting-the-cloud/](architecting-the-cloud/) |
-| Project Cloud Engineering | 15 EC | Q4 | *(to be added)* |
+| Module | EC | Quarter |
+|--------|-----|---------
+| Public Cloud Concepts | 5 EC | Q3 |
 
-> **Public Cloud Concepts** (5 EC, Q3) is a solo module and lives in its own repository: [Stensel8/public-cloud-concepts](https://github.com/Stensel8/public-cloud-concepts).
+
+> [**Architecting the Cloud**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/architecting-the-cloud) and [**Cloud Automation Concepts**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/cloud-automation-concepts) (5 EC, Q3) are shared modules done in collaboration with [Hintenhaus04](https://github.com/Hintenhaus04) and live in their own repository:[Spring 2026 — Cloud Engineering
+](https://github.com/Stensel8/spring2026-cloud-engineering).
 
 ## Disclaimer
 
