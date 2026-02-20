@@ -14,6 +14,13 @@ This repository is maintained by [Stensel8](https://github.com/Stensel8) and cov
 > [**Architecting the Cloud**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/architecting-the-cloud) and [**Cloud Automation Concepts**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/cloud-automation-concepts) (5 EC, Q3) are shared modules done in collaboration with [Hintenhaus04](https://github.com/Hintenhaus04) and live in their own repository:[Spring 2026 — Cloud Engineering
 ](https://github.com/Stensel8/spring2026-cloud-engineering).
 
+## Course Structure
+
+| Week | Topic | Folder |
+|---|---|---|
+| 1 | Introduction & Deployments | [Week 1](Week%201/) |
+| 2 | Ingress, Services & Apps | [Week 2](Week%202/) |
+
 ## Disclaimer
 
 This is a work in progress for educational purposes. Code, configurations, and documentation may change significantly as the course progresses.
