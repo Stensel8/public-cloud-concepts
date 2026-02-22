@@ -1,35 +1,47 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI Week 1
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the $default-branch branch
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
-
-  # Allows you to run this workflow manually from the Actions tab
+    branches: [main]
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  lint:
+    name: Dockerfile lint
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: "Week 1/Dockerfile"
+
+  build:
+    name: Build & scan
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t stensel8/container:latest "./Week 1/"
+
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@0.30.0
+        with:
+          image-ref: stensel8/container:latest
+          format: table
+          exit-code: "1"
+          severity: CRITICAL
+
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PAT }}
-      - name: Build and push Docker image
-        run: |
-          docker build -t stensel8/container:latest "./public-cloud-concepts/Week 1/"
-          docker push stensel8/container:latest
+
+      - name: Push to Docker Hub
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: docker push stensel8/container:latest

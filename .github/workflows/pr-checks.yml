@@ -1,0 +1,42 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [main, development]
+
+jobs:
+  pr-title:
+    name: Semantic PR title
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            chore
+            refactor
+            style
+            revert
+            ci
+
+  markdown:
+    name: Markdown lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DavidAnson/markdownlint-cli2-action@v22
+        with:
+          globs: "**/*.md"
+
+  dockerfile-lint:
+    name: Dockerfile lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: "Week 1/Dockerfile"
