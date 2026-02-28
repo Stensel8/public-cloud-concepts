@@ -13,9 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: hadolint/hadolint-action@v3.3.0
-        with:
-          recursive: true
+      - name: Install hadolint
+        run: |
+          wget -qO /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+          chmod +x /usr/local/bin/hadolint
+      - name: Lint Dockerfile
+        run: hadolint "Week 1/Dockerfile"
 
   build:
     name: Build & scan
