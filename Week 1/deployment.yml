@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: my-container
-        image: stensel8/container:latest
+        image: stensel8/public-cloud-concepts:latest
         ports:
         - containerPort: 80
 

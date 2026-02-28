@@ -25,12 +25,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t stensel8/container:latest "./Week 1/"
+        run: docker build -t stensel8/public-cloud-concepts:latest "./Week 1/"
 
       - name: Scan image with Trivy
         uses: aquasecurity/trivy-action@0.30.0
         with:
-          image-ref: stensel8/container:latest
+          image-ref: stensel8/public-cloud-concepts:latest
           format: table
           exit-code: "1"
           severity: CRITICAL
@@ -44,4 +44,4 @@ jobs:
 
       - name: Push to Docker Hub
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        run: docker push stensel8/container:latest
+        run: docker push stensel8/public-cloud-concepts:latest

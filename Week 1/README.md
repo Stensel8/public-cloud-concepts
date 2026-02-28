@@ -307,14 +307,14 @@ The `kube-system` namespace contains the core Kubernetes components:
 
 ```dockerfile
 FROM nginx:alpine
-COPY index.html /usr/share/nginx/html/
+COPY static-site/ /usr/share/nginx/html/
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 ```
 
 **`FROM nginx:alpine`** — The image is built on top of the official `nginx:alpine` base image. The `alpine` variant was deliberately chosen over `nginx:latest` (which is based on Debian): Alpine Linux is significantly smaller (~5 MB vs ~180 MB), contains far fewer pre-installed binaries and libraries, and therefore has a much smaller attack surface with fewer CVEs. For a static web server that just needs to serve HTML, the full Debian-based image would bring unnecessary overhead.
 
-**`COPY index.html /usr/share/nginx/html/`** — This copies our own `index.html` into the nginx document root. When a browser sends a request to the container, nginx serves this file as the HTTP response. This is how the custom static website is injected into the image — the HTML (and any CSS, JS, or Bootstrap templates included in it) replaces nginx's default placeholder page.
+**`COPY static-site/ /usr/share/nginx/html/`** — This copies the entire `static-site/` directory (containing `index.html` and any assets) into the nginx document root. When a browser sends a request to the container, nginx serves this file as the HTTP response. This is how the custom static website is injected into the image — the HTML (and any CSS, JS, or Bootstrap templates included in it) replaces nginx's default placeholder page.
 
 **`EXPOSE 80`** — Declares that the container listens on port 80 (standard HTTP). This is a convention that tells Docker and Kubernetes which port the application uses, and is required for routing traffic to the container. Without this, browsers would not be able to connect using the default HTTP port. If the application were running on a non-standard port (e.g. 8000), clients would need to specify it explicitly — e.g. `stentijhuis.nl:8000`.
 
@@ -322,20 +322,126 @@ CMD ["nginx", "-g", "daemon off;"]
 
 **GitHub Actions workflow:**
 
-_..._
+The workflow is defined in [`.github/workflows/ci_week1.yml`](../.github/workflows/ci_week1.yml) and runs automatically on every push or pull request to `main`. It consists of two jobs:
+
+```yaml
+name: CI Week 1
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Dockerfile lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: "Week 1/Dockerfile"
+
+  build:
+    name: Build & scan
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t stensel8/public-cloud-concepts:latest "./Week 1/"
+
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@0.30.0
+        with:
+          image-ref: stensel8/public-cloud-concepts:latest
+          format: table
+          exit-code: "1"
+          severity: CRITICAL
+
+      - name: Login to Docker Hub
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Push to Docker Hub
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: docker push stensel8/public-cloud-concepts:latest
+```
+
+**Job 1 — `lint`:** Uses [Hadolint](https://github.com/hadolint/hadolint) to statically analyse the Dockerfile for best-practice violations (e.g. missing `--no-install-recommends`, wrong `COPY` ordering). The build job will not start if linting fails.
+
+**Job 2 — `build`** (runs after `lint`):
+
+- Builds the Docker image from `Week 1/Dockerfile`
+- Scans the image with [Trivy](https://github.com/aquasecurity/trivy) and fails the pipeline if any **CRITICAL** CVEs are found
+- Logs in to DockerHub using repository secrets (`DOCKER_USERNAME` and `DOCKER_PAT`) — only when pushing to `main` (not on PRs)
+- Pushes the image as `stensel8/public-cloud-concepts:latest` to DockerHub — again only on direct pushes to `main`
+
+The secrets are configured under **Settings → Secrets and Variables → Actions → Repository Secrets** in the GitHub repository.
 
 **2a — Explanation of deployment.yaml structure:**
 
-_..._
+The completed `deployment.yml` used for this assignment:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: first-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-container
+  template:
+    metadata:
+      labels:
+        app: my-container
+    spec:
+      containers:
+      - name: my-container
+        image: stensel8/public-cloud-concepts:latest
+        ports:
+        - containerPort: 80
+```
+
+**`apiVersion: apps/v1`** — Specifies which Kubernetes API group and version to use. `apps/v1` is the stable API for workload resources like Deployments, ReplicaSets, and StatefulSets.
+
+**`kind: Deployment`** — Declares the type of resource. A Deployment manages a ReplicaSet, which in turn ensures that the desired number of pod replicas are always running. If a pod crashes or is deleted, the Deployment controller automatically creates a replacement.
+
+**`metadata.name: first-deployment`** — A unique name for this Deployment within the namespace, used to identify and manage it with `kubectl`.
+
+**`spec.replicas: 2`** — Instructs Kubernetes to maintain exactly 2 running instances (pods) of this application at all times.
+
+**`spec.selector.matchLabels`** — Tells the Deployment which pods it owns and is responsible for managing. It selects pods with the label `app: my-container`. This label must match the labels defined in the pod template below.
+
+**`spec.template`** — The pod template: everything under this key defines what each pod will look like when created.
+
+- **`metadata.labels: app: my-container`** — The label applied to each created pod. Must match `spec.selector.matchLabels` so that the Deployment can track its pods.
+- **`spec.containers[0].name: my-container`** — The name of the container within the pod.
+- **`spec.containers[0].image: stensel8/public-cloud-concepts:latest`** — The Docker image to pull from DockerHub and run. This is the image built and pushed by the GitHub Actions workflow.
+- **`spec.containers[0].ports[0].containerPort: 80`** — Declares that the container listens on port 80 (HTTP). This is informational for Kubernetes and required for Services to route traffic to the correct port.
+
+The deployment was applied to the cluster with:
+
+```bash
+kubectl apply -f deployment.yml
+```
 
 **2b — Output of `curl <ip-pod>`:**
 
-```
+```text
 ...
 ```
 
 **2c — Output of `cat /usr/share/nginx/html/index.html`:**
 
-```
+```text
 ...
 ```
