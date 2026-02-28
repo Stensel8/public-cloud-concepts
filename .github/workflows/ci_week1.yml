@@ -28,7 +28,7 @@ jobs:
         run: docker build -t stensel8/public-cloud-concepts:latest "./Week 1/"
 
       - name: Scan image with Trivy
-        uses: aquasecurity/trivy-action@0.30.0
+        uses: aquasecurity/trivy-action@0.34.1
         with:
           image-ref: stensel8/public-cloud-concepts:latest
           format: table
