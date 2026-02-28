@@ -27,7 +27,7 @@ jobs:
     name: Dockerfile lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: "Week 1/Dockerfile"
