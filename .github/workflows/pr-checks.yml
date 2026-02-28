@@ -30,4 +30,4 @@ jobs:
       - uses: actions/checkout@v6
       - uses: hadolint/hadolint-action@v3.3.0
         with:
-          dockerfile: "Week 1/Dockerfile"
+          recursive: true
