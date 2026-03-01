@@ -169,7 +169,6 @@ We use GitHub to automatically create an image when the code (`index.html`) is m
 | [deployment.yml](deployment.yml) | Kubernetes Deployment manifest |
 | [service.yml](service.yml) | Kubernetes Service manifest |
 | [index.html](index.html) | Static HTML page served by the container |
-| [deploymenttemplate.yaml](deploymenttemplate.yaml) | Template for Kubernetes deployments |
 | [Installmastertemplate](Installmastertemplate) | Script template for setting up the Kubernetes master node |
 | [installnode](installnode) | Script for setting up a Kubernetes worker node |
 
@@ -339,23 +338,26 @@ jobs:
     name: Dockerfile lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: hadolint/hadolint-action@v3.1.0
-        with:
-          dockerfile: "Week 1/Dockerfile"
+      - uses: actions/checkout@v6
+      - name: Install hadolint
+        run: |
+          wget -qO /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+          chmod +x /usr/local/bin/hadolint
+      - name: Lint Dockerfile
+        run: hadolint "Week 1/Dockerfile"
 
   build:
     name: Build & scan
     runs-on: ubuntu-latest
     needs: lint
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build Docker image
         run: docker build -t stensel8/public-cloud-concepts:latest "./Week 1/"
 
       - name: Scan image with Trivy
-        uses: aquasecurity/trivy-action@0.30.0
+        uses: aquasecurity/trivy-action@0.34.1
         with:
           image-ref: stensel8/public-cloud-concepts:latest
           format: table
@@ -374,7 +376,7 @@ jobs:
         run: docker push stensel8/public-cloud-concepts:latest
 ```
 
-**Job 1 — `lint`:** Uses [Hadolint](https://github.com/hadolint/hadolint) to statically analyse the Dockerfile for best-practice violations (e.g. missing `--no-install-recommends`, wrong `COPY` ordering). The build job will not start if linting fails.
+**Job 1 — `lint`:** Installs [Hadolint](https://github.com/hadolint/hadolint) directly via `wget` (the `hadolint/hadolint-action` was replaced because it could not handle directory paths containing spaces) and statically analyses the Dockerfile for best-practice violations (e.g. missing `--no-install-recommends`, wrong `COPY` ordering). The build job will not start if linting fails.
 
 **Job 2 — `build`** (runs after `lint`):
 
@@ -434,14 +436,44 @@ The deployment was applied to the cluster with:
 kubectl apply -f deployment.yml
 ```
 
-**2b — Output of `curl <ip-pod>`:**
+**2b — Pod IPs and `curl` output:**
+
+After applying the deployment, both pods came up `Running` across two different regions, demonstrating that Flannel correctly routes pod traffic across GCP regions:
+
+![Both pods Running](screenshots/deployment-pods-running.png)
 
 ```text
-...
+NAME                               READY   STATUS    RESTARTS   AGE   IP           NODE              NOMINATED NODE   READINESS GATES
+first-deployment-5ffbd9444c-5hkzs  1/1     Running   0          88s   10.244.2.2   worker-london     <none>           <none>
+first-deployment-5ffbd9444c-s4xdb  1/1     Running   0          88s   10.244.1.2   worker-brussels   <none>           <none>
 ```
 
-**2c — Output of `cat /usr/share/nginx/html/index.html`:**
+`curl` issued from the master node to the pod on `worker-london` (`10.244.2.2`):
 
-```text
-...
+![curl and kubectl exec output](screenshots/curl-pod-and-exec.png)
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Sten Tijhuis - Public Cloud Concepts</title>
+  <!-- Bootstrap CSS, Google Fonts, icons ... (truncated) -->
+```
+
+The response confirms the nginx container is running and serving the static site from the pod's internal Flannel IP. This IP is only reachable within the cluster — not from a browser on an external machine. External access requires a Kubernetes Service (covered in Week 2).
+
+**2c — Output of `kubectl exec -it <pod> -- cat /usr/share/nginx/html/index.html`:**
+
+Logging into the pod from the master with `kubectl exec` and reading the file directly confirms the `index.html` was correctly placed in the nginx document root by the Dockerfile:
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Sten Tijhuis - Public Cloud Concepts</title>
+  <!-- Bootstrap CSS, Google Fonts, icons ... (truncated) -->
 ```
