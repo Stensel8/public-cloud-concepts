@@ -1,30 +1,34 @@
-# Week 2 — Kubernetes Networking & CI/CD
-
-## Topics
-
-This week you will learn about **Kubernetes Networking**. You create a Kubernetes Cluster in the Google Cloud and learn about the **LoadBalancer** Service type.
+🇳🇱 Nederlands | [🇬🇧 English](README.en.md)
 
 ---
 
-## Learning Goals
+# Week 2 - Kubernetes Networking & CI/CD
 
-- [ ] Analyze the Software Development Life Cycle (SDLC)
-- [ ] Explore DevOps strategies for automation
-- [ ] Connecting a source code repository and building applications from Artifact Repositories
-- [ ] Setting up CI/CD for a DTAP environment
-- [ ] How to use Kubernetes in the Cloud (GKE)
-- [ ] Using Cloud Shell and `kubectl` to interact with Kubernetes clusters
-- [ ] Knowing networking in Kubernetes
+## Onderwerpen
+
+Deze week gaat het over **Kubernetes Networking**. We maken een Kubernetes Cluster in Google Cloud en leren hoe het **LoadBalancer** Service-type werkt.
 
 ---
 
-## Learning Materials
+## Leerdoelen
+
+- [ ] Het Software Development Life Cycle (SDLC) analyseren
+- [ ] DevOps-strategieen voor automatisering verkennen
+- [ ] Een broncode-repository koppelen en applicaties bouwen vanuit Artifact Repositories
+- [ ] CI/CD inrichten voor een DTAP-omgeving
+- [ ] Kubernetes gebruiken in de cloud (GKE)
+- [ ] Cloud Shell en `kubectl` gebruiken om met Kubernetes-clusters te werken
+- [ ] Networking in Kubernetes begrijpen
+
+---
+
+## Leermaterialen
 
 ### DevOps & CI/CD
 
 | Resource | Link |
 |---|---|
-| AWS Whitepaper — Practicing Continuous Integration and Continuous Delivery on AWS | [docs.aws.amazon.com (PDF)](https://docs.aws.amazon.com/whitepapers/latest/practicing-continuous-integration-continuous-delivery/welcome.html) |
+| AWS Whitepaper - Practicing Continuous Integration and Continuous Delivery on AWS | [docs.aws.amazon.com (PDF)](https://docs.aws.amazon.com/whitepapers/latest/practicing-continuous-integration-continuous-delivery/welcome.html) |
 | 2023 Accelerate State of DevOps Report | [cloud.google.com](https://cloud.google.com/blog/products/devops-sre/announcing-the-2023-state-of-devops-report) |
 | DORA's Research Program | [dora.dev](https://dora.dev/research/) |
 
@@ -32,40 +36,40 @@ This week you will learn about **Kubernetes Networking**. You create a Kubernete
 
 | Resource | Link |
 |---|---|
-| Google Kubernetes Engine documentation | [cloud.google.com](https://cloud.google.com/kubernetes-engine/docs/#training-and-tutorials) |
+| Google Kubernetes Engine documentatie | [cloud.google.com](https://cloud.google.com/kubernetes-engine/docs/#training-and-tutorials) |
 | Getting Started with Kubernetes Engine | [github.com/GoogleCloudPlatform](https://github.com/GoogleCloudPlatform/qwiklabs-training-content/blob/master/labs/GCPFUND-Kubernetes/instructions/en.md) |
-| Kubernetes Engine — Qwik Start (GSP100) | [cloudskillsboost.google](https://www.cloudskillsboost.google/catalog_lab/911?qlcampaign=77-18-gcpd-236&utm_source=gcp&utm_medium=documentation&utm_campaign=kubernetes) |
+| Kubernetes Engine - Qwik Start (GSP100) | [cloudskillsboost.google](https://www.cloudskillsboost.google/catalog_lab/911?qlcampaign=77-18-gcpd-236&utm_source=gcp&utm_medium=documentation&utm_campaign=kubernetes) |
 
 ---
 
-## Course Documents
+## Cursusdocumenten
 
 | Document | Omschrijving |
 |---|---|
-| [Slides week 2 — Kubernetes Networking](Les%202%20Kubernetes%20networking%20ENG.pdf) | Theorie over Kubernetes networking |
-| [Assignments week 2 v2](PCC/Assignments%20week%202%20v2.docx) | Opdrachten voor week 2 |
+| [Slides week 2 - Kubernetes Networking](Les%202%20Kubernetes%20networking%20ENG.pdf) | Theorie over Kubernetes networking |
+| [Opdrachten week 2 v2](PCC/Assignments%20week%202%20v2.docx) | Opdrachten voor week 2 |
 
 ---
 
-## Files in This Directory
+## Bestanden in Deze Map
 
-| File / Folder | Description |
+| Bestand / Map | Beschrijving |
 |---|---|
-| [ingress.yml](ingress.yml) | Kubernetes Ingress manifest for routing external traffic |
-| [bison/](bison/) | Deployment and service manifests for the Bison application |
-| [brightspace/](brightspace/) | Deployment and service manifests for the Brightspace application |
-| [PCC/](PCC/) | Additional project files and assignments |
+| [ingress.yml](ingress.yml) | Kubernetes Ingress manifest voor het routeren van extern verkeer |
+| [bison/](bison/) | Deployment- en service-manifesten voor de Bison-applicatie |
+| [brightspace/](brightspace/) | Deployment- en service-manifesten voor de Brightspace-applicatie |
+| [PCC/](PCC/) | Extra projectbestanden en opdrachten |
 
 ---
 
-# My Work
+# Mijn Werk
 
-## CI/CD — Docker Hub Tags
+## CI/CD - Docker Hub Tags
 
-The GitHub Actions workflow ([ci_week2.yml](../.github/workflows/ci_week2.yml)) builds and pushes two images to the existing `stensel8/public-cloud-concepts` DockerHub repository using separate tags:
+De GitHub Actions workflow ([ci_week2.yml](../.github/workflows/ci_week2.yml)) bouwt twee images en pusht ze naar de bestaande `stensel8/public-cloud-concepts` DockerHub-repository met aparte tags:
 
-| Image | Tag | Pull command |
-|-------|-----|--------------|
+| Image | Tag | Pull commando |
+|-------|-----|---------------|
 | Bison app | `bison` | `docker pull stensel8/public-cloud-concepts:bison` |
 | Brightspace app | `brightspace` | `docker pull stensel8/public-cloud-concepts:brightspace` |
 
@@ -73,13 +77,13 @@ The GitHub Actions workflow ([ci_week2.yml](../.github/workflows/ci_week2.yml)) 
 
 ---
 
-## 2.2 Kubernetes Challenge (part 2)
+## 2.2 Kubernetes Uitdaging (deel 2)
 
-### Assignment 2.2a — Deployment up and running
+### Opdracht 2.2a - Deployment draait
 
-The Week 1 deployment (`first-deployment`) is confirmed running on the kubeadm cluster with both pods active across two regions:
+De Week 1 deployment (`first-deployment`) draait op het kubeadm-cluster met beide pods actief in twee regio's:
 
-![Deployment running — all nodes Ready, pods Running with IPs](screenshots/2-2a-deployment-running.png)
+![Deployment running - alle nodes Ready, pods Running met IPs](screenshots/2-2a-deployment-running.png)
 
 ```
 NAME               STATUS   ROLES           AGE   VERSION
@@ -94,27 +98,27 @@ first-deployment-5ffbd9444c-s4xdb   1/1     Running   1 (105s ago)  10.244.1.3  
 
 ---
 
-### Assignment 2.2b — Pod deletion and recreation
+### Opdracht 2.2b - Pod verwijderen en opnieuw aanmaken
 
-A pod was deleted while the Deployment remained active. Kubernetes automatically created a replacement pod with a **different IP address**, demonstrating that pod IPs are ephemeral and not stable identifiers.
+Een pod werd verwijderd terwijl de Deployment actief bleef. Kubernetes maakte automatisch een vervangende pod aan met een **ander IP-adres**, wat aantoont dat pod-IPs tijdelijk zijn en geen stabiele identifiers.
 
-![Pod deleted — new pod created with different IP](screenshots/2-2b-pod-delete-new-ip.png)
+![Pod verwijderd - nieuwe pod aangemaakt met ander IP](screenshots/2-2b-pod-delete-new-ip.png)
 
 ```
-# Before delete:
+# Voor verwijdering:
 first-deployment-5ffbd9444c-5hkzs   IP: 10.244.2.3   worker-london
 
-# After delete — new pod:
+# Na verwijdering - nieuwe pod:
 first-deployment-5ffbd9444c-pdrw0   IP: 10.244.2.4   worker-london
 ```
 
-The IP changed from `10.244.2.3` to `10.244.2.4`. This is exactly why a Service is needed: pods are disposable and their IPs change. A Service provides a stable virtual IP that always routes to the healthy pods behind it, regardless of pod restarts.
+Het IP veranderde van `10.244.2.3` naar `10.244.2.4`. Dit is precies waarom je een Service nodig hebt: pods zijn wegwerpbaar en hun IPs veranderen. Een Service geeft een stabiel virtueel IP dat altijd naar de actieve pods routeert, ongeacht herstarts.
 
 ---
 
-### Assignment 2.2c — ClusterIP Service
+### Opdracht 2.2c - ClusterIP Service
 
-A Service of type `ClusterIP` was created for the deployment:
+Er is een Service van het type `ClusterIP` aangemaakt voor de deployment:
 
 ```yaml
 apiVersion: v1
@@ -130,135 +134,135 @@ spec:
       targetPort: 80
 ```
 
-![ClusterIP service created with stable virtual IP](screenshots/2-2c-clusterip-service.png)
+![ClusterIP service aangemaakt met stabiel virtueel IP](screenshots/2-2c-clusterip-service.png)
 
 ```
 NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
 first-service   ClusterIP   10.110.23.98    <none>        80/TCP    0s
 ```
 
-The ClusterIP `10.110.23.98` is a stable virtual IP managed by `kube-proxy`. It is only reachable from within the cluster — not from outside. Traffic sent to this IP is load-balanced across all pods matching the selector `app: my-container`.
+Het ClusterIP `10.110.23.98` is een stabiel virtueel IP dat door `kube-proxy` wordt beheerd. Het is alleen bereikbaar vanuit het cluster, niet van buiten. Verkeer naar dit IP wordt load-balanced over alle pods die overeenkomen met de selector `app: my-container`.
 
 ---
 
-### Assignment 2.2d — ClusterIP reachable from every node
+### Opdracht 2.2d - ClusterIP bereikbaar vanaf elke node
 
-The ClusterIP was tested from all three nodes in the cluster. All nodes returned the HTML response, confirming that `kube-proxy` correctly routes traffic to the pods regardless of which node sends the request.
+Het ClusterIP is getest vanaf alle drie de nodes. Alle nodes gaven de HTML-respons terug, wat bevestigt dat `kube-proxy` verkeer correct routeert ongeacht welke node het verzoek verstuurt.
 
-**From master-amsterdam (`10.164.0.14`):**
+**Vanaf master-amsterdam (`10.164.0.14`):**
 
-![curl via ClusterIP from master](screenshots/2-2d-curl-from-master.png)
+![curl via ClusterIP vanaf master](screenshots/2-2d-curl-from-master.png)
 
-**From worker-brussels (`10.132.0.5`):**
+**Vanaf worker-brussels (`10.132.0.5`):**
 
-![curl via ClusterIP from worker-brussels](screenshots/2-2d-curl-from-worker-brussels.png)
+![curl via ClusterIP vanaf worker-brussels](screenshots/2-2d-curl-from-worker-brussels.png)
 
-**From worker-london (`10.154.0.5`):**
+**Vanaf worker-london (`10.154.0.5`):**
 
-![curl via ClusterIP from worker-london](screenshots/2-2d-curl-from-worker-london.png)
+![curl via ClusterIP vanaf worker-london](screenshots/2-2d-curl-from-worker-london.png)
 
-All three nodes reached the application via `curl 10.110.23.98`, proving the ClusterIP is accessible cluster-wide.
+Alle drie nodes bereikten de applicatie via `curl 10.110.23.98`, wat bewijst dat het ClusterIP clusterbreed bereikbaar is.
 
 ---
 
-### Assignment 2.2e — NodePort Service
+### Opdracht 2.2e - NodePort Service
 
-The service was updated to type `NodePort`. Kubernetes assigned port `32490` on every node:
+De service is bijgewerkt naar type `NodePort`. Kubernetes wees poort `32490` toe op elke node:
 
-![NodePort service — port 80:32490/TCP](screenshots/2-2e-nodeport-service.png)
+![NodePort service - poort 80:32490/TCP](screenshots/2-2e-nodeport-service.png)
 
 ```
 NAME            TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
 first-service   NodePort   10.110.23.98    <none>        80:32490/TCP   8m39s
 ```
 
-**Node internal IPs:**
+**Interne IPs van de nodes:**
 
-![kubectl get nodes -o wide — internal IPs](screenshots/2-2e-nodes-internal-ips.png)
+![kubectl get nodes -o wide - interne IPs](screenshots/2-2e-nodes-internal-ips.png)
 
-| Node | Internal IP |
-|------|-------------|
+| Node | Intern IP |
+|------|-----------|
 | master-amsterdam | 10.164.0.14 |
 | worker-brussels | 10.132.0.5 |
 | worker-london | 10.154.0.5 |
 
-**Internal curl test via NodePort:**
+**Interne curl-test via NodePort:**
 
-The application was reached from inside the cluster using the node's internal IP and NodePort `32490`:
+De applicatie is bereikt vanuit het cluster via het interne IP van de node en NodePort `32490`:
 
-![curl via NodePort on internal node IPs](screenshots/2-2e-nodeport-curl-internal.png)
+![curl via NodePort op interne node-IPs](screenshots/2-2e-nodeport-curl-internal.png)
 
 ```bash
-curl 10.132.0.5:32490   # worker-brussels → HTML response ✓
-curl 10.154.0.5:32490   # worker-london   → HTML response ✓
+curl 10.132.0.5:32490   # worker-brussels -> HTML response
+curl 10.154.0.5:32490   # worker-london   -> HTML response
 ```
 
-**External access — before firewall rule:**
+**Externe toegang - voor de firewallregel:**
 
-Attempting to reach the application via the external IP (`34.140.10.158`) on port `32490` from a browser failed — the GCP firewall blocked the traffic:
+Proberen de applicatie te bereiken via het externe IP (`34.140.10.158`) op poort `32490` vanuit een browser mislukte. De GCP-firewall blokkeerde het verkeer:
 
-![Browser blocked before firewall rule](screenshots/2-2e-browser-blocked-no-firewall.png)
+![Browser geblokkeerd voor de firewallregel](screenshots/2-2e-browser-blocked-no-firewall.png)
 
-**Creating the firewall rule in GCP:**
+**Firewallregel aanmaken in GCP:**
 
-A firewall rule was created in **VPC Network → Firewall** to allow inbound TCP traffic on port `32490` for all instances in the network:
+In **VPC Network -> Firewall** is een firewallregel aangemaakt om inkomend TCP-verkeer op poort `32490` toe te staan voor alle instanties in het netwerk:
 
-![Creating firewall rule in GCP console](screenshots/2-2e-firewall-rule-created.png)
+![Firewallregel aanmaken in GCP console](screenshots/2-2e-firewall-rule-created.png)
 
-**External access — after firewall rule:**
+**Externe toegang - na de firewallregel:**
 
-After applying the firewall rule, the application is reachable from a browser via `http://34.160.10.158:32490`:
+Na het toepassen van de firewallregel is de applicatie bereikbaar via een browser op `http://34.160.10.158:32490`:
 
-![Website accessible from browser via external IP and NodePort](screenshots/2-2e-browser-working-after-firewall.png)
+![Website bereikbaar via extern IP en NodePort](screenshots/2-2e-browser-working-after-firewall.png)
 
-This confirms the full NodePort flow: external traffic → node external IP → port 32490 → `kube-proxy` → ClusterIP → pods.
+Dit bevestigt de volledige NodePort-flow: extern verkeer -> extern node-IP -> poort 32490 -> `kube-proxy` -> ClusterIP -> pods.
 
 ---
 
-### Assignment 2.2f — LoadBalancer on the kubeadm cluster
+### Opdracht 2.2f - LoadBalancer op het kubeadm-cluster
 
-The service was updated to type `LoadBalancer`:
+De service is bijgewerkt naar type `LoadBalancer`:
 
-![LoadBalancer service created — EXTERNAL-IP pending](screenshots/2-2f-loadbalancer-service-created.png)
+![LoadBalancer service aangemaakt - EXTERNAL-IP pending](screenshots/2-2f-loadbalancer-service-created.png)
 
 ```
 NAME            TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
 first-service   LoadBalancer   10.110.23.98   <pending>     80:32490/TCP   26m
 ```
 
-The `EXTERNAL-IP` column stays at `<pending>` indefinitely, regardless of how many times `kubectl get service` is run:
+De `EXTERNAL-IP` blijft `<pending>`, ongeacht hoe vaak `kubectl get service` wordt uitgevoerd:
 
-![LoadBalancer keeps showing pending after multiple checks](screenshots/2-2f-loadbalancer-pending.png)
+![LoadBalancer blijft pending na meerdere checks](screenshots/2-2f-loadbalancer-pending.png)
 
-**Why does it stay pending?**
+**Waarom blijft het pending?**
 
-A `LoadBalancer` service works by asking the **cloud controller manager** to provision an external load balancer on the underlying cloud platform and assign it a public IP. On a self-managed kubeadm cluster running on plain GCP VMs, there is no cloud controller manager — Kubernetes has no knowledge of or integration with the GCP API. There is no component that can request a load balancer on Kubernetes' behalf, so the external IP is never assigned and the service remains `<pending>` forever.
+Een `LoadBalancer` service werkt door de **cloud controller manager** te vragen een externe load balancer te provisionen op het onderliggende cloudplatform en er een publiek IP aan toe te wijzen. Op een zelfbeheerd kubeadm-cluster op gewone GCP-VMs is er geen cloud controller manager aanwezig. Kubernetes heeft geen kennis van of integratie met de GCP-API. Er is geen component dat namens Kubernetes een load balancer kan aanvragen, dus het externe IP wordt nooit toegewezen en de service blijft `<pending>`.
 
-This is the fundamental difference with managed Kubernetes services like **GKE**: GKE includes the GCP cloud controller manager, which automatically provisions a Google Cloud Load Balancer and assigns a real external IP whenever a `LoadBalancer` service is created.
+Dit is het grote verschil met managed Kubernetes-diensten zoals **GKE**: GKE heeft de GCP cloud controller manager ingebouwd, die automatisch een Google Cloud Load Balancer provisioneert en een echt extern IP toewijst zodra je een `LoadBalancer` service aanmaakt.
 
 ---
 
-### Assignment 2.2g — LoadBalancer on GKE (real external IP)
+### Opdracht 2.2g - LoadBalancer op GKE (echt extern IP)
 
-#### Creating the GKE cluster
+#### GKE-cluster aanmaken
 
-A new GKE cluster `week2-cluster` was created via the GCP Console (Kubernetes Engine → Create cluster).
+Een nieuw GKE-cluster `week2-cluster` is aangemaakt via de GCP Console (Kubernetes Engine -> Create cluster).
 
-**Cluster basics** — name `week2-cluster`, zone `europe-west4-a`, Standard mode, Regular release channel:
+**Cluster basics** - naam `week2-cluster`, zone `europe-west4-a`, Standard mode, Regular release channel:
 
-![GKE cluster creation — cluster basics](screenshots/2-2g-gke-cluster-create-basics.png)
+![GKE cluster aanmaken - cluster basics](screenshots/2-2g-gke-cluster-create-basics.png)
 
-**Node pool — machine type** — `e2-medium` (2 vCPU, 4 GB memory), Standard persistent disk, 100 GB boot disk:
+**Node pool - machine type** - `e2-medium` (2 vCPU, 4 GB geheugen), Standard persistent disk, 100 GB boot disk:
 
-![GKE node pool — e2-medium machine type selected](screenshots/2-2g-gke-cluster-node-machine-type.png)
+![GKE node pool - e2-medium machine type geselecteerd](screenshots/2-2g-gke-cluster-node-machine-type.png)
 
-**Node pool — details** — pool name `default-pool`, 2 nodes, control plane version `1.34.3-gke.1318000`, zone `europe-west4-a`:
+**Node pool - details** - pool naam `default-pool`, 2 nodes, control plane versie `1.34.3-gke.1318000`, zone `europe-west4-a`:
 
-![GKE node pool details — 2 nodes, europe-west4-a](screenshots/2-2g-gke-cluster-node-pool-details.png)
+![GKE node pool details - 2 nodes, europe-west4-a](screenshots/2-2g-gke-cluster-node-pool-details.png)
 
-After clicking Create, the cluster entered the provisioning phase:
+Na het klikken op Create ging het cluster in de provisioningfase:
 
-![GKE week2-cluster provisioning at 33%](screenshots/2-2g-gke-cluster-provisioning.png)
+![GKE week2-cluster provisioning op 33%](screenshots/2-2g-gke-cluster-provisioning.png)
 
 ```
 Status: Provisioning   Mode: Standard   Nodes: 2   Zone: europe-west4-a
@@ -266,37 +270,37 @@ Status: Provisioning   Mode: Standard   Nodes: 2   Zone: europe-west4-a
 
 ---
 
-#### Setting up kubectl for GKE (CachyOS / Arch Linux)
+#### kubectl instellen voor GKE (CachyOS / Arch Linux)
 
-Before deploying to GKE, the local `kubectl` must be connected to the GKE cluster. The `gcloud` CLI was not yet installed, so the following steps were taken:
+Voordat je naar GKE kunt deployen, moet lokale `kubectl` verbonden worden met het GKE-cluster. De `gcloud` CLI was nog niet geinstalleerd, dus de volgende stappen zijn uitgevoerd:
 
-**1. Install gcloud CLI via AUR:**
+**1. gcloud CLI installeren via AUR:**
 ```bash
 paru -S google-cloud-cli
 paru -S google-cloud-cli-component-gke-gcloud-auth-plugin
 ```
 
-**2. Authenticate with Google:**
+**2. Inloggen bij Google:**
 ```bash
 gcloud auth login
 ```
 
-**3. Set the project:**
+**3. Project instellen:**
 ```bash
 gcloud config set project project-5b8c5498-4fe2-42b9-bc3
 ```
 
-**4. Fetch cluster credentials:**
+**4. Cluster-credentials ophalen:**
 ```bash
 gcloud container clusters get-credentials week2-cluster --zone europe-west4-a
 ```
 
-**5. Verify kubectl is connected:**
+**5. kubectl-verbinding controleren:**
 ```bash
 kubectl get nodes
 ```
 
-![GKE cluster connected — two nodes Ready](screenshots/2-2g-gke-kubectl-connected.png)
+![GKE cluster verbonden - twee nodes Ready](screenshots/2-2g-gke-kubectl-connected.png)
 
 ```
 NAME                                           STATUS   ROLES    AGE    VERSION
@@ -304,20 +308,20 @@ gke-week2-cluster-default-pool-64557d8d-5zc7   Ready    <none>   5m     v1.34.3-
 gke-week2-cluster-default-pool-64557d8d-qgcc   Ready    <none>   5m1s   v1.34.3-gke.1318000
 ```
 
-Both GKE nodes are `Ready`. Unlike the self-managed kubeadm cluster, GKE includes the Google Cloud controller manager, which means a `LoadBalancer` service will receive a real external IP automatically.
+Beide GKE-nodes zijn `Ready`. In tegenstelling tot het zelfbeheerde kubeadm-cluster heeft GKE de Google Cloud controller manager ingebouwd, waardoor een `LoadBalancer` service automatisch een echt extern IP krijgt.
 
-#### Deploying to GKE
+#### Deployen naar GKE
 
-The Week 1 deployment and LoadBalancer service were applied to the GKE cluster:
+De Week 1 deployment en LoadBalancer service zijn toegepast op het GKE-cluster:
 
 ```bash
 kubectl apply -f "Week 1/deployment.yml"
 kubectl apply -f "Week 1/service.yml"
 ```
 
-Then the external IP was watched with repeated `kubectl get service first-service` calls:
+Daarna is het externe IP gevolgd met herhaalde `kubectl get service first-service` aanroepen:
 
-![LoadBalancer on GKE — external IP assigned after ~44 seconds](screenshots/2-2g-gke-loadbalancer-external-ip.png)
+![LoadBalancer op GKE - extern IP toegewezen na ~44 seconden](screenshots/2-2g-gke-loadbalancer-external-ip.png)
 
 ```
 NAME            TYPE           CLUSTER-IP       EXTERNAL-IP     PORT(S)        AGE
@@ -326,51 +330,51 @@ first-service   LoadBalancer   34.118.232.196   <pending>       80:31275/TCP   1
 first-service   LoadBalancer   34.118.232.196   34.12.127.52    80:31275/TCP   44s
 ```
 
-Within ~44 seconds, GKE provisioned a **Google Cloud Load Balancer** and assigned the real external IP `34.12.127.52`. This is the key difference with the self-managed kubeadm cluster where the external IP remained `<pending>` forever — GKE's cloud controller manager handles the provisioning automatically.
+Na ~44 seconden had GKE een **Google Cloud Load Balancer** geprovisioneert en het echte externe IP `34.12.127.52` toegewezen. Dit is het kernverschil met het zelfbeheerde kubeadm-cluster waar het externe IP permanent `<pending>` bleef. De cloud controller manager van GKE regelt de provisioning automatisch.
 
-**Browser test:**
+**Browser-test:**
 
-Navigating to `http://34.12.127.52` in the browser confirms the application is publicly accessible via the GKE LoadBalancer:
+Navigeren naar `http://34.12.127.52` in de browser bevestigt dat de applicatie publiek bereikbaar is via de GKE LoadBalancer:
 
-![Website accessible via GKE LoadBalancer external IP](screenshots/2-2g-gke-browser-working.png)
+![Website bereikbaar via GKE LoadBalancer extern IP](screenshots/2-2g-gke-browser-working.png)
 
-The full LoadBalancer flow on GKE: browser → Google Cloud Load Balancer (`34.12.127.52`) → GKE node → `kube-proxy` → ClusterIP → pods.
+De volledige LoadBalancer-flow op GKE: browser -> Google Cloud Load Balancer (`34.12.127.52`) -> GKE node -> `kube-proxy` -> ClusterIP -> pods.
 
 ---
 
-### Assignment 2.2h — Ingress: multiple services via one load balancer
+### Opdracht 2.2h - Ingress: meerdere services via een load balancer
 
-With a LoadBalancer service, every application needs its own external IP and load balancer. An **Ingress** solves this: one load balancer routes traffic to multiple services based on the hostname.
+Met een LoadBalancer service heeft elke applicatie zijn eigen externe IP en load balancer nodig. Een **Ingress** lost dit op: een load balancer routeert verkeer naar meerdere services op basis van de hostnaam.
 
-The goal is to expose two apps via a single Ingress:
+Het doel is twee apps beschikbaar stellen via een enkele Ingress:
 
-| Hostname | Backend service |
+| Hostnaam | Backend service |
 |---|---|
-| `bison.mysaxion.nl` | `bison-service` (port 80) |
-| `brightspace.mysaxion.nl` | `brightspace-service` (port 80) |
+| `bison.mysaxion.nl` | `bison-service` (poort 80) |
+| `brightspace.mysaxion.nl` | `brightspace-service` (poort 80) |
 
-#### Step 1 — Install the nginx Ingress Controller
+#### Stap 1 - nginx Ingress Controller installeren
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.0/deploy/static/provider/cloud/deploy.yaml
 ```
 
-![nginx Ingress Controller installed — all resources created](screenshots/2-2h-nginx-ingress-controller-installed.png)
+![nginx Ingress Controller geinstalleerd - alle resources aangemaakt](screenshots/2-2h-nginx-ingress-controller-installed.png)
 
-GKE automatically provisions a Google Cloud Load Balancer for the Ingress Controller. The external IP was watched until it appeared:
+GKE provisioneert automatisch een Google Cloud Load Balancer voor de Ingress Controller. Het externe IP is gevolgd totdat het verscheen:
 
 ```bash
 kubectl get service ingress-nginx-controller -n ingress-nginx
 ```
 
-![nginx Ingress Controller — external IP 34.91.190.135 assigned](screenshots/2-2h-nginx-ingress-controller-external-ip.png)
+![nginx Ingress Controller - extern IP 34.91.190.135 toegewezen](screenshots/2-2h-nginx-ingress-controller-external-ip.png)
 
 ```
 NAME                       TYPE           CLUSTER-IP       EXTERNAL-IP      PORT(S)                      AGE
 ingress-nginx-controller   LoadBalancer   34.118.239.245   34.91.190.135    80:32659/TCP,443:31681/TCP   53s
 ```
 
-#### Step 2 — Deploy bison, brightspace and the Ingress
+#### Stap 2 - bison, brightspace en de Ingress deployen
 
 ```bash
 kubectl apply -f "Week 2/bison/deployment.yml"
@@ -380,7 +384,7 @@ kubectl apply -f "Week 2/brightspace/service.yml"
 kubectl apply -f "Week 2/ingress.yml"
 ```
 
-![All deployments, services and Ingress created](screenshots/2-2h-deployments-services-ingress-applied.png)
+![Alle deployments, services en Ingress aangemaakt](screenshots/2-2h-deployments-services-ingress-applied.png)
 
 ```
 deployment.apps/bison-deployment created
@@ -390,45 +394,45 @@ service/brightspace-service created
 ingress.networking.k8s.io/ingress-saxion created
 ```
 
-#### Step 3 — Verify the Ingress
+#### Stap 3 - Ingress controleren
 
 ```bash
 kubectl get ingress ingress-saxion
 ```
 
-![Ingress saxion — address 34.91.190.135, both hosts registered](screenshots/2-2h-ingress-saxion-address.png)
+![Ingress saxion - adres 34.91.190.135, beide hosts geregistreerd](screenshots/2-2h-ingress-saxion-address.png)
 
 ```
 NAME             CLASS   HOSTS                                        ADDRESS          PORTS   AGE
 ingress-saxion   nginx   bison.mysaxion.nl,brightspace.mysaxion.nl   34.91.190.135    80      25s
 ```
 
-The Ingress has a single address (`34.91.190.135`) routing to both hostnames.
+De Ingress heeft een enkel adres (`34.91.190.135`) dat naar beide hostnamen routeert.
 
-#### Step 4 — Update /etc/hosts
+#### Stap 4 - /etc/hosts bijwerken
 
-Since `bison.mysaxion.nl` and `brightspace.mysaxion.nl` are not real DNS records, they must be resolved locally via `/etc/hosts`:
+Omdat `bison.mysaxion.nl` en `brightspace.mysaxion.nl` geen echte DNS-records zijn, moeten ze lokaal worden opgelost via `/etc/hosts`:
 
 ```bash
 echo "34.91.190.135  bison.mysaxion.nl brightspace.mysaxion.nl" | sudo tee -a /etc/hosts
 ```
 
-![/etc/hosts updated with both hostnames pointing to the Ingress IP](screenshots/2-2h-hosts-file-updated.png)
+![/etc/hosts bijgewerkt met beide hostnamen die naar het Ingress-IP wijzen](screenshots/2-2h-hosts-file-updated.png)
 
-#### Step 5 — Browser test
+#### Stap 5 - Browser-test
 
-Both hostnames now resolve to the Ingress Controller, which routes based on the `Host` header to the correct backend.
+Beide hostnamen worden nu omgezet naar de Ingress Controller, die op basis van de `Host`-header naar de juiste backend routeert.
 
 **bison.mysaxion.nl:**
 
-![bison.mysaxion.nl — Bison application accessible via Ingress](screenshots/2-2h-browser-bison.png)
+![bison.mysaxion.nl - Bison-applicatie bereikbaar via Ingress](screenshots/2-2h-browser-bison.png)
 
 **brightspace.mysaxion.nl:**
 
-![brightspace.mysaxion.nl — Brightspace application accessible via Ingress](screenshots/2-2h-browser-brightspace.png)
+![brightspace.mysaxion.nl - Brightspace-applicatie bereikbaar via Ingress](screenshots/2-2h-browser-brightspace.png)
 
-**Why Ingress?**
+**Waarom Ingress?**
 
-Without Ingress, two separate `LoadBalancer` services would be needed — each provisioning its own Google Cloud Load Balancer and external IP, which costs money and is harder to manage. The Ingress pattern uses a **single load balancer** (`34.91.190.135`) that routes traffic to the correct service based on the `Host` HTTP header. This is the standard way to expose multiple applications in Kubernetes.
+Zonder Ingress zou je twee aparte `LoadBalancer` services nodig hebben, elk met hun eigen Google Cloud Load Balancer en extern IP. Dat kost extra geld en is lastiger te beheren. Met het Ingress-patroon gebruik je een **enkele load balancer** (`34.91.190.135`) die verkeer naar de juiste service stuurt op basis van de `Host` HTTP-header. Dit is de standaardmanier om meerdere applicaties in Kubernetes beschikbaar te stellen.
 
-The full Ingress flow: browser → `34.91.190.135` (Google Cloud LB) → nginx Ingress Controller pod → `bison-service` or `brightspace-service` (ClusterIP) → application pods.
+De volledige Ingress-flow: browser -> `34.91.190.135` (Google Cloud LB) -> nginx Ingress Controller pod -> `bison-service` of `brightspace-service` (ClusterIP) -> applicatiepods.

@@ -1,92 +1,96 @@
-# Week 1 — Introduction to Google Cloud & Kubernetes
+🇳🇱 Nederlands | [🇬🇧 English](README.en.md)
 
 ---
 
-# Assignments
+# Week 1 - Introductie tot Google Cloud & Kubernetes
+
+---
+
+# Opdrachten
 
 ## 1.1 Google Cloud & Google Kubernetes Engine (GKE)
 
-This week you will be introduced to the Google Cloud Platform. We will learn the basic concepts of the Google Cloud and the most important Google services.
+Deze week maak je kennis met het Google Cloud Platform. We leren de basisconcepten van Google Cloud en de belangrijkste Google-services.
 
-If you've already a basic understanding of Public Cloud Concepts then you may skip the first two basic courses.
+Als je al een basiskennis hebt van Public Cloud Concepts, kun je de eerste twee basiscursussen overslaan.
 
-- Complete the course **Essential Google Cloud Infrastructure: Core Infrastructure**
+- Voltooi de cursus **Essential Google Cloud Infrastructure: Core Infrastructure**
   https://www.cloudskillsboost.google/course_templates/60
 
-- Complete the course **Essential Google Cloud Infrastructure: Core Services**
+- Voltooi de cursus **Essential Google Cloud Infrastructure: Core Services**
   https://www.cloudskillsboost.google/course_templates/49
 
-Now you've a basic understanding of the Google Cloud, let's jump into Google Kubernetes Engine (GKE).
+Nu je een basiskennis hebt van Google Cloud, gaan we aan de slag met Google Kubernetes Engine (GKE).
 
-- Complete the course **Getting Started with Google Kubernetes Engine**, incl. labs (12 credits):
+- Voltooi de cursus **Getting Started with Google Kubernetes Engine**, incl. labs (12 credits):
   https://www.cloudskillsboost.google/paths/11/course_templates/2
 
-You need to add the Proof of Completion (Course Badge) badges to your portfolio.
+Voeg de Proof of Completion (Course Badge) badges toe aan je portfolio.
 
 ---
 
-## 1.2 Kubernetes Challenge
+## 1.2 Kubernetes Uitdaging
 
-To complete the first week's assignment, we want to apply the knowledge of Kubernetes and gain more in-depth knowledge of Kubernetes.
+Om de eerste weekopdracht af te ronden, willen we de opgedane Kubernetes-kennis toepassen en verder verdiepen.
 
-We need a Kubernetes cluster for that. We are therefore going to install a full cluster on **Ubuntu minimal 24.04 LTS** instances (1 masternode and 2 workernodes) with `kubeadm`.
+Daarvoor hebben we een Kubernetes-cluster nodig. We gaan een volledig cluster installeren op **Ubuntu minimal 24.04 LTS**-instanties (1 masternode en 2 workernodes) met `kubeadm`.
 
-Also study the relevant topics from the ebook *Production Kubernetes* (see Brightspace).
+Bestudeer ook de relevante hoofdstukken uit het e-book *Production Kubernetes* (zie Brightspace).
 
-### Assignment 1 — Installing the Kubernetes Cluster
+### Opdracht 1 - Het Kubernetes Cluster Installeren
 
-**Prerequisites (per node):**
+**Vereisten (per node):**
 
-- An Ubuntu 24.04 LTS minimal system
-- Privileged access to the system (root or sudo user)
-- Active internet connection
-- Minimum 4 GB RAM
-- Minimum 2 CPU cores (or 2 vCPUs)
-- 20 GB of free disk space on `/var` (or more)
+- Een Ubuntu 24.04 LTS minimal systeem
+- Beheerderstoegang (root of sudo)
+- Actieve internetverbinding
+- Minimaal 4 GB RAM
+- Minimaal 2 CPU-kernen (of 2 vCPUs)
+- 20 GB vrije schijfruimte op `/var` (of meer)
 
-1. Create three Ubuntu 24.04 LTS minimal instances in Google Cloud (type `e2-standard-2`). To see that a virtual network in Google directly connects multiple regions, place:
-   - the **master** in the Netherlands
-   - a **node** in Brussels
-   - a **node** in London
+1. Maak drie Ubuntu 24.04 LTS minimal-instanties aan in Google Cloud (type `e2-standard-2`). Plaats ze in verschillende regio's om te zien hoe Google's netwerk meerdere regio's direct verbindt:
+   - de **master** in Nederland
+   - een **node** in Brussel
+   - een **node** in Londen
 
-   Install a Kubernetes master and 2 Kubernetes workernodes.
-   A good guide: https://hbayraktar.medium.com/how-to-install-kubernetes-cluster-on-ubuntu-22-04-step-by-step-guide-7dbf7e8f5f99
+   Installeer een Kubernetes master en 2 Kubernetes workernodes.
+   Handige handleiding: https://hbayraktar.medium.com/how-to-install-kubernetes-cluster-on-ubuntu-22-04-step-by-step-guide-7dbf7e8f5f99
 
-   > **Do use the Flannel CNI** — otherwise the communication between pods on different nodes may not work.
+   > **Gebruik de Flannel CNI**, anders werkt de communicatie tussen pods op verschillende nodes mogelijk niet.
 
-   The bash scripts `Installmastertemplate` and `installnode` are provided (see files in this directory). `Installmastertemplate` still needs to be modified (uncomment the correct lines as indicated at the top of the file) and then run on the master. `installnode` must be executed on the nodes.
+   De bash-scripts `Installmastertemplate` en `installnode` zijn beschikbaar (zie bestanden in deze map). Pas `Installmastertemplate` aan (verwijder commentaar van de juiste regels bovenaan het bestand) en voer het uit op de master. `installnode` voer je uit op de workernodes.
 
-   After this, the nodes must be added to the cluster with the command visible on the master after executing the script: `sudo kubeadm join....`
-   If it is not visible, run on the master: `kubeadm token create --print-join-command`
+   Voeg daarna de nodes toe aan het cluster met het commando dat na het script zichtbaar is op de master: `sudo kubeadm join....`
+   Niet zichtbaar? Voer dan op de master uit: `kubeadm token create --print-join-command`
 
-   Explain what the `kubeadm init` command does (and why it only needs to be done on the master) and explain what the following command does (the CNI must be installed on the master after the nodes are added):
+   Leg uit wat `kubeadm init` doet (en waarom dit alleen op de master hoeft) en leg uit wat het volgende commando doet (installeer de CNI op de master nadat de nodes zijn toegevoegd):
    ```
    kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
    ```
-   What other network CNIs are there?
+   Welke andere netwerk-CNIs bestaan er?
 
-   **a)** Once installed, you should have a well-functioning cluster. First check that on the master with:
+   **a)** Als alles goed is, heb je een werkend cluster. Controleer dat eerst op de master met:
    ```
    kubectl get nodes
    kubectl get pods -n kube-system
    ```
-   Explain these pods using the diagram from the book *Production Kubernetes*.
+   Verklaar deze pods aan de hand van het diagram uit het boek *Production Kubernetes*.
 
-### Assignment 2 — Running a Containerized Application
+### Opdracht 2 - Een Gecontaineriseerde Applicatie Draaien
 
-We now want to run a containerized application in this cluster. A `Dockerfile` and `index.html` file are provided (see files in this directory).
+Nu willen we een gecontaineriseerde applicatie draaien in dit cluster. Een `Dockerfile` en `index.html` zijn beschikbaar (zie bestanden in deze map).
 
-Examine the Dockerfile and explain how the application is built and what it does.
+Bestudeer de Dockerfile en leg uit hoe de applicatie is gebouwd en wat het doet.
 
-We use GitHub to automatically create an image when the code (`index.html`) is modified and the image is then stored in DockerHub. After that, we can run the image in the Google Kubernetes cluster.
+We gebruiken GitHub om automatisch een image te bouwen wanneer de code (`index.html`) wordt aangepast. Dat image wordt opgeslagen in DockerHub, waarna we het kunnen uitvoeren in het Google Kubernetes-cluster.
 
-2. Create a repository in GitHub (e.g. called `container`). Make sure git is installed on your PC and clone the GitHub repository to your own PC and place the `Dockerfile` and the `index.html` file there.
+2. Maak een repository aan in GitHub (bijv. `container`). Zorg dat git op je pc staat, clone de repository en voeg de `Dockerfile` en `index.html` toe.
 
-   Also create a repository in DockerHub where the docker image should be placed after a build.
+   Maak ook een repository aan in DockerHub voor het docker image.
 
-   Create a workflow in GitHub that builds a new image when the Dockerfile is modified and uploads it to the newly created DockerHub repository. Start with the `blank.yml` workflow found at https://github.com/actions/starter-workflows/tree/main/ci
+   Maak een GitHub workflow die automatisch een nieuw image bouwt en uploadt als de Dockerfile wordt aangepast. Begin met de `blank.yml` workflow van https://github.com/actions/starter-workflows/tree/main/ci
 
-   Customize this workflow so that the final steps look like this:
+   Pas de workflow zo aan dat de laatste stappen er zo uitzien:
 
    ```yaml
    steps:
@@ -100,15 +104,15 @@ We use GitHub to automatically create an image when the code (`index.html`) is m
 
      - name: Build and push Docker image
        run: |
-         docker build -t <dockerhubaccountname>/<repository>:latest .
-         docker push <dockerhubaccountname>/<repository>:latest
+         docker build -t <dockerhub-accountnaam>/<repository>:latest .
+         docker push <dockerhub-accountnaam>/<repository>:latest
    ```
 
-   Make sure that the secrets are set in GitHub (Settings → Secrets and Variables → Actions → Repository Secrets) and that the Docker account and repository are adjusted.
+   Stel de secrets in via GitHub (Settings -> Secrets and Variables -> Actions -> Repository Secrets) en pas het Docker-account en de repository aan.
 
-   Commit the files `Dockerfile` and `index.html` to your PC and push it to GitHub. The workflow should now be kicked off so that a Docker image is created in the DockerHub repository.
+   Commit de bestanden en push naar GitHub. De workflow start dan automatisch en bouwt een Docker image in de DockerHub-repository.
 
-   We now want to run this image (which is a web application) in a pod in Kubernetes. Create a `Deployment.yaml` file for the newly created image (e.g. create 2 replicas). The first part of this file looks like this:
+   Maak nu een `Deployment.yaml` voor het nieuwe image (bijv. met 2 replica's). Het begin van dit bestand ziet er zo uit:
 
    ```yaml
    apiVersion: apps/v1
@@ -116,11 +120,11 @@ We use GitHub to automatically create an image when the code (`index.html`) is m
    metadata:
      name: myfirst-deployment
    spec:
-     replicas: 1  # Number of instances (pods) to run
+     replicas: 1  # Aantal instanties (pods) om uit te voeren
      selector:
        matchLabels:
          app: my-container
-   # everything under template is the definition of the pod that will be created.
+   # alles onder template is de definitie van de pod die wordt aangemaakt
      template:
        metadata:
          labels:
@@ -131,56 +135,56 @@ We use GitHub to automatically create an image when the code (`index.html`) is m
            image:
    ```
 
-   **a)** Study the structure of this file and explain the various parts. Complete the deployment file by filling in the image and adding which port to use (port 80). Create two pods using the deployment file with `kubectl apply -f`.
+   **a)** Bestudeer de structuur van dit bestand en verklaar de verschillende onderdelen. Vul het image in en voeg de poort toe (poort 80). Maak twee pods aan met `kubectl apply -f`.
 
-   **b)** Investigate whether the pods are running and investigate the IP address of the newly created pods. Access the web server in the pod by issuing `curl <ip-pod>` from a node where a pod is running. Show what the output is.
+   **b)** Controleer of de pods draaien en bekijk de IP-adressen. Voer `curl <ip-pod>` uit vanaf een node waarop een pod draait. Laat de uitvoer zien.
 
-   **c)** Also, log in to the pod from the master with `kubectl exec` and verify that the directory `/usr/share/nginx/html/` exists, and use `cat` to view the contents of `index.html`.
+   **c)** Log ook in op de pod vanuit de master met `kubectl exec` en controleer of de map `/usr/share/nginx/html/` bestaat. Gebruik `cat` om de inhoud van `index.html` te bekijken.
 
 ---
 
-# Learning Materials
+# Leermaterialen
 
 ### Google Cloud
 
 | Resource | Link |
 |---|---|
 | A Tour of Google Cloud Hands-on Labs (GSP282) | [cloudskillsboost.google](https://www.cloudskillsboost.google/focuses/2794?parent=catalog) |
-| Google Cloud Fundamentals — Core Infrastructure | [cloudskillsboost.google](https://www.cloudskillsboost.google/course_templates/60) |
-| Essential Google Cloud Infrastructure — Core Services | [cloudskillsboost.google](https://www.cloudskillsboost.google/course_templates/49) |
-| Google Compute Engine documentation | [cloud.google.com](https://cloud.google.com/compute?hl=en) |
+| Google Cloud Fundamentals - Core Infrastructure | [cloudskillsboost.google](https://www.cloudskillsboost.google/course_templates/60) |
+| Essential Google Cloud Infrastructure - Core Services | [cloudskillsboost.google](https://www.cloudskillsboost.google/course_templates/49) |
+| Google Compute Engine documentatie | [cloud.google.com](https://cloud.google.com/compute?hl=en) |
 
 ### Kubernetes
 
 | Resource | Link |
 |---|---|
 | Getting Started with Google Kubernetes Engine | [cloudskillsboost.google](https://www.cloudskillsboost.google/paths/11/course_templates/2) |
-| Google Kubernetes Engine documentation | [cloud.google.com](https://cloud.google.com/kubernetes-engine/docs/concepts/kubernetes-engine-overview) |
-| Kubernetes documentation | [kubernetes.io](https://kubernetes.io/docs/home/) |
-| Kubernetes cluster on Ubuntu (step-by-step guide) | [hbayraktar.medium.com](https://hbayraktar.medium.com/how-to-install-kubernetes-cluster-on-ubuntu-22-04-step-by-step-guide-7dbf7e8f5f99) |
+| Google Kubernetes Engine documentatie | [cloud.google.com](https://cloud.google.com/kubernetes-engine/docs/concepts/kubernetes-engine-overview) |
+| Kubernetes documentatie | [kubernetes.io](https://kubernetes.io/docs/home/) |
+| Kubernetes cluster op Ubuntu (stap-voor-stap handleiding) | [hbayraktar.medium.com](https://hbayraktar.medium.com/how-to-install-kubernetes-cluster-on-ubuntu-22-04-step-by-step-guide-7dbf7e8f5f99) |
 
 ---
 
-# Files in This Directory
+# Bestanden in Deze Map
 
-| File | Description |
+| Bestand | Beschrijving |
 |---|---|
-| [Dockerfile](Dockerfile) | Docker image definition for the Week 1 application |
+| [Dockerfile](Dockerfile) | Docker image definitie voor de Week 1 applicatie |
 | [deployment.yml](deployment.yml) | Kubernetes Deployment manifest |
 | [service.yml](service.yml) | Kubernetes Service manifest |
-| [index.html](index.html) | Static HTML page served by the container |
-| [Installmastertemplate](Installmastertemplate) | Script template for setting up the Kubernetes master node |
-| [installnode](installnode) | Script for setting up a Kubernetes worker node |
+| [index.html](index.html) | Statische HTML-pagina geserveerd door de container |
+| [Installmastertemplate](Installmastertemplate) | Scriptsjabloon voor het opzetten van de Kubernetes masternode |
+| [installnode](installnode) | Script voor het opzetten van een Kubernetes workernode |
 
 ---
 
 ---
 
-# My Work
+# Mijn Werk
 
-## 1.1 Google Cloud & GKE — Completed Badges
+## 1.1 Google Cloud & GKE - Voltooide Badges
 
-Completed badges via [Google Cloud Skills Boost](https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe):
+Voltooide badges via [Google Cloud Skills Boost](https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe):
 
 [![Google Cloud Fundamentals: Core Infrastructure](https://cdn.qwiklabs.com/V%2FuXlPOWQoaDTrhNB3K%2Ba2p2wGiQZT7%2BODtWIPHmON4%3D)](https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe)
 [![Essential Google Cloud Infrastructure: Core Services](https://cdn.qwiklabs.com/sgKmjMjD%2BpyCGA4VRZkhXxeonasfqbo8j85m8b5gC%2Bg%3D)](https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe)
@@ -188,65 +192,65 @@ Completed badges via [Google Cloud Skills Boost](https://www.skills.google/publi
 
 ---
 
-## 1.2 Kubernetes Challenge
+## 1.2 Kubernetes Uitdaging
 
-### Assignment 1 — Cluster Installation
+### Opdracht 1 - Cluster Installatie
 
-> **Note:** The assignment specifies Ubuntu 24.04 LTS minimal. I used **Ubuntu 25.10 LTS minimal** instead.
+> **Opmerking:** De opdracht specificeert Ubuntu 24.04 LTS minimal. Ik heb **Ubuntu 25.10 LTS minimal** gebruikt.
 >
-> Ubuntu 25.10 ships with `sudo-rs` (a Rust reimplementation of sudo) version 0.2.8 by default — as confirmed below:
+> Ubuntu 25.10 komt standaard met `sudo-rs` (een Rust-herimplementatie van sudo) versie 0.2.8, zoals hieronder te zien is:
 >
-> ![sudo-rs version on fresh Ubuntu 25.10](screenshots/sudo-rs-version.png)
+> ![sudo-rs versie op een nieuwe Ubuntu 25.10](screenshots/sudo-rs-version.png)
 >
-> This version has a known session bug. For example, running `sudo reboot` would fail with an unexpected error instead of rebooting:
+> Deze versie heeft een bekende sessiebug. `sudo reboot` mislukt bijvoorbeeld met een onverwachte fout in plaats van te herstarten:
 >
-> ![sudo-rs bug: reboot failing](screenshots/sudo-rs-bug.png)
+> ![sudo-rs bug: reboot mislukt](screenshots/sudo-rs-bug.png)
 >
-> This was resolved by configuring a GCP startup script ([AUTOSTART-configure_classic_sudo.sh](AUTOSTART-configure_classic_sudo.sh)) that installs classic `sudo` on every boot, replacing `sudo-rs`:
+> Opgelost via een GCP-opstartscript ([AUTOSTART-configure_classic_sudo.sh](AUTOSTART-configure_classic_sudo.sh)) dat klassieke `sudo` installeert bij elke opstart ter vervanging van `sudo-rs`:
 >
-> ![GCP startup script replacing sudo-rs](screenshots/sudo-rs-startup-script.png)
+> ![GCP opstartscript vervangt sudo-rs](screenshots/sudo-rs-startup-script.png)
 
-**Instances used:**
+**Gebruikte instanties:**
 
-| Node | Name | Zone | Type | OS |
+| Node | Naam | Zone | Type | OS |
 |------|------|------|------|----|
-| Master | master-amsterdam | europe-west4-a (Netherlands) | e2-medium | Ubuntu 25.10 LTS minimal |
-| Worker 1 | worker-brussels | europe-west1-b (Belgium) | e2-medium | Ubuntu 25.10 LTS minimal |
-| Worker 2 | worker-london | europe-west2-b (United Kingdom) | e2-medium | Ubuntu 25.10 LTS minimal |
+| Master | master-amsterdam | europe-west4-a (Nederland) | e2-medium | Ubuntu 25.10 LTS minimal |
+| Worker 1 | worker-brussels | europe-west1-b (Belgie) | e2-medium | Ubuntu 25.10 LTS minimal |
+| Worker 2 | worker-london | europe-west2-b (Verenigd Koninkrijk) | e2-medium | Ubuntu 25.10 LTS minimal |
 
-![VM instances in Google Cloud](screenshots/vm-instances-gcp.png)
+![VM-instanties in Google Cloud](screenshots/vm-instances-gcp.png)
 
-![OS and storage configuration](screenshots/vm-os-storage-config.png)
+![OS en opslagconfiguratie](screenshots/vm-os-storage-config.png)
 
-The cluster was installed using two custom shell scripts: [`configure_master.sh`](configure_master.sh) for the master node and [`configure_worker.sh`](configure_worker.sh) for the worker nodes. These scripts automate all steps: kernel module configuration, containerd installation, Kubernetes package installation (v1.35), and cluster initialization.
+Het cluster heb ik geinstalleerd met twee eigen shell-scripts: [`configure_master.sh`](configure_master.sh) voor de masternode en [`configure_worker.sh`](configure_worker.sh) voor de workernodes. Deze scripts automatiseren alle stappen: kernelmoduleconfiguratie, containerd installeren, Kubernetes-pakketinstallatie (v1.35) en clusterinitialisatie.
 
-![Running configure_master.sh on master-amsterdam](screenshots/configure-master-run.png)
+![configure_master.sh uitvoeren op master-amsterdam](screenshots/configure-master-run.png)
 
-![Running configure_worker.sh on worker-brussels](screenshots/configure-worker-run.png)
+![configure_worker.sh uitvoeren op worker-brussels](screenshots/configure-worker-run.png)
 
-After both workers completed the script, they were joined to the cluster using the `kubeadm join` command printed by the master. The screenshot below shows the full Flannel installation, both workers joining, and the final `kubectl get nodes` confirming all three nodes are `Ready`:
+Nadat beide workers klaar waren, heb ik ze via het `kubeadm join`-commando van de master aan het cluster toegevoegd. De screenshot hieronder toont de volledige Flannel-installatie, de twee workers die toetreden en de uiteindelijke `kubectl get nodes` waaruit blijkt dat alle drie nodes `Ready` zijn:
 
-![Workers joined — all nodes Ready](screenshots/cluster-nodes-joined.png)
+![Workers toegevoegd - alle nodes Ready](screenshots/cluster-nodes-joined.png)
 
-**Explanation of `kubeadm init`:**
+**Uitleg van `kubeadm init`:**
 
-`kubeadm init` bootstraps the Kubernetes control plane on the master node. It generates all TLS certificates (for the API server, etcd, and kubelet communication), writes kubeconfig files, deploys the static Pod manifests for the core control-plane components (kube-apiserver, kube-controller-manager, kube-scheduler, etcd), and creates a bootstrap token that worker nodes use to join the cluster. It is only run on the master because the master is the only node that hosts the control plane — worker nodes do not run the API server or etcd, they only run workloads via kubelet.
+`kubeadm init` zet het Kubernetes-besturingsvlak op op de masternode. Het genereert alle TLS-certificaten (voor de API-server, etcd en kubelet), schrijft kubeconfig-bestanden, maakt de statische Pod-manifesten aan voor de kerncomponenten (kube-apiserver, kube-controller-manager, kube-scheduler, etcd) en genereert een bootstrap-token waarmee workernodes het cluster kunnen binnenkomen. Het wordt alleen op de master uitgevoerd omdat de master de enige node is die het besturingsvlak draait. Workernodes draaien geen API-server of etcd, die voeren alleen workloads uit via kubelet.
 
-**Explanation of `kubectl apply -f kube-flannel.yml`:**
+**Uitleg van `kubectl apply -f kube-flannel.yml`:**
 
-This command installs Flannel as the Container Network Interface (CNI) plugin. Kubernetes itself does not provide pod-to-pod networking — it delegates that to a CNI plugin. Flannel creates an overlay network (VXLAN by default) that gives every pod a unique IP address and ensures pods on different nodes can communicate directly with each other, even across regions. The `apply -f` command reads the Flannel manifest from the URL and creates all required resources: a DaemonSet (so Flannel runs on every node), a ConfigMap with the network configuration (CIDR `10.244.0.0/16`), and the necessary RBAC rules. The CIDR must match the `--pod-network-cidr` flag passed to `kubeadm init`.
+Dit commando installeert Flannel als de Container Network Interface (CNI) plugin. Kubernetes regelt zelf geen pod-naar-pod networking, dat wordt gedelegeerd aan een CNI-plugin. Flannel maakt een overlay-netwerk (standaard VXLAN) dat elk pod een uniek IP-adres geeft, zodat pods op verschillende nodes direct met elkaar kunnen communiceren, zelfs over regio's heen. Het `apply -f`-commando leest het Flannel-manifest en maakt alle benodigde resources aan: een DaemonSet (zodat Flannel op elke node draait), een ConfigMap met de netwerkconfiguratie (CIDR `10.244.0.0/16`) en de benodigde RBAC-regels. De CIDR moet overeenkomen met de `--pod-network-cidr` die je aan `kubeadm init` hebt meegegeven.
 
-**Other network CNIs:**
+**Andere netwerk-CNIs:**
 
-| CNI | Description |
+| CNI | Beschrijving |
 |-----|-------------|
-| **Flannel** | Simple L3 overlay network using VXLAN. Easy to set up, no network policy support. |
-| **Calico** | Feature-rich CNI with BGP routing and full NetworkPolicy support. Common in production. |
-| **Cilium** | eBPF-based CNI with advanced observability and security features. |
-| **Weave Net** | Mesh overlay network, easy setup, supports NetworkPolicy. |
-| **Canal** | Combines Flannel (networking) with Calico (network policy). |
+| **Flannel** | Eenvoudig L3 overlay-netwerk via VXLAN. Makkelijk op te zetten, geen netwerkbeleidsondersteuning. |
+| **Calico** | Veelzijdige CNI met BGP-routing en volledige NetworkPolicy-ondersteuning. Veel gebruikt in productie. |
+| **Cilium** | eBPF-gebaseerde CNI met geavanceerde observeerbaarheid en beveiliging. |
+| **Weave Net** | Mesh overlay-netwerk, eenvoudige installatie, ondersteunt NetworkPolicy. |
+| **Canal** | Combineert Flannel (networking) met Calico (netwerkbeleid). |
 
-**1a — Output of `kubectl get nodes`:**
+**1a - Uitvoer van `kubectl get nodes`:**
 
 ```
 NAME               STATUS   ROLES           AGE    VERSION
@@ -255,7 +259,7 @@ worker-london      Ready    <none>          7m     v1.35.1
 master-amsterdam   Ready    control-plane   17m    v1.35.1
 ```
 
-**Output of `kubectl get pods -n kube-system`:**
+**Uitvoer van `kubectl get pods -n kube-system`:**
 
 ![kubectl get pods -n kube-system](screenshots/kubectl-get-pods-kube-system.png)
 
@@ -272,7 +276,7 @@ kube-proxy-xfg9q                              1/1     Running   0          7m23s
 kube-scheduler-master-amsterdam               1/1     Running   0          17m
 ```
 
-> **Note:** The `kube-flannel` pods do not appear here because Flannel creates its own `kube-flannel` namespace. Verified with `kubectl get pods -n kube-flannel`:
+> **Opmerking:** De `kube-flannel`-pods staan hier niet bij omdat Flannel zijn eigen `kube-flannel`-namespace aanmaakt. Geverifieerd met `kubectl get pods -n kube-flannel`:
 
 ![kubectl get pods -n kube-flannel](screenshots/kubectl-get-pods-kube-flannel.png)
 
@@ -283,26 +287,26 @@ kube-flannel-ds-w2b5x   1/1     Running   0          26m
 kube-flannel-ds-z8zdb   1/1     Running   0          29m
 ```
 
-One `kube-flannel-ds` pod runs on each node (master + 2 workers), deployed as a DaemonSet. Each pod configures the VXLAN overlay network on its node so that pods across different nodes — and different regions — can reach each other.
+Er draait één `kube-flannel-ds`-pod op elke node (master + 2 workers) als een DaemonSet. Elke pod configureert het VXLAN overlay-netwerk op zijn node, zodat pods op verschillende nodes en regio's elkaar kunnen bereiken.
 
-**Explanation of kube-system pods:**
+**Verklaring van de kube-system pods:**
 
-The `kube-system` namespace contains the core Kubernetes components:
+De `kube-system`-namespace bevat de kerncomponenten van Kubernetes:
 
-| Pod | Role |
-|-----|------|
-| `kube-apiserver` | The front-end of the control plane. All kubectl commands, node registrations, and internal components communicate through this REST API. Only runs on the master. |
-| `kube-controller-manager` | Runs all controller loops: ensures the desired number of pod replicas exist, manages node lifecycles, handles certificate rotation, etc. Only on master. |
-| `kube-scheduler` | Watches for unscheduled pods and assigns them to a suitable node based on resource availability, taints, and affinity rules. Only on master. |
-| `etcd` | Distributed key-value store that holds the entire cluster state. All API server reads/writes go through etcd. Only on master. |
-| `kube-proxy` | Runs on every node. Maintains iptables/nftables rules so that Service IPs route traffic correctly to pods. One pod per node — three here for master + 2 workers. |
-| `coredns` | Cluster-internal DNS. Pods resolve services by name (e.g. `my-service.default.svc.cluster.local`) via CoreDNS. Two replicas for redundancy. |
+| Pod | Rol |
+|-----|-----|
+| `kube-apiserver` | Het front-end van het besturingsvlak. Alle kubectl-commando's, node-registraties en interne componenten lopen via deze REST API. Draait alleen op de master. |
+| `kube-controller-manager` | Voert alle controller-loops uit: zorgt dat het juiste aantal pod-replica's draait, beheert node-levenscycli, handelt certificaatrotatie af, enz. Alleen op master. |
+| `kube-scheduler` | Bewaakt niet-ingeplande pods en wijst ze toe aan een geschikte node op basis van beschikbare resources, taints en affinity-regels. Alleen op master. |
+| `etcd` | Gedistribueerde sleutel-waardeopslag met de volledige clusterstatus. Alle API-server lees- en schrijfacties gaan via etcd. Alleen op master. |
+| `kube-proxy` | Draait op elke node. Beheert iptables/nftables-regels zodat Service-IPs verkeer correct naar pods routeren. Een pod per node, dus drie in totaal voor master + 2 workers. |
+| `coredns` | Cluster-interne DNS. Pods lossen servicenamen op (bijv. `my-service.default.svc.cluster.local`) via CoreDNS. Twee replica's voor redundantie. |
 
 ---
 
-### Assignment 2 — Containerized Application
+### Opdracht 2 - Gecontaineriseerde Applicatie
 
-**Dockerfile explanation:**
+**Uitleg Dockerfile:**
 
 ```dockerfile
 FROM nginx:alpine
@@ -311,17 +315,17 @@ EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 ```
 
-**`FROM nginx:alpine`** — The image is built on top of the official `nginx:alpine` base image. The `alpine` variant was deliberately chosen over `nginx:latest` (which is based on Debian): Alpine Linux is significantly smaller (~5 MB vs ~180 MB), contains far fewer pre-installed binaries and libraries, and therefore has a much smaller attack surface with fewer CVEs. For a static web server that just needs to serve HTML, the full Debian-based image would bring unnecessary overhead.
+**`FROM nginx:alpine`**: Het image is gebouwd op basis van het officiele `nginx:alpine` base image. De `alpine`-variant is bewust gekozen boven `nginx:latest` (Debian-gebaseerd): Alpine Linux is veel kleiner (~5 MB vs ~180 MB), heeft veel minder voorgeinstalleerde software en heeft daarmee een kleiner aanvalsoppervlak met minder CVEs. Voor een simpele statische webserver is het volledige Debian-image gewoon onnodige overhead.
 
-**`COPY static-site/ /usr/share/nginx/html/`** — This copies the entire `static-site/` directory (containing `index.html` and any assets) into the nginx document root. When a browser sends a request to the container, nginx serves this file as the HTTP response. This is how the custom static website is injected into the image — the HTML (and any CSS, JS, or Bootstrap templates included in it) replaces nginx's default placeholder page.
+**`COPY static-site/ /usr/share/nginx/html/`**: Dit kopieert de volledige `static-site/`-map (met `index.html` en eventuele assets) naar de nginx-documentroot. Wanneer een browser een verzoek stuurt, serveert nginx dit bestand als HTTP-respons. Zo wordt de eigen website in het image geladen en vervangt het de standaard placeholder van nginx.
 
-**`EXPOSE 80`** — Declares that the container listens on port 80 (standard HTTP). This is a convention that tells Docker and Kubernetes which port the application uses, and is required for routing traffic to the container. Without this, browsers would not be able to connect using the default HTTP port. If the application were running on a non-standard port (e.g. 8000), clients would need to specify it explicitly — e.g. `stentijhuis.nl:8000`.
+**`EXPOSE 80`**: Geeft aan dat de container luistert op poort 80 (standaard HTTP). Dit is een conventie voor Docker en Kubernetes om te weten welke poort de applicatie gebruikt, en is nodig voor het routeren van verkeer. Zonder dit kunnen browsers geen verbinding maken via de standaard HTTP-poort. Bij een niet-standaard poort (bijv. 8000) moeten clients dit expliciet aangeven, bijv. `stentijhuis.nl:8000`.
 
-**`CMD ["nginx", "-g", "daemon off;"]`** — This is the startup command executed when the container launches. It starts nginx in the foreground (`daemon off` prevents nginx from forking into the background). Containers are designed around a single foreground process — if that process exits, the container stops. Running nginx in foreground mode ensures the container stays alive as long as nginx is running.
+**`CMD ["nginx", "-g", "daemon off;"]`**: Dit is het opstartcommando van de container. Het start nginx op de voorgrond (`daemon off` voorkomt dat nginx naar de achtergrond forkt). Containers draaien rond een enkel voorgrondproces: als dat stopt, stopt de container. Nginx op de voorgrond houden zorgt dat de container actief blijft zolang nginx draait.
 
 **GitHub Actions workflow:**
 
-The workflow is defined in [`.github/workflows/ci_week1.yml`](../.github/workflows/ci_week1.yml) and runs automatically on every push or pull request to `main`. It consists of two jobs:
+De workflow staat in [`.github/workflows/ci_week1.yml`](../.github/workflows/ci_week1.yml) en draait automatisch bij elke push of pull request naar `main`. Er zijn twee jobs:
 
 ```yaml
 name: CI Week 1
@@ -376,20 +380,20 @@ jobs:
         run: docker push stensel8/public-cloud-concepts:latest
 ```
 
-**Job 1 — `lint`:** Installs [Hadolint](https://github.com/hadolint/hadolint) directly via `wget` (the `hadolint/hadolint-action` was replaced because it could not handle directory paths containing spaces) and statically analyses the Dockerfile for best-practice violations (e.g. missing `--no-install-recommends`, wrong `COPY` ordering). The build job will not start if linting fails.
+**Job 1 (`lint`):** Installeert [Hadolint](https://github.com/hadolint/hadolint) via `wget` (de `hadolint/hadolint-action` werd vervangen omdat die geen mapnamen met spaties aankon) en checkt de Dockerfile statisch op best-practice schendingen (bijv. ontbrekende `--no-install-recommends`, verkeerde `COPY`-volgorde). De build-job start pas als de lint slaagt.
 
-**Job 2 — `build`** (runs after `lint`):
+**Job 2 (`build`)** draait na `lint`:
 
-- Builds the Docker image from `Week 1/Dockerfile`
-- Scans the image with [Trivy](https://github.com/aquasecurity/trivy) and fails the pipeline if any **CRITICAL** CVEs are found
-- Logs in to DockerHub using repository secrets (`DOCKER_USERNAME` and `DOCKER_PAT`) — only when pushing to `main` (not on PRs)
-- Pushes the image as `stensel8/public-cloud-concepts:latest` to DockerHub — again only on direct pushes to `main`
+- Bouwt het Docker image van `Week 1/Dockerfile`
+- Scant het image met [Trivy](https://github.com/aquasecurity/trivy) en breekt de pipeline af bij **CRITICAL** CVEs
+- Logt in bij DockerHub met repository-secrets (`DOCKER_USERNAME` en `DOCKER_PAT`), alleen bij pushes naar `main` (niet bij PRs)
+- Pusht het image als `stensel8/public-cloud-concepts:latest` naar DockerHub, ook alleen bij directe pushes naar `main`
 
-The secrets are configured under **Settings → Secrets and Variables → Actions → Repository Secrets** in the GitHub repository.
+De secrets stel je in via **Settings -> Secrets and Variables -> Actions -> Repository Secrets** in de GitHub-repository.
 
-**2a — Explanation of deployment.yaml structure:**
+**2a - Uitleg van de deployment.yaml structuur:**
 
-The completed `deployment.yml` used for this assignment:
+Het voltooide `deployment.yml` dat ik voor deze opdracht heb gebruikt:
 
 ```yaml
 apiVersion: apps/v1
@@ -413,34 +417,34 @@ spec:
         - containerPort: 80
 ```
 
-**`apiVersion: apps/v1`** — Specifies which Kubernetes API group and version to use. `apps/v1` is the stable API for workload resources like Deployments, ReplicaSets, and StatefulSets.
+**`apiVersion: apps/v1`**: Geeft aan welke Kubernetes API-groep en versie gebruikt wordt. `apps/v1` is de stabiele API voor workload-resources zoals Deployments, ReplicaSets en StatefulSets.
 
-**`kind: Deployment`** — Declares the type of resource. A Deployment manages a ReplicaSet, which in turn ensures that the desired number of pod replicas are always running. If a pod crashes or is deleted, the Deployment controller automatically creates a replacement.
+**`kind: Deployment`**: Bepaalt het type resource. Een Deployment beheert een ReplicaSet, die ervoor zorgt dat het gewenste aantal pod-replica's altijd draait. Als een pod crasht of wordt verwijderd, maakt de Deployment-controller automatisch een nieuwe aan.
 
-**`metadata.name: first-deployment`** — A unique name for this Deployment within the namespace, used to identify and manage it with `kubectl`.
+**`metadata.name: first-deployment`**: Een unieke naam voor deze Deployment binnen de namespace, waarmee je het kunt identificeren en beheren via `kubectl`.
 
-**`spec.replicas: 2`** — Instructs Kubernetes to maintain exactly 2 running instances (pods) of this application at all times.
+**`spec.replicas: 2`**: Vertelt Kubernetes om altijd precies 2 actieve pods van deze applicatie te onderhouden.
 
-**`spec.selector.matchLabels`** — Tells the Deployment which pods it owns and is responsible for managing. It selects pods with the label `app: my-container`. This label must match the labels defined in the pod template below.
+**`spec.selector.matchLabels`**: Vertelt de Deployment welke pods bij hem horen. Hij selecteert pods met het label `app: my-container`. Dit label moet overeenkomen met de labels in het pod-sjabloon hieronder.
 
-**`spec.template`** — The pod template: everything under this key defines what each pod will look like when created.
+**`spec.template`**: Het pod-sjabloon. Alles onder deze sleutel bepaalt hoe elke nieuwe pod eruitziet.
 
-- **`metadata.labels: app: my-container`** — The label applied to each created pod. Must match `spec.selector.matchLabels` so that the Deployment can track its pods.
-- **`spec.containers[0].name: my-container`** — The name of the container within the pod.
-- **`spec.containers[0].image: stensel8/public-cloud-concepts:latest`** — The Docker image to pull from DockerHub and run. This is the image built and pushed by the GitHub Actions workflow.
-- **`spec.containers[0].ports[0].containerPort: 80`** — Declares that the container listens on port 80 (HTTP). This is informational for Kubernetes and required for Services to route traffic to the correct port.
+- **`metadata.labels: app: my-container`**: Het label dat op elke pod wordt gezet. Moet overeenkomen met `spec.selector.matchLabels` zodat de Deployment zijn pods kan bijhouden.
+- **`spec.containers[0].name: my-container`**: De naam van de container in de pod.
+- **`spec.containers[0].image: stensel8/public-cloud-concepts:latest`**: Het Docker image dat van DockerHub gepullt en uitgevoerd wordt. Dit is het image dat door de GitHub Actions workflow gebouwd en gepusht is.
+- **`spec.containers[0].ports[0].containerPort: 80`**: Geeft aan dat de container op poort 80 (HTTP) luistert. Dit is informatief voor Kubernetes en nodig zodat Services verkeer naar de juiste poort kunnen sturen.
 
-The deployment was applied to the cluster with:
+De deployment heb ik toegepast met:
 
 ```bash
 kubectl apply -f deployment.yml
 ```
 
-**2b — Pod IPs and `curl` output:**
+**2b - Pod-IPs en `curl`-uitvoer:**
 
-After applying the deployment, both pods came up `Running` across two different regions, demonstrating that Flannel correctly routes pod traffic across GCP regions:
+Na het toepassen van de deployment kwamen beide pods op `Running` in twee verschillende regio's, wat aantoont dat Flannel pod-verkeer correct routeert over GCP-regio's heen:
 
-![Both pods Running](screenshots/deployment-pods-running.png)
+![Beide pods Running](screenshots/deployment-pods-running.png)
 
 ```text
 NAME                               READY   STATUS    RESTARTS   AGE   IP           NODE              NOMINATED NODE   READINESS GATES
@@ -448,9 +452,9 @@ first-deployment-5ffbd9444c-5hkzs  1/1     Running   0          88s   10.244.2.2
 first-deployment-5ffbd9444c-s4xdb  1/1     Running   0          88s   10.244.1.2   worker-brussels   <none>           <none>
 ```
 
-`curl` issued from the master node to the pod on `worker-london` (`10.244.2.2`):
+`curl` uitgevoerd van de masternode naar de pod op `worker-london` (`10.244.2.2`):
 
-![curl and kubectl exec output](screenshots/curl-pod-and-exec.png)
+![curl en kubectl exec uitvoer](screenshots/curl-pod-and-exec.png)
 
 ```html
 <!doctype html>
@@ -459,14 +463,14 @@ first-deployment-5ffbd9444c-s4xdb  1/1     Running   0          88s   10.244.1.2
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Sten Tijhuis - Public Cloud Concepts</title>
-  <!-- Bootstrap CSS, Google Fonts, icons ... (truncated) -->
+  <!-- Bootstrap CSS, Google Fonts, iconen ... (afgekapt) -->
 ```
 
-The response confirms the nginx container is running and serving the static site from the pod's internal Flannel IP. This IP is only reachable within the cluster — not from a browser on an external machine. External access requires a Kubernetes Service (covered in Week 2).
+De respons bevestigt dat de nginx-container draait en de statische site serveert via het interne Flannel-IP. Dit IP is alleen bereikbaar vanuit het cluster, niet via een browser van buitenaf. Externe toegang vereist een Kubernetes Service (behandeld in Week 2).
 
-**2c — Output of `kubectl exec -it <pod> -- cat /usr/share/nginx/html/index.html`:**
+**2c - Uitvoer van `kubectl exec -it <pod> -- cat /usr/share/nginx/html/index.html`:**
 
-Logging into the pod from the master with `kubectl exec` and reading the file directly confirms the `index.html` was correctly placed in the nginx document root by the Dockerfile:
+Inloggen op de pod via `kubectl exec` en het bestand direct uitlezen bevestigt dat de `index.html` correct door de Dockerfile in de nginx-documentroot is geplaatst:
 
 ```html
 <!doctype html>
@@ -475,5 +479,5 @@ Logging into the pod from the master with `kubectl exec` and reading the file di
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Sten Tijhuis - Public Cloud Concepts</title>
-  <!-- Bootstrap CSS, Google Fonts, icons ... (truncated) -->
+  <!-- Bootstrap CSS, Google Fonts, iconen ... (afgekapt) -->
 ```
