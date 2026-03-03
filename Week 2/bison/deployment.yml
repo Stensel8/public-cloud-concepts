@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: bison
-        image: stensel8/bison:latest
+        image: stensel8/public-cloud-concepts:bison
         ports:
         - containerPort: 80
