@@ -1,12 +1,5 @@
 Nederlands | [English](README.en.md)
 
----
-
-| [Week 1 - Introductie & Deployments](../Week%201/README.md) | [Week 3](../Week%203/README.md) |
-|:---|---:|
-
----
-
 # Week 2 - Kubernetes Networking & CI/CD
 
 ## Onderwerpen
@@ -42,8 +35,3 @@ Deze week gaat het over **Kubernetes Networking**. We maken een Kubernetes Clust
 | [ingress.yml](Bestanden/ingress.yml) | Kubernetes Ingress manifest voor het routeren van extern verkeer |
 | [bison/](Bestanden/bison/) | Deployment- en service-manifesten voor de Bison-applicatie |
 | [brightspace/](Bestanden/brightspace/) | Deployment- en service-manifesten voor de Brightspace-applicatie |
-
----
-
-| [Week 1 - Introductie \& Deployments](../Week%201/README.md) | [Week 3](../Week%203/README.md) |
-|:---|---:|

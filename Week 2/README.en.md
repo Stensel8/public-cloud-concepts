@@ -5,13 +5,6 @@
 > [!NOTE]
 > This repository is maintained primarily in **Dutch**. This English version may be incomplete or outdated. An English translation may be added in the future, but is not guaranteed.
 
----
-
-| [Week 1 - Introduction & Deployments](../Week%201/README.en.md) | [Week 3](../Week%203/) |
-|:---|---:|
-
----
-
 # Week 2 - Kubernetes Networking & CI/CD
 
 ## Topics
@@ -483,8 +476,3 @@ Both hostnames now resolve to the Ingress Controller, which routes based on the 
 Without Ingress, two separate `LoadBalancer` services would be needed, each provisioning its own Google Cloud Load Balancer and external IP, which costs money and is harder to manage. The Ingress pattern uses a **single load balancer** (`34.91.190.135`) that routes traffic to the correct service based on the `Host` HTTP header. This is the standard way to expose multiple applications in Kubernetes.
 
 The full Ingress flow: browser -> `34.91.190.135` (Google Cloud LB) -> nginx Ingress Controller pod -> `bison-service` or `brightspace-service` (ClusterIP) -> application pods.
-
----
-
-| [Week 1 - Introduction \& Deployments](../Week%201/README.en.md) | [Week 3](../Week%203/) |
-|:---|---:|

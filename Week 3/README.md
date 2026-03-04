@@ -1,12 +1,5 @@
 Nederlands
 
----
-
-| [Week 2 - Kubernetes Networking & CI/CD](../Week%202/README.md) |
-|:---|
-
----
-
 # Week 3 - Blue-Green Deployments & Artifact Registry
 
 ## Onderwerpen
@@ -32,8 +25,3 @@ Deze week implementeren we een **Blue-Green deployment** voor een applicatie via
 |---|---|
 | [Opdracht/](Opdracht/) | Opdrachten voor week 3 |
 | [Uitwerking/](Uitwerking/) | Mijn uitwerkingen voor week 3 |
-
----
-
-| [Week 2 - Kubernetes Networking \& CI/CD](../Week%202/README.md) |
-|:---|

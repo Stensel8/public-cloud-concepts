@@ -1,8 +1,3 @@
-| [Week 1 - Introductie & Deployments](../../Week%201/README.md) | [Week 3](../../Week%203/README.md) |
-|:---|---:|
-
----
-
 # Mijn Uitwerking - Week 2
 
 ## CI/CD - Docker Hub Tags
@@ -414,8 +409,3 @@ Beide hostnamen worden nu omgezet naar de Ingress Controller, die op basis van d
 Zonder Ingress zou je twee aparte `LoadBalancer` services nodig hebben, elk met hun eigen Google Cloud Load Balancer en extern IP. Dat kost extra geld en is lastiger te beheren. Met het Ingress-patroon gebruik je een **enkele load balancer** (`34.91.190.135`) die verkeer naar de juiste service stuurt op basis van de `Host` HTTP-header. Dit is de standaardmanier om meerdere applicaties in Kubernetes beschikbaar te stellen.
 
 De volledige Ingress-flow: browser -> `34.91.190.135` (Google Cloud LB) -> nginx Ingress Controller pod -> `bison-service` of `brightspace-service` (ClusterIP) -> applicatiepods.
-
----
-
-| [Week 1 - Introductie \& Deployments](../../Week%201/README.md) | [Week 3](../../Week%203/README.md) |
-|:---|---:|

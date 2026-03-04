@@ -1,12 +1,5 @@
 Nederlands | [English](README.en.md)
 
----
-
-| [Overzicht](../README.md) | [Week 2 - Kubernetes Networking & CI/CD](../Week%202/README.md) |
-|:---|---:|
-
----
-
 # Week 1 - Introductie tot Google Cloud & Kubernetes
 
 ## Onderwerpen
@@ -45,8 +38,3 @@ Deze week maak je kennis met het **Google Cloud Platform** en **Kubernetes**. We
 | [configure_worker.sh](Bestanden/configure_worker.sh) | Script voor het opzetten van een Kubernetes workernode |
 | [Installmastertemplate](Bestanden/Installmastertemplate) | Scriptsjabloon (origineel van cursus) voor de masternode |
 | [installnode](Bestanden/installnode) | Script (origineel van cursus) voor de workernodes |
-
----
-
-| [Overzicht](../README.md) | [Week 2 - Kubernetes Networking \& CI/CD](../Week%202/README.md) |
-|:---|---:|

@@ -1,8 +1,3 @@
-| [Overzicht](../../README.md) | [Week 2 - Kubernetes Networking & CI/CD](../../Week%202/README.md) |
-|:---|---:|
-
----
-
 # Mijn Uitwerking - Week 1
 
 ## 1.1 Google Cloud & GKE - Voltooide Badges
@@ -246,8 +241,3 @@ Inloggen op de pod via `kubectl exec` en het bestand direct uitlezen bevestigt d
   <title>Sten Tijhuis - Public Cloud Concepts</title>
   <!-- Bootstrap CSS, Google Fonts, iconen ... (afgekapt) -->
 ```
-
----
-
-| [Overzicht](../../README.md) | [Week 2 - Kubernetes Networking \& CI/CD](../../Week%202/README.md) |
-|:---|---:|
