@@ -1,0 +1,65 @@
+name: CI Week 3 - Blue-Green Deploy
+
+on:
+  push:
+    branches: [main, development]
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
+  GKE_ZONE: ${{ secrets.GKE_ZONE }}
+  GAR_ZONE: europe-west4
+  GAR_REPO: public-cloud-concepts
+  IMAGE: app
+
+jobs:
+  build-and-deploy:
+    name: Build, push & deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Determine deployment slot
+        id: slot
+        run: |
+          if [ "${{ github.ref_name }}" == "main" ]; then
+            echo "slot=blue" >> $GITHUB_OUTPUT
+          else
+            echo "slot=green" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth print-access-token | docker login -u oauth2accesstoken \
+            --password-stdin https://${{ env.GAR_ZONE }}-docker.pkg.dev
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --tag "${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${{ steps.slot.outputs.slot }}" \
+            --build-arg GITHUB_SHA="${{ github.sha }}" \
+            "./Week 1/Bestanden/"
+
+      - name: Push to Artifact Registry
+        run: |
+          docker push "${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${{ steps.slot.outputs.slot }}"
+
+      - name: Deploy to GKE
+        run: |
+          kubectl apply -f "Week 3/Bestanden/deployment-${{ steps.slot.outputs.slot }}.yml"
+          kubectl rollout status deployment/deployment-${{ steps.slot.outputs.slot }} --timeout=120s
+          kubectl get pods -l slot=${{ steps.slot.outputs.slot }}

@@ -6,6 +6,20 @@ Daarnaast richt ik een CI/CD pipeline in met GitHub Actions die automatisch een 
 
 ---
 
+## Blue-Green strategie
+
+> [!NOTE]
+> Bij een **Blue-Green deployment** draaien twee versies van de applicatie tegelijk in Kubernetes. Een Kubernetes Service stuurt al het verkeer naar één versie (de actieve slot). Overschakelen gaat zonder downtime door simpelweg de `selector` in de Service aan te passen.
+
+| Slot | Branch | Docker image tag | Status |
+|------|--------|-----------------|--------|
+| 🔵 Blue | `main` | `blue` | Productie — ontvangt live verkeer |
+| 🟢 Green | `development` | `green` | Test — draait parallel, ontvangt geen verkeer |
+
+De branchnamen hoeven niet `blue` en `green` te heten — de kleur wordt bepaald door het label `slot: blue` of `slot: green` in de Kubernetes Deployment, en door welke selector de Service gebruikt.
+
+---
+
 ## Stap 1: Kubernetes Cluster aanmaken
 
 Eerst ruim ik de werkzaamheden van Week 1 op (de handmatig opgezette deployments op de virtuele machines). Als basis gebruik ik de omgeving van Week 2: een Google Kubernetes Engine cluster, wat beter geschikt is voor een Blue-Green deployment.
@@ -106,3 +120,20 @@ De JSON key en overige projectgegevens voeg ik toe als repository secrets in Git
 De volgende secrets zijn aangemaakt:
 
 ![GitHub Secrets overzicht](image-20.avif)
+
+Vervolgens kan ik weer terug naar de gcloud CLI om verbinding te maken met het cluster.
+
+![Verbinding maken met het cluster via gcloud CLI](image.avif)
+
+Daarna naar de Artifact Registry om een repository aan te maken voor de container images. Ik kies dezelfde naam als mijn Docker Hub en GitHub repositories: `public-cloud-concepts`.
+
+![Artifact Registry aanmaken](image-1.avif)
+
+De instellingen heb ik grotendeels op de standaardwaarden gelaten.
+
+![Artifact Registry instellingen](image-2.avif)
+
+Tot slot heb ik de **Container Scanning API** ingeschakeld. Dit deed ik in Week 1 en 2 ook al met Docker Scout — het geeft een mooi overzicht van kwetsbaarheden in de images.
+
+![Container Scanning API inschakelen](image-3.avif)
+

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-green
+  labels:
+    app: public-cloud-concepts
+    slot: green
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: public-cloud-concepts
+      slot: green
+  template:
+    metadata:
+      labels:
+        app: public-cloud-concepts
+        slot: green
+    spec:
+      containers:
+        - name: app
+          image: europe-west4-docker.pkg.dev/project-5b8c5498-4fe2-42b9-bc3/public-cloud-concepts/app:green
+          ports:
+            - containerPort: 80
