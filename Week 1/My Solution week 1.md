@@ -9,9 +9,9 @@
 
 Voltooide badges via [Google Cloud Skills Boost](https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe):
 
-[![Google Cloud Fundamentals: Core Infrastructure](https://cdn.qwiklabs.com/V%2FuXlPOWQoaDTrhNB3K%2Ba2p2wGiQZT7%2BODtWIPHmON4%3D)](https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe)
-[![Essential Google Cloud Infrastructure: Core Services](https://cdn.qwiklabs.com/sgKmjMjD%2BpyCGA4VRZkhXxeonasfqbo8j85m8b5gC%2Bg%3D)](https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe)
-[![Getting Started with Google Kubernetes Engine](https://cdn.qwiklabs.com/HPtjPjHuWp197QQiSmfshQL2uNxmxDCHjWps43o10Cg%3D)](https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe)
+<a href="https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe"><img src="https://cdn.qwiklabs.com/V%2FuXlPOWQoaDTrhNB3K%2Ba2p2wGiQZT7%2BODtWIPHmON4%3D" alt="Google Cloud Fundamentals: Core Infrastructure" width="120"></a>
+<a href="https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe"><img src="https://cdn.qwiklabs.com/sgKmjMjD%2BpyCGA4VRZkhXxeonasfqbo8j85m8b5gC%2Bg%3D" alt="Essential Google Cloud Infrastructure: Core Services" width="120"></a>
+<a href="https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe"><img src="https://cdn.qwiklabs.com/HPtjPjHuWp197QQiSmfshQL2uNxmxDCHjWps43o10Cg%3D" alt="Getting Started with Google Kubernetes Engine" width="120"></a>
 
 ---
 
