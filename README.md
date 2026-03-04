@@ -16,7 +16,7 @@ Deze repository wordt bijgehouden door [Sten Tijhuis](https://github.com/Stensel
 |--------|-----|----------|
 | Public Cloud Concepts | 5 EC | Q3 |
 
-> [**Architecting the Cloud**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/architecting-the-cloud) en [**Cloud Automation Concepts**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/cloud-automation-concepts) (5 EC, Q3) zijn gedeelde modules die samen met [Hintenhaus04](https://github.com/Hintenhaus04) worden gedaan en staan in een aparte repository: [Voorjaar 2026 - Cloud Engineering](https://github.com/Stensel8/spring2026-cloud-engineering).
+> [**Architecting the Cloud**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/architecting-the-cloud) en [**Cloud Automation Concepts**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/cloud-automation-concepts) (5 EC, Q3) zijn gedeelde modules die samen met [Wout Achterhuis](https://github.com/Wout Achterhuis) worden gedaan en staan in een aparte repository: [Voorjaar 2026 - Cloud Engineering](https://github.com/Stensel8/spring2026-cloud-engineering).
 
 ## Week-overzicht
 
