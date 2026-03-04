@@ -72,10 +72,10 @@ jobs:
               'sudo pacman -S libavif',
               '```',
               '',
-              'Batch-converteer alle afbeeldingen:',
+              'Batch-converteer alle afbeeldingen (recursief):',
               '```bash',
-              'for f in *.png *.jpg *.jpeg; do',
-              '  [ -f "$f" ] && avifenc -q 80 -s 6 "$f" "${f%.*}.avif" && rm "$f"',
+              'find . -type f \\( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \\) | while read -r f; do',
+              '  avifenc -q 80 -s 6 "$f" "${f%.*}.avif" && rm "$f"',
               'done',
               '```',
             ].join('\n');

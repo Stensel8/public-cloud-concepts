@@ -37,7 +37,7 @@ Alle afbeeldingen in deze repository gebruiken het [AVIF](https://en.wikipedia.o
 Batch-converteer PNG/JPG screenshots naar AVIF (converteert en verwijdert originelen):
 
 ```bash
-for f in *.png *.jpg *.jpeg; do [ -f "$f" ] && avifenc -q 80 -s 6 "$f" "${f%.*}.avif" && rm "$f"; done
+find . -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \) | while read -r f; do avifenc -q 80 -s 6 "$f" "${f%.*}.avif" && rm "$f"; done
 ```
 
 Installeer `avifenc` eerst via `sudo pacman -S libavif` (Arch/CachyOS) of `sudo apt install libavif-bin` (Debian/Ubuntu).
