@@ -1,5 +1,7 @@
 # Mijn Uitwerking - Week 1
 
+[![CI Week 1](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml)
+
 ## 1.1 Google Cloud & GKE - Voltooide Badges
 
 Voltooide badges via [Google Cloud Skills Boost](https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe):

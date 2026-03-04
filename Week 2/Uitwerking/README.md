@@ -1,5 +1,7 @@
 # Mijn Uitwerking - Week 2
 
+[![CI Week 2](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week2.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week2.yml)
+
 ## CI/CD - Docker Hub Tags
 
 De GitHub Actions workflow ([ci_week2.yml](../../.github/workflows/ci_week2.yml)) bouwt twee images en pusht ze naar de bestaande `stensel8/public-cloud-concepts` DockerHub-repository met aparte tags:
