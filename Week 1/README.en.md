@@ -1,6 +1,9 @@
-[🇳🇱 Nederlands](README.md) | 🇬🇧 English
+[Nederlands](README.md) | English
 
 ---
+
+> [!NOTE]
+> This repository is maintained primarily in **Dutch**. This English version may be incomplete or outdated. An English translation may be added in the future, but is not guaranteed.
 
 # Week 1 - Introduction to Google Cloud & Kubernetes
 

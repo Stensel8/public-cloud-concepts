@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-green
+  labels:
+    app: public-cloud-concepts
+    slot: green
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: public-cloud-concepts
+      slot: green
+  template:
+    metadata:
+      labels:
+        app: public-cloud-concepts
+        slot: green
+    spec:
+      containers:
+        - name: app
+          # IMAGE_TAG wordt ingevuld door de CI-workflow via envsubst, zodat altijd
+          # het juist gebouwde image wordt gebruikt en er geen hardcoded project-id staat.
+          # Formaat: <zone>-docker.pkg.dev/<project-id>/<repo>/<image>:<slot>
+          image: ${IMAGE_TAG}
+          ports:
+            - containerPort: 80
