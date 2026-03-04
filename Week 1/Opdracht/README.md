@@ -15,7 +15,7 @@ Now you've basic understanding of the Google Cloud, let's jump into Google Kuber
 
 You need to add the Proof of Completion (Course Badge) badges to your portfolio.
 
-![](images/image-001.jpeg)
+![](images/image-001.avif)
 
 ## 1.2 Kubernetes Challenge
 
@@ -29,7 +29,7 @@ Of course, you can use all kinds of sources for this, such as chatgpt or manuals
 
 1. Create three Ubuntu 24.04 LTS minimal instances in Google (choose type e2-standard-2 as node) and choose Ubuntu 24.04 LTS minimal as OS. To see that a virtual network in Google directly connects multiple regions, you can place the master in the Netherlands, a node in Brussels and a node in London.
 
-![](images/image-002.png)
+![](images/image-002.avif)
 
 Install a Kubernetes master and 2 Kubernetes workernodes.
 
@@ -67,7 +67,7 @@ First check that on the master with the command:
 kubectl get nodes
 ```
 
-![](images/image-003.png)
+![](images/image-003.avif)
 
 Use the following command to check which pods are running in the namespace `kube-system`. It should look something like this:
 
@@ -75,11 +75,11 @@ Use the following command to check which pods are running in the namespace `kube
 kubectl get pods -n kube-system
 ```
 
-![](images/image-004.png)
+![](images/image-004.avif)
 
 Explain these pods using the figure below from the book "Production Kubernetes":
 
-![](images/image-005.png)
+![](images/image-005.avif)
 
 2. We now want to run a containerized application in this cluster.
 
@@ -91,7 +91,7 @@ We use GitHub to automatically create an image when the code (`index.html`) is m
 
 After that, we can run the image in the Google Kubernetes cluster. It is shown schematically below:
 
-![](images/image-006.png)
+![](images/image-006.avif)
 
 Create a repository in GitHub (e.g. called "container"). Make sure git is installed on your PC and clone the GitHub repository to your own PC and place the Dockerfile and the `index.html` file there.
 
