@@ -14,7 +14,7 @@ This repository is maintained by [Stensel8](https://github.com/Stensel8) and cov
 |--------|-----|---------|
 | Public Cloud Concepts | 5 EC | Q3 |
 
-> [**Architecting the Cloud**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/architecting-the-cloud) and [**Cloud Automation Concepts**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/cloud-automation-concepts) (5 EC, Q3) are shared modules done in collaboration with [Wout Achterhuis](https://github.com/Wout Achterhuis) and live in their own repository: [Spring 2026 - Cloud Engineering](https://github.com/Stensel8/spring2026-cloud-engineering).
+> [**Architecting the Cloud**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/architecting-the-cloud) and [**Cloud Automation Concepts**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/cloud-automation-concepts) (5 EC, Q3) are shared modules done in collaboration with [Wout Achterhuis](https://github.com/Hintenhaus04) and live in their own repository: [Spring 2026 - Cloud Engineering](https://github.com/Stensel8/spring2026-cloud-engineering).
 
 ## Course Structure
 
