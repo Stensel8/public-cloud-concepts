@@ -9,9 +9,11 @@
 #   2. Authenticeer met GCP via het github-pipeline service account.
 #   3. Configureer Docker voor Artifact Registry en haal GKE-credentials op.
 #   4. Bouw het image en push het naar Artifact Registry met de juiste slot-tag.
-#   5. Pas de Kubernetes Service toe (LoadBalancer, idempotent).
-#   6. Deploy naar GKE via envsubst + kubectl apply, forceer een rollout restart
+#   5. Deploy naar GKE via envsubst + kubectl apply, forceer een rollout restart
 #      en wacht op een succesvolle rollout (timeout 120s).
+#
+# Let op: de Kubernetes Service wordt hier NIET aangepast. De selector (blue/green)
+# wordt beheerd via de switch-slot.yml workflow. Eenmalig aanmaken via kubectl apply.
 #
 # Secrets benodigd: GCP_PROJECT_ID, GCP_SA_KEY, GKE_CLUSTER, GKE_ZONE
 name: CI Week 3 - Blue-Green Deploy
@@ -84,9 +86,6 @@ jobs:
           # IMAGE_TAG samenstellen uit de workflow-variabelen, zodat het exact overeenkomt
           # met het image dat hierboven gebouwd en gepusht is.
           export IMAGE_TAG="${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${SLOT}"
-
-          # Pas de Service toe (idempotent: werkt ook als die al bestaat).
-          kubectl apply -f "Week 3/Bestanden/service.yml"
 
           # envsubst vervangt ${IMAGE_TAG} in het YAML-bestand met de waarde hierboven.
           # Het resultaat wordt direct via stdin naar kubectl gestuurd (geen tijdelijk bestand nodig).
