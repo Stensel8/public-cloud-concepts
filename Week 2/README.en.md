@@ -217,6 +217,9 @@ After applying the firewall rule, the application is reachable from a browser vi
 
 This confirms the full NodePort flow: external traffic -> node external IP -> port 32490 -> `kube-proxy` -> ClusterIP -> pods.
 
+> [!NOTE]
+> The firewall rule here was a **workaround**, not a standard part of the NodePort approach. On a production system you do not manually open GCP firewall rules per NodePort — that does not scale and introduces security risks. The intended solution for externally reachable services is a `LoadBalancer` service (on a managed cluster like GKE) or an Ingress controller. The firewall rule was used here solely to demonstrate the NodePort flow on a self-managed kubeadm cluster without a cloud controller manager.
+
 ---
 
 ### Assignment 2.2f - LoadBalancer on the kubeadm cluster
@@ -239,6 +242,21 @@ The `EXTERNAL-IP` column stays at `<pending>` indefinitely, regardless of how ma
 A `LoadBalancer` service works by asking the **cloud controller manager** to provision an external load balancer on the underlying cloud platform and assign it a public IP. On a self-managed kubeadm cluster running on plain GCP VMs, there is no cloud controller manager. Kubernetes has no knowledge of or integration with the GCP API. There is no component that can request a load balancer on Kubernetes' behalf, so the external IP is never assigned and the service remains `<pending>` forever.
 
 This is the fundamental difference with managed Kubernetes services like **GKE**: GKE includes the GCP cloud controller manager, which automatically provisions a Google Cloud Load Balancer and assigns a real external IP whenever a `LoadBalancer` service is created.
+
+#### Why is pending normal behavior on our setup?
+
+Our kubeadm cluster runs on plain GCP VMs with Kubernetes set up manually. Kubernetes itself has no knowledge of GCP — there is no cloud controller manager present that can call the GCP API. The pending behavior is therefore **completely expected and correct**: Kubernetes is waiting for a signal that will never arrive. This is not an error, but a logical consequence of the setup.
+
+#### Summary: What are the options?
+
+| Approach | How | When |
+|---|---|---|
+| **Correct way** | Use a managed cluster (GKE) — the cloud controller manager automatically provisions a Load Balancer with an external IP | Production, assignments 2.2g and beyond |
+| **NodePort + firewall rule** | Manually open a GCP firewall rule for the NodePort port | Workaround on kubeadm, for demo/testing only |
+| **Ingress controller** | Install an nginx Ingress controller (itself a LoadBalancer service on GKE) — routes multiple services through a single external IP | Multiple apps behind one load balancer (assignment 2.2h) |
+
+> [!IMPORTANT]
+> The firewall rule from assignment 2.2e was a **workaround** to demonstrate external access on the kubeadm cluster. It is not a replacement for a real LoadBalancer and does not scale to production. The correct approach is to use GKE (assignment 2.2g), where the cloud controller manager automatically provisions a load balancer without any manual firewall changes.
 
 ---
 

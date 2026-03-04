@@ -217,6 +217,9 @@ Na het toepassen van de firewallregel is de applicatie bereikbaar via een browse
 
 Dit bevestigt de volledige NodePort-flow: extern verkeer -> extern node-IP -> poort 32490 -> `kube-proxy` -> ClusterIP -> pods.
 
+> [!NOTE]
+> De firewallregel was hier een **workaround**, geen standaard onderdeel van de NodePort-aanpak. Op een productiesysteem open je niet handmatig GCP-firewallregels per NodePort - dat schaalt slecht en leidt tot beveiligingsrisico's. De bedoelde oplossing voor extern bereikbare services is een `LoadBalancer` service (op een managed cluster zoals GKE) of een Ingress controller. De firewallregel is hier uitsluitend gebruikt om de NodePort-flow te demonstreren op een zelfbeheerd kubeadm-cluster zonder cloud controller manager.
+
 ---
 
 ### Opdracht 2.2f - LoadBalancer op het kubeadm-cluster
@@ -239,6 +242,21 @@ De `EXTERNAL-IP` blijft `<pending>`, ongeacht hoe vaak `kubectl get service` wor
 Een `LoadBalancer` service werkt door de **cloud controller manager** te vragen een externe load balancer te provisionen op het onderliggende cloudplatform en er een publiek IP aan toe te wijzen. Op een zelfbeheerd kubeadm-cluster op gewone GCP-VMs is er geen cloud controller manager aanwezig. Kubernetes heeft geen kennis van of integratie met de GCP-API. Er is geen component dat namens Kubernetes een load balancer kan aanvragen, dus het externe IP wordt nooit toegewezen en de service blijft `<pending>`.
 
 Dit is het grote verschil met managed Kubernetes-diensten zoals **GKE**: GKE heeft de GCP cloud controller manager ingebouwd, die automatisch een Google Cloud Load Balancer provisioneert en een echt extern IP toewijst zodra je een `LoadBalancer` service aanmaakt.
+
+#### Waarom is pending normaal gedrag op onze setup?
+
+Op ons kubeadm-cluster draaien gewone GCP-VMs met Kubernetes dat handmatig is opgezet. Kubernetes zelf weet niets van GCP - er is geen cloud controller manager aanwezig die de GCP-API kan aanroepen. Het pending-gedrag is dus **volledig verwacht en correct**: Kubernetes wacht op een signaal dat nooit komt. Dit is geen fout, maar een logisch gevolg van de setup.
+
+#### Samenvatting: Wat zijn de opties?
+
+| Aanpak | Hoe | Wanneer |
+|---|---|---|
+| **Juiste manier** | Gebruik een managed cluster (GKE) - de cloud controller manager regelt automatisch een Load Balancer met extern IP | Productie, opdrachten 2.2g en verder |
+| **NodePort + firewallregel** | Open handmatig een GCP-firewallregel voor de NodePort-poort | Workaround op kubeadm, alleen voor demo/test |
+| **Ingress controller** | Installeer een nginx Ingress controller (zelf een LoadBalancer service op GKE) - routeert meerdere services via één extern IP | Meerdere apps achter één load balancer (opdracht 2.2h) |
+
+> [!IMPORTANT]
+> De firewallregel uit opdracht 2.2e was een **workaround** om externe toegang te demonstreren op het kubeadm-cluster. Het is geen vervanging voor een echte LoadBalancer en schaalt niet in productie. De docent wees er terecht op dat de bedoelde aanpak het gebruik van GKE is (opdracht 2.2g), waarbij de cloud controller manager automatisch een load balancer provisioneert zonder handmatige firewallaanpassingen.
 
 ---
 
