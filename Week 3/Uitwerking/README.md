@@ -137,7 +137,11 @@ Tot slot heb ik de **Container Scanning API** ingeschakeld. Dit deed ik in Week 
 
 ![Container Scanning API inschakelen](image-3.avif)
 
-Uiteindelijk na het uitvoeren van mijn Blue-Green deployment, ziet het Github Actions gedeelte er zo uit: ![alt text](image-4.png)
+Uiteindelijk na het uitvoeren van mijn Blue-Green deployment, ziet het GitHub Actions gedeelte er zo uit:
 
-Bij Google Cloud zie ik nu mijn applicatie erbij komen, want de registry us nu 25,2MB groot. ![alt text](image-5.png)
+![GitHub Actions overzicht](image-4.avif)
+
+Bij Google Cloud zie ik nu mijn applicatie erbij komen — de registry is nu 25,2 MB groot.
+
+![Artifact Registry met image](image-5.avif)
 
