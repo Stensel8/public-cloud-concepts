@@ -45,4 +45,4 @@ This is a work in progress for educational purposes. Code, configurations, and d
 
 ---
 
-*Last updated: maart 2026*
+*Last updated: March 2026*
