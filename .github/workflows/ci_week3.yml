@@ -67,5 +67,9 @@ jobs:
           # Het resultaat wordt direct via stdin naar kubectl gestuurd (geen tijdelijk bestand nodig).
           envsubst < "Week 3/Bestanden/deployment-${{ steps.slot.outputs.slot }}.yml" | kubectl apply -f -
 
+          # Forceer een herstart zodat Kubernetes het nieuw gepushte image ophaalt.
+          # Zonder dit herkent Kubernetes geen wijziging als de tag (bijv. :green) gelijk blijft.
+          kubectl rollout restart deployment/deployment-${{ steps.slot.outputs.slot }}
+
           kubectl rollout status deployment/deployment-${{ steps.slot.outputs.slot }} --timeout=120s
           kubectl get pods -l slot=${{ steps.slot.outputs.slot }}

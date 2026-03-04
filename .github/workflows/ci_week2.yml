@@ -31,8 +31,8 @@ jobs:
           password: ${{ secrets.DOCKER_PAT }}
       - name: Build and push Docker images
         run: |
-          docker build -t stensel8/public-cloud-concepts:bison "./Week 2/bison"
+          docker build -t stensel8/public-cloud-concepts:bison "./Week 2/Bestanden/bison"
           docker push stensel8/public-cloud-concepts:bison
 
-          docker build -t stensel8/public-cloud-concepts:brightspace "./Week 2/brightspace"
+          docker build -t stensel8/public-cloud-concepts:brightspace "./Week 2/Bestanden/brightspace"
           docker push stensel8/public-cloud-concepts:brightspace
