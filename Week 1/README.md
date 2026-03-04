@@ -1,8 +1,8 @@
-🇳🇱 Nederlands | [🇬🇧 English](README.en.md)
+Nederlands | [English](README.en.md)
 
 ---
 
-| [Overzicht](../README.md) | [Week 2 - Kubernetes Networking & CI/CD →](../Week%202/README.md) |
+| [Overzicht](../README.md) | [Week 2 - Kubernetes Networking & CI/CD](../Week%202/README.md) |
 |:---|---:|
 
 ---
@@ -69,5 +69,5 @@ Deze week maak je kennis met het **Google Cloud Platform** en **Kubernetes**. We
 
 ---
 
-| [🏠 Overzicht](../README.md) | [Week 2 - Kubernetes Networking \& CI/CD →](../Week%202/README.md) |
+| [Overzicht](../README.md) | [Week 2 - Kubernetes Networking \& CI/CD](../Week%202/README.md) |
 |:---|---:|

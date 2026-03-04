@@ -1,4 +1,4 @@
-🇳🇱 Nederlands | [🇬🇧 English](README.en.md)
+Nederlands | [English](README.en.md)
 
 > [!NOTE]
 > Deze repository wordt primair in het **Nederlands** bijgehouden. Een Engelse vertaling is mogelijk in de toekomst beschikbaar, maar dit is geen garantie.

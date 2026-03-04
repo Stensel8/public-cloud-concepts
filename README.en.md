@@ -1,4 +1,4 @@
-[🇳🇱 Nederlands](README.md) | 🇬🇧 English
+[Nederlands](README.md) | English
 
 ---
 

@@ -1,4 +1,4 @@
-| [← Week 1 - Introductie & Deployments](../Week%201/README.md) | [Week 3 →](../Week%203/README.md) |
+| [Week 1 - Introductie & Deployments](../Week%201/README.md) | [Week 3](../Week%203/README.md) |
 |:---|---:|
 
 ---
@@ -417,5 +417,5 @@ De volledige Ingress-flow: browser -> `34.91.190.135` (Google Cloud LB) -> nginx
 
 ---
 
-| [← Week 1 - Introductie \& Deployments](../Week%201/README.md) | [Week 3 →](../Week%203/README.md) |
+| [Week 1 - Introductie \& Deployments](../Week%201/README.md) | [Week 3](../Week%203/README.md) |
 |:---|---:|

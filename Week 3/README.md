@@ -1,8 +1,8 @@
-🇳🇱 Nederlands
+Nederlands
 
 ---
 
-| [← Week 2 - Kubernetes Networking & CI/CD](../Week%202/README.md) |
+| [Week 2 - Kubernetes Networking & CI/CD](../Week%202/README.md) |
 |:---|
 
 ---

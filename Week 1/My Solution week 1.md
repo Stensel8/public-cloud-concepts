@@ -1,4 +1,4 @@
-| [Overzicht](../README.md) | [Week 2 - Kubernetes Networking & CI/CD →](../Week%202/README.md) |
+| [Overzicht](../README.md) | [Week 2 - Kubernetes Networking & CI/CD](../Week%202/README.md) |
 |:---|---:|
 
 ---
@@ -148,71 +148,13 @@ CMD ["nginx", "-g", "daemon off;"]
 
 **GitHub Actions workflow:**
 
-De workflow staat in [`.github/workflows/ci_week1.yml`](../.github/workflows/ci_week1.yml) en draait automatisch bij elke push of pull request naar `main`. Er zijn twee jobs:
+De workflow staat in [`.github/workflows/ci_week1.yml`](../.github/workflows/ci_week1.yml) en draait automatisch bij elke push of pull request naar `main`. De relevante stappen voor de opdracht:
 
-```yaml
-name: CI Week 1
+- **Build:** het Docker image wordt gebouwd vanuit `Week 1/Dockerfile`
+- **Login:** inloggen bij DockerHub via repository-secrets (`DOCKER_USERNAME` en `DOCKER_PAT`), alleen bij een directe push naar `main`
+- **Push:** het image wordt gepusht als `stensel8/public-cloud-concepts:latest`, ook alleen bij directe pushes naar `main` (niet bij PRs)
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
-
-jobs:
-  lint:
-    name: Dockerfile lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - name: Install hadolint
-        run: |
-          wget -qO /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
-          chmod +x /usr/local/bin/hadolint
-      - name: Lint Dockerfile
-        run: hadolint "Week 1/Dockerfile"
-
-  build:
-    name: Build & scan
-    runs-on: ubuntu-latest
-    needs: lint
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Build Docker image
-        run: docker build -t stensel8/public-cloud-concepts:latest "./Week 1/"
-
-      - name: Scan image with Trivy
-        uses: aquasecurity/trivy-action@0.34.1
-        with:
-          image-ref: stensel8/public-cloud-concepts:latest
-          format: table
-          exit-code: "1"
-          severity: CRITICAL
-
-      - name: Login to Docker Hub
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PAT }}
-
-      - name: Push to Docker Hub
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        run: docker push stensel8/public-cloud-concepts:latest
-```
-
-**Job 1 (`lint`):** Installeert [Hadolint](https://github.com/hadolint/hadolint) via `wget` (de `hadolint/hadolint-action` werd vervangen omdat die geen mapnamen met spaties aankon) en checkt de Dockerfile statisch op best-practice schendingen (bijv. ontbrekende `--no-install-recommends`, verkeerde `COPY`-volgorde). De build-job start pas als de lint slaagt.
-
-**Job 2 (`build`)** draait na `lint`:
-
-- Bouwt het Docker image van `Week 1/Dockerfile`
-- Scant het image met [Trivy](https://github.com/aquasecurity/trivy) en breekt de pipeline af bij **CRITICAL** CVEs
-- Logt in bij DockerHub met repository-secrets (`DOCKER_USERNAME` en `DOCKER_PAT`), alleen bij pushes naar `main` (niet bij PRs)
-- Pusht het image als `stensel8/public-cloud-concepts:latest` naar DockerHub, ook alleen bij directe pushes naar `main`
-
-De secrets stel je in via **Settings -> Secrets and Variables -> Actions -> Repository Secrets** in de GitHub-repository.
+De secrets stel je in via **Settings > Secrets and Variables > Actions > Repository Secrets** in de GitHub-repository.
 
 **2a - Uitleg van de deployment.yaml structuur:**
 
@@ -307,5 +249,5 @@ Inloggen op de pod via `kubectl exec` en het bestand direct uitlezen bevestigt d
 
 ---
 
-| [🏠 Overzicht](../README.md) | [Week 2 - Kubernetes Networking \& CI/CD →](../Week%202/README.md) |
+| [Overzicht](../README.md) | [Week 2 - Kubernetes Networking \& CI/CD](../Week%202/README.md) |
 |:---|---:|

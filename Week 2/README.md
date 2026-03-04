@@ -1,8 +1,8 @@
-🇳🇱 Nederlands | [🇬🇧 English](README.en.md)
+Nederlands | [English](README.en.md)
 
 ---
 
-| [← Week 1 - Introductie & Deployments](../Week%201/README.md) | [Week 3 →](../Week%203/README.md) |
+| [Week 1 - Introductie & Deployments](../Week%201/README.md) | [Week 3](../Week%203/README.md) |
 |:---|---:|
 
 ---
@@ -59,5 +59,5 @@ Deze week gaat het over **Kubernetes Networking**. We maken een Kubernetes Clust
 
 ---
 
-| [← Week 1 - Introductie \& Deployments](../Week%201/README.md) | [Week 3 →](../Week%203/README.md) |
+| [Week 1 - Introductie \& Deployments](../Week%201/README.md) | [Week 3](../Week%203/README.md) |
 |:---|---:|

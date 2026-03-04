@@ -1,4 +1,4 @@
-[🇳🇱 Nederlands](README.md) | 🇬🇧 English
+[Nederlands](README.md) | English
 
 ---
 
@@ -7,7 +7,7 @@
 
 ---
 
-| [Overview](../README.en.md) | [Week 2 - Kubernetes Networking & CI/CD →](../Week%202/README.en.md) |
+| [Overview](../README.en.md) | [Week 2 - Kubernetes Networking & CI/CD](../Week%202/README.en.md) |
 |:---|---:|
 
 ---
@@ -494,5 +494,5 @@ Logging into the pod from the master with `kubectl exec` and reading the file di
 
 ---
 
-| [🏠 Overview](../README.en.md) | [Week 2 - Kubernetes Networking \& CI/CD →](../Week%202/README.en.md) |
+| [Overview](../README.en.md) | [Week 2 - Kubernetes Networking \& CI/CD](../Week%202/README.en.md) |
 |:---|---:|
