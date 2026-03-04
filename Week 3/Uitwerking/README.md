@@ -24,28 +24,15 @@ De branchnamen hoeven niet `blue` en `green` te heten — de kleur wordt bepaald
 
 Eerst ruim ik de werkzaamheden van Week 1 op (de handmatig opgezette deployments op de virtuele machines). Als basis gebruik ik de omgeving van Week 2: een Google Kubernetes Engine cluster, wat beter geschikt is voor een Blue-Green deployment.
 
-![De omgeving van week 2](image.avif)
-
 De week 2 omgeving draait nog, maar ik bouw hem opnieuw op als `week3-cluster` — dat is netter en overzichtelijker.
-
-![Het aanmaken van een standaard cluster voor week 3](image-1.avif)
 
 Net zoals bij Week 2 kies ik voor een **standaard cluster**. Dit geeft volledige controle over de configuratie en is goedkoop te houden voor deze opdracht.
 
 **Instellingen:**
-
-![Cluster basics](image-2.avif)
-![Node pools](image-3.avif)
-
-Ik kies voor **2 nodes** — het minimum dat nodig is voor een Blue-Green deployment.
-
-Voor het machinetype kies ik **e2-medium** (2 vCPU's, 4 GB RAM). Voldoende voor de applicatie en nog steeds betaalbaar.
-
-![Node specs](image-4.avif)
+- **2 nodes** — het minimum dat nodig is voor een Blue-Green deployment
+- **Machinetype e2-medium** (2 vCPU's, 4 GB RAM) — voldoende voor de applicatie en nog betaalbaar
 
 Het aanmaken van het cluster duurde ongeveer 5 minuten.
-
-![Cluster wordt aangemaakt](image-5.avif)
 
 ---
 
@@ -54,14 +41,20 @@ Het aanmaken van het cluster duurde ongeveer 5 minuten.
 Terwijl het cluster aangemaakt wordt, begin ik alvast met het opzetten van een Service Account waarmee GitHub Actions met GCP kan communiceren. Ik volg hiervoor deze handleiding:
 [Setup CI/CD using GitHub Actions to deploy to GKE](https://medium.com/@gravish316/setup-ci-cd-using-github-actions-to-deploy-to-google-kubernetes-engine-ef465a482fd)
 
-![Service account aanmaken](image-7.avif)
+![Het formulier voor het aanmaken van een service account](service-account-form.avif)
+
+Ik vul de naam in als **Github Pipeline Account**.
+
+![Service account aangemaakt met naam en beschrijving](service-account-create.avif)
 
 Het service account krijgt de volgende rollen:
 - Artifact Registry Reader
 - Artifact Registry Writer
 - Kubernetes Engine Developer
 
-![Permissions](image-8.avif)
+![Rollen toegewezen aan het service account](service-account-permissions.avif)
+
+![Principals with access — stap 3 van het aanmaken](service-account-principals.avif)
 
 ---
 
@@ -69,23 +62,31 @@ Het service account krijgt de volgende rollen:
 
 Om de GitHub Actions workflow te kunnen authenticeren, maak ik een JSON key aan via **IAM → Service Accounts → Keys → Add Key → JSON**.
 
-![JSON key aanmaken](image-10.avif)
+![Keys-tabblad van het Github Pipeline Account](service-account-keys.avif)
 
 Bij het aanmaken van de key krijg ik de volgende foutmelding:
 
-![Foutmelding bij key aanmaken](image-11.avif)
+![Foutmelding: service account key creation is disabled](service-account-key-disabled.avif)
 
 Een Organization Policy (`iam.disableServiceAccountKeyCreation`) blokkeert het aanmaken van keys.
 
-![Organization Policies overzicht](image-12.avif)
+![Organization Policies overzicht met de geblokkeerde policy](org-policy-overview.avif)
 
 In de GUI kan ik de policy niet aanpassen — daarvoor ontbreken de benodigde rechten.
 
-![Policy aanpassen niet mogelijk in GUI](image-13.avif)
+![Bewerkoptie geblokkeerd in de GUI](org-policy-blocked.avif)
 
 ### Oplossing via Cloud Shell
 
-Via de CLI kan ik mezelf eerst de benodigde rechten geven en daarna de policy overrulen op projectniveau:
+Via de CLI los ik dit in twee stappen op. Eerst zoek ik het organization ID op:
+
+```bash
+gcloud organizations list
+```
+
+![Organization ID opvragen via gcloud](org-list.avif)
+
+Daarna geef ik mezelf de benodigde rechten:
 
 ```bash
 gcloud organizations add-iam-policy-binding 774668784967 \
@@ -93,21 +94,22 @@ gcloud organizations add-iam-policy-binding 774668784967 \
   --role="roles/orgpolicy.policyAdmin"
 ```
 
-![CLI commando uitvoeren](image-14.avif)
+![IAM policy binding toegevoegd aan de organisatie](org-policy-add-binding.avif)
+
+Vervolgens zet ik de policy op projectniveau uit:
 
 ```bash
 gcloud resource-manager org-policies disable-enforce iam.disableServiceAccountKeyCreation \
   --project=project-5b8c5498-4fe2-42b9-bc3
 ```
 
-![Policy succesvol uitgeschakeld](image-15.avif)
+![Policy succesvol uitgeschakeld op projectniveau](org-policy-disable-enforce.avif)
 
-De policy is nu uitgeschakeld op projectniveau (`booleanPolicy: {}`), waarna ik de key wel kan aanmaken.
+De policy is nu uitgeschakeld (`booleanPolicy: {}`), waarna ik de key wel kan aanmaken.
 
-![Policy overschreven](image-16.avif)
+![Bestandsdialoog voor het opslaan van de JSON key](json-key-download.avif)
 
-![Key aangemaakt](image-17.avif)
-![Key gedownload](image-18.avif)
+![Bevestiging: private key opgeslagen op de computer](json-key-saved.avif)
 
 ---
 
@@ -115,33 +117,44 @@ De policy is nu uitgeschakeld op projectniveau (`booleanPolicy: {}`), waarna ik 
 
 De JSON key en overige projectgegevens voeg ik toe als repository secrets in GitHub via **Settings → Secrets and variables → Actions**.
 
-![GitHub Secrets toevoegen](image-19.avif)
+![GitHub Secrets gedeeltelijk ingesteld (DOCKER_PAT en DOCKER_USERNAME)](github-secrets-partial.avif)
 
 De volgende secrets zijn aangemaakt:
 
-![GitHub Secrets overzicht](image-20.avif)
+![GitHub Secrets volledig ingesteld (GCP_PROJECT_ID, GCP_SA_KEY, GKE_CLUSTER, GKE_ZONE)](github-secrets-complete.avif)
 
-Vervolgens kan ik weer terug naar de gcloud CLI om verbinding te maken met het cluster.
+---
 
-![Verbinding maken met het cluster via gcloud CLI](image.avif)
+## Stap 5: Artifact Registry & cluster verbinden
 
-Daarna naar de Artifact Registry om een repository aan te maken voor de container images. Ik kies dezelfde naam als mijn Docker Hub en GitHub repositories: `public-cloud-concepts`.
+Daarna maak ik verbinding met het cluster via de gcloud CLI:
 
-![Artifact Registry aanmaken](image-1.avif)
+```bash
+gcloud container clusters get-credentials week3-cluster --region europe-west4-a --project project-5b8c5498-4fe2-42b9-bc3
+```
 
-De instellingen heb ik grotendeels op de standaardwaarden gelaten.
+![Cluster credentials ophalen via gcloud in Cloud Shell](gcloud-connect-cluster.avif)
 
-![Artifact Registry instellingen](image-2.avif)
+Daarna ga ik naar de Artifact Registry om een repository aan te maken voor de container images. Ik kies dezelfde naam als mijn Docker Hub en GitHub repositories: `public-cloud-concepts`.
 
-Tot slot heb ik de **Container Scanning API** ingeschakeld. Dit deed ik in Week 1 en 2 ook al met Docker Scout — het geeft een mooi overzicht van kwetsbaarheden in de images.
+![Artifact Registry nog leeg — geen repositories aangemaakt](artifact-registry-empty.avif)
 
-![Container Scanning API inschakelen](image-3.avif)
+![Formulier voor het aanmaken van een Artifact Registry repository](artifact-registry-create.avif)
 
-Uiteindelijk na het uitvoeren van mijn Blue-Green deployment, ziet het GitHub Actions gedeelte er zo uit:
+De instellingen heb ik grotendeels op de standaardwaarden gelaten: Docker-formaat, region `europe-west4`.
 
-![GitHub Actions overzicht](image-4.avif)
+Tot slot schakel ik de **Container Scanning API** in. Dit deed ik in Week 1 en 2 ook al met Docker Scout — het geeft een mooi overzicht van kwetsbaarheden in de images.
 
-Bij Google Cloud zie ik nu mijn applicatie erbij komen — de registry is nu 25,2 MB groot.
+![Container Scanning API activeren in Google Cloud](container-scanning-api.avif)
 
-![Artifact Registry met image](image-5.avif)
+---
 
+## Resultaat
+
+Na het uitvoeren van de Blue-Green deployment via GitHub Actions ziet de workflow er zo uit:
+
+![GitHub Actions workflow: Build, push & deploy geslaagd](github-actions-run.avif)
+
+In de Artifact Registry staat nu het gebuilde image met tag `green` — 25,2 MB groot.
+
+![Artifact Registry met het gepushte green image](artifact-registry-result.avif)
