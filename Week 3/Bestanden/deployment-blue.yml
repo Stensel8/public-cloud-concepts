@@ -19,6 +19,9 @@ spec:
     spec:
       containers:
         - name: app
-          image: europe-west4-docker.pkg.dev/project-5b8c5498-4fe2-42b9-bc3/public-cloud-concepts/app:blue
+          # IMAGE_TAG wordt ingevuld door de CI-workflow via envsubst, zodat altijd
+          # het juist gebouwde image wordt gebruikt en er geen hardcoded project-id staat.
+          # Formaat: <zone>-docker.pkg.dev/<project-id>/<repo>/<image>:<slot>
+          image: ${IMAGE_TAG}
           ports:
             - containerPort: 80

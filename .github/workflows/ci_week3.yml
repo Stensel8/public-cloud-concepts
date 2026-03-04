@@ -60,6 +60,13 @@ jobs:
 
       - name: Deploy to GKE
         run: |
-          kubectl apply -f "Week 3/Bestanden/deployment-${{ steps.slot.outputs.slot }}.yml"
+          # IMAGE_TAG samenstellen uit de workflow-variabelen, zodat het exact overeenkomt
+          # met het image dat hierboven gebouwd en gepusht is.
+          export IMAGE_TAG="${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${{ steps.slot.outputs.slot }}"
+
+          # envsubst vervangt ${IMAGE_TAG} in het YAML-bestand met de waarde hierboven.
+          # Het resultaat wordt direct via stdin naar kubectl gestuurd (geen tijdelijk bestand nodig).
+          envsubst < "Week 3/Bestanden/deployment-${{ steps.slot.outputs.slot }}.yml" | kubectl apply -f -
+
           kubectl rollout status deployment/deployment-${{ steps.slot.outputs.slot }} --timeout=120s
           kubectl get pods -l slot=${{ steps.slot.outputs.slot }}
