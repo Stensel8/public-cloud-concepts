@@ -1,5 +1,8 @@
 # Week 3 - Blue-Green Deployment & Artifact Registry
 
+[![CI Week 3 - Blue-Green Deploy](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week3.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week3.yml)
+[![Switch Blue-Green Slot](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml)
+
 Voor week 3 is het de bedoeling dat ik een Blue-Green deployment opzet voor de eerder gecreëerde applicatie, maar dan met Google Artifact Registry als container registry in plaats van Docker Hub.
 
 Daarnaast richt ik een CI/CD pipeline in met GitHub Actions die automatisch een nieuw image bouwt en uitrolt bij elke codeverandering.
@@ -195,9 +198,13 @@ De Kubernetes Service is eenmalig handmatig aangemaakt via Cloud Shell met `kube
 
 ![Kubernetes Service aangemaakt via kubectl apply in Cloud Shell](service-handmatig-aangemaakt.avif)
 
-De website is bereikbaar via het externe IP van de LoadBalancer Service op poort 80:
+De website is bereikbaar via het externe IP van de LoadBalancer Service op poort 80. De gekleurde balk bovenaan geeft aan welke slot actief is - dit wordt ingevoegd op build-tijd via een Docker ARG:
 
-![De statische website draaiend op het GKE cluster via het externe LoadBalancer-IP](website-draaiend.avif)
+![De website met actieve blue slot - blauwe balk bovenaan](website-slot-blue.avif)
+
+Na het uitvoeren van de switch-slot workflow naar green verschijnt de groene balk:
+
+![De website met actieve green slot - groene balk bovenaan](website-slot-green.avif)
 
 De pods draaien correct en zijn voorzien van de juiste labels (`slot=blue` of `slot=green`):
 
