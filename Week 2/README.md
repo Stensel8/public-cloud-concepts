@@ -167,7 +167,24 @@ Alle drie nodes bereikten de applicatie via `curl 10.110.23.98`, wat bewijst dat
 
 ### Opdracht 2.2e - NodePort Service
 
-De service is bijgewerkt naar type `NodePort`. Kubernetes wees poort `32490` toe op elke node:
+De service is bijgewerkt naar type `NodePort`:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: first-service
+spec:
+  type: NodePort
+  selector:
+    app: my-container
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 32490
+```
+
+Met `type: NodePort` opent Kubernetes automatisch een poort (hier `32490`) op **elke node** in het cluster. Verkeer dat op die poort binnenkomt op een willekeurige node, wordt doorgestuurd naar de pods via `kube-proxy`. Kubernetes wees poort `32490` toe:
 
 ![NodePort service - poort 80:32490/TCP](screenshots/2-2e-nodeport-service.png)
 
@@ -186,39 +203,41 @@ first-service   NodePort   10.110.23.98    <none>        80:32490/TCP   8m39s
 | worker-brussels | 10.132.0.5 |
 | worker-london | 10.154.0.5 |
 
-**Interne curl-test via NodePort:**
+**Lokale toegang via `kubectl port-forward`:**
 
-De applicatie is bereikt vanuit het cluster via het interne IP van de node en NodePort `32490`:
-
-![curl via NodePort op interne node-IPs](screenshots/2-2e-nodeport-curl-internal.png)
+Voor het testen zonder firewallregels te openen kan `kubectl port-forward` gebruikt worden. Dit maakt een tijdelijke tunnel van `localhost` naar de service, alleen op de machine waar het commando draait:
 
 ```bash
-curl 10.132.0.5:32490   # worker-brussels -> HTML response
-curl 10.154.0.5:32490   # worker-london   -> HTML response
+kubectl port-forward service/first-service 8080:80
 ```
 
-**Externe toegang - voor de firewallregel:**
+![kubectl port-forward draaiend - tunnel van localhost:8080 naar service poort 80](screenshots/2-2e-port-forward-running.png)
 
-Proberen de applicatie te bereiken via het externe IP (`34.140.10.158`) op poort `32490` vanuit een browser mislukte. De GCP-firewall blokkeerde het verkeer:
+Vanuit een tweede terminal op dezelfde machine is de service bereikbaar via `curl localhost:8080`:
+
+![curl op localhost:8080 geeft HTML response terug](screenshots/2-2e-port-forward-curl-localhost.png)
+
+> [!NOTE]
+> `kubectl port-forward` is een **developer-tool voor lokaal testen**, geen externe toegangsoplossing. De tunnel is alleen bereikbaar op de machine waar het commando draait (`127.0.0.1`) en stopt zodra je `Ctrl+C` doet. Voor externe browsertoegang van buiten het cluster is dit niet bruikbaar zonder aanvullende SSH-tunneling.
+
+**Externe toegang via NodePort + firewallregel:**
+
+NodePort opent de poort op elke node, maar GCP blokkeert inkomend verkeer standaard via de VPC-firewall. Proberen de applicatie te bereiken via het externe IP (`34.140.10.158`) op poort `32490` vanuit een browser mislukte:
 
 ![Browser geblokkeerd voor de firewallregel](screenshots/2-2e-browser-blocked-no-firewall.png)
 
-**Firewallregel aanmaken in GCP:**
-
-In **VPC Network -> Firewall** is een firewallregel aangemaakt om inkomend TCP-verkeer op poort `32490` toe te staan voor alle instanties in het netwerk:
+In **VPC Network -> Firewall** is een firewallregel aangemaakt om inkomend TCP-verkeer op poort `32490` toe te staan:
 
 ![Firewallregel aanmaken in GCP console](screenshots/2-2e-firewall-rule-created.png)
 
-**Externe toegang - na de firewallregel:**
-
-Na het toepassen van de firewallregel is de applicatie bereikbaar via een browser op `http://34.160.10.158:32490`:
+Na het toepassen is de applicatie bereikbaar via een browser op `http://34.160.10.158:32490`:
 
 ![Website bereikbaar via extern IP en NodePort](screenshots/2-2e-browser-working-after-firewall.png)
 
 Dit bevestigt de volledige NodePort-flow: extern verkeer -> extern node-IP -> poort 32490 -> `kube-proxy` -> ClusterIP -> pods.
 
 > [!NOTE]
-> De firewallregel was hier een **workaround**, geen standaard onderdeel van de NodePort-aanpak. Op een productiesysteem open je niet handmatig GCP-firewallregels per NodePort - dat schaalt slecht en leidt tot beveiligingsrisico's. De bedoelde oplossing voor extern bereikbare services is een `LoadBalancer` service (op een managed cluster zoals GKE) of een Ingress controller. De firewallregel is hier uitsluitend gebruikt om de NodePort-flow te demonstreren op een zelfbeheerd kubeadm-cluster zonder cloud controller manager.
+> De firewallregel is bij NodePort op een bare-VM cluster de **verwachte aanpak** om externe toegang te krijgen — dat is geen hack, maar gewoon hoe GCP-netwerken werken. De eigenlijke beperking zit hem in NodePort zelf: op een productiesysteem wil je niet per service handmatig firewallregels beheren. De bedoelde oplossing is een `LoadBalancer` service op een managed cluster (GKE), die dit automatisch regelt (zie opdracht 2.2g).
 
 ---
 
@@ -256,7 +275,7 @@ Op ons kubeadm-cluster draaien gewone GCP-VMs met Kubernetes dat handmatig is op
 | **Ingress controller** | Installeer een nginx Ingress controller (zelf een LoadBalancer service op GKE) - routeert meerdere services via één extern IP | Meerdere apps achter één load balancer (opdracht 2.2h) |
 
 > [!IMPORTANT]
-> De firewallregel uit opdracht 2.2e was een **workaround** om externe toegang te demonstreren op het kubeadm-cluster. Het is geen vervanging voor een echte LoadBalancer en schaalt niet in productie. De docent wees er terecht op dat de bedoelde aanpak het gebruik van GKE is (opdracht 2.2g), waarbij de cloud controller manager automatisch een load balancer provisioneert zonder handmatige firewallaanpassingen.
+> Het gebruik van **NodePort als externe toegangsmethode** was de workaround — niet de firewallregel op zichzelf. Voor NodePort op GCP is een firewallregel gewoon noodzakelijk. De docent wees erop dat de bedoelde aanpak het gebruik van GKE is (opdracht 2.2g): daar regelt de cloud controller manager automatisch een load balancer, zonder dat je handmatig firewallregels hoeft te beheren.
 
 ---
 
