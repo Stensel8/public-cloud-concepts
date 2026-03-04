@@ -17,13 +17,13 @@ Deze week gaat het over **Kubernetes Networking**. We maken een Kubernetes Clust
 
 ## Leerdoelen
 
-- [ ] Het Software Development Life Cycle (SDLC) analyseren
-- [ ] DevOps-strategieen voor automatisering verkennen
-- [ ] Een broncode-repository koppelen en applicaties bouwen vanuit Artifact Repositories
-- [ ] CI/CD inrichten voor een DTAP-omgeving
-- [ ] Kubernetes gebruiken in de cloud (GKE)
-- [ ] Cloud Shell en `kubectl` gebruiken om met Kubernetes-clusters te werken
-- [ ] Networking in Kubernetes begrijpen
+- Het Software Development Life Cycle (SDLC) analyseren
+- DevOps-strategieen voor automatisering verkennen
+- Een broncode-repository koppelen en applicaties bouwen vanuit Artifact Repositories
+- CI/CD inrichten voor een DTAP-omgeving
+- Kubernetes gebruiken in de cloud (GKE)
+- Cloud Shell en `kubectl` gebruiken om met Kubernetes-clusters te werken
+- Networking in Kubernetes begrijpen
 
 ---
 
@@ -47,15 +47,20 @@ Deze week gaat het over **Kubernetes Networking**. We maken een Kubernetes Clust
 
 ---
 
-## Bestanden in Deze Map
+## Opdrachten & Uitwerkingen
+
+| Map | Beschrijving |
+|---|---|
+| [Opdracht/](Opdracht/) | Opdrachten voor week 2 |
+| [Uitwerking/](Uitwerking/) | Mijn uitwerkingen voor week 2 |
+
+## Gebruikte Bestanden Deze Week
 
 | Bestand / Map | Beschrijving |
 |---|---|
-| [Assignments week 2.md](Assignments%20week%202.md) | Opdrachten voor week 2 |
-| [My Solution week 2.md](My%20Solution%20week%202.md) | Mijn uitwerkingen voor week 2 |
-| [ingress.yml](ingress.yml) | Kubernetes Ingress manifest voor het routeren van extern verkeer |
-| [bison/](bison/) | Deployment- en service-manifesten voor de Bison-applicatie |
-| [brightspace/](brightspace/) | Deployment- en service-manifesten voor de Brightspace-applicatie |
+| [ingress.yml](Bestanden/ingress.yml) | Kubernetes Ingress manifest voor het routeren van extern verkeer |
+| [bison/](Bestanden/bison/) | Deployment- en service-manifesten voor de Bison-applicatie |
+| [brightspace/](Bestanden/brightspace/) | Deployment- en service-manifesten voor de Brightspace-applicatie |
 
 ---
 

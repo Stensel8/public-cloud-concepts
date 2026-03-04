@@ -17,11 +17,11 @@ Deze week implementeren we een **Blue-Green deployment** voor een applicatie via
 
 ## Leerdoelen
 
-- [ ] Blue-Green deployment opzetten en begrijpen
-- [ ] Google Artifact Registry gebruiken als container registry
-- [ ] CI/CD pipeline inrichten met GitHub Actions voor deployment naar GKE
-- [ ] Wisselen tussen Blue en Green versies via een Kubernetes Service
-- [ ] Alternatieven voor GitHub Actions kennen: Argo CD en Flux CD
+- Blue-Green deployment opzetten en begrijpen
+- Google Artifact Registry gebruiken als container registry
+- CI/CD pipeline inrichten met GitHub Actions voor deployment naar GKE
+- Wisselen tussen Blue en Green versies via een Kubernetes Service
+- Alternatieven voor GitHub Actions kennen: Argo CD en Flux CD
 
 ---
 
@@ -36,14 +36,14 @@ Deze week implementeren we een **Blue-Green deployment** voor een applicatie via
 
 ---
 
-## Bestanden in Deze Map
+## Opdrachten & Uitwerkingen
 
-| Bestand / Map | Beschrijving |
+| Map | Beschrijving |
 |---|---|
-| [Assignments week 3.md](Assignments%20week%203.md) | Opdrachten voor week 3 |
-| [My Solution week 3.md](My%20Solution%20week%203.md) | Mijn uitwerkingen voor week 3 |
+| [Opdracht/](Opdracht/) | Opdrachten voor week 3 |
+| [Uitwerking/](Uitwerking/) | Mijn uitwerkingen voor week 3 |
 
 ---
 
-| [← Week 2 - Kubernetes Networking \& CI/CD](../Week%202/README.md) |
+| [Week 2 - Kubernetes Networking \& CI/CD](../Week%202/README.md) |
 |:---|

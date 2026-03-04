@@ -1,4 +1,4 @@
-| [Week 1 - Introductie & Deployments](../Week%201/README.md) | [Week 3](../Week%203/README.md) |
+| [Week 1 - Introductie & Deployments](../../Week%201/README.md) | [Week 3](../../Week%203/README.md) |
 |:---|---:|
 
 ---
@@ -7,7 +7,7 @@
 
 ## CI/CD - Docker Hub Tags
 
-De GitHub Actions workflow ([ci_week2.yml](../.github/workflows/ci_week2.yml)) bouwt twee images en pusht ze naar de bestaande `stensel8/public-cloud-concepts` DockerHub-repository met aparte tags:
+De GitHub Actions workflow ([ci_week2.yml](../../.github/workflows/ci_week2.yml)) bouwt twee images en pusht ze naar de bestaande `stensel8/public-cloud-concepts` DockerHub-repository met aparte tags:
 
 | Image | Tag | Pull commando |
 |-------|-----|---------------|
@@ -355,11 +355,11 @@ ingress-nginx-controller   LoadBalancer   34.118.239.245   34.91.190.135    80:3
 #### Stap 2 - bison, brightspace en de Ingress deployen
 
 ```bash
-kubectl apply -f "Week 2/bison/deployment.yml"
-kubectl apply -f "Week 2/bison/service.yml"
-kubectl apply -f "Week 2/brightspace/deployment.yml"
-kubectl apply -f "Week 2/brightspace/service.yml"
-kubectl apply -f "Week 2/ingress.yml"
+kubectl apply -f "Week 2/Bestanden/bison/deployment.yml"
+kubectl apply -f "Week 2/Bestanden/bison/service.yml"
+kubectl apply -f "Week 2/Bestanden/brightspace/deployment.yml"
+kubectl apply -f "Week 2/Bestanden/brightspace/service.yml"
+kubectl apply -f "Week 2/Bestanden/ingress.yml"
 ```
 
 ![Alle deployments, services en Ingress aangemaakt](screenshots/2-2h-deployments-services-ingress-applied.png)
@@ -417,5 +417,5 @@ De volledige Ingress-flow: browser -> `34.91.190.135` (Google Cloud LB) -> nginx
 
 ---
 
-| [Week 1 - Introductie \& Deployments](../Week%201/README.md) | [Week 3](../Week%203/README.md) |
+| [Week 1 - Introductie \& Deployments](../../Week%201/README.md) | [Week 3](../../Week%203/README.md) |
 |:---|---:|

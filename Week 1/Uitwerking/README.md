@@ -1,4 +1,4 @@
-| [Overzicht](../README.md) | [Week 2 - Kubernetes Networking & CI/CD](../Week%202/README.md) |
+| [Overzicht](../../README.md) | [Week 2 - Kubernetes Networking & CI/CD](../../Week%202/README.md) |
 |:---|---:|
 
 ---
@@ -29,7 +29,7 @@ Voltooide badges via [Google Cloud Skills Boost](https://www.skills.google/publi
 >
 > ![sudo-rs bug: reboot mislukt](screenshots/sudo-rs-bug.png)
 >
-> Opgelost via een GCP-opstartscript ([AUTOSTART-configure_classic_sudo.sh](AUTOSTART-configure_classic_sudo.sh)) dat klassieke `sudo` installeert bij elke opstart ter vervanging van `sudo-rs`:
+> Opgelost via een GCP-opstartscript ([AUTOSTART-configure_classic_sudo.sh](../Bestanden/AUTOSTART-configure_classic_sudo.sh)) dat klassieke `sudo` installeert bij elke opstart ter vervanging van `sudo-rs`:
 >
 > ![GCP opstartscript vervangt sudo-rs](screenshots/sudo-rs-startup-script.png)
 
@@ -45,7 +45,7 @@ Voltooide badges via [Google Cloud Skills Boost](https://www.skills.google/publi
 
 ![OS en opslagconfiguratie](screenshots/vm-os-storage-config.png)
 
-Het cluster heb ik geinstalleerd met twee eigen shell-scripts: [`configure_master.sh`](configure_master.sh) voor de masternode en [`configure_worker.sh`](configure_worker.sh) voor de workernodes. Deze scripts automatiseren alle stappen: kernelmoduleconfiguratie, containerd installeren, Kubernetes-pakketinstallatie (v1.35) en clusterinitialisatie.
+Het cluster heb ik geinstalleerd met twee eigen shell-scripts: [`configure_master.sh`](../Bestanden/configure_master.sh) voor de masternode en [`configure_worker.sh`](../Bestanden/configure_worker.sh) voor de workernodes. Deze scripts automatiseren alle stappen: kernelmoduleconfiguratie, containerd installeren, Kubernetes-pakketinstallatie (v1.35) en clusterinitialisatie.
 
 ![configure_master.sh uitvoeren op master-amsterdam](screenshots/configure-master-run.png)
 
@@ -148,9 +148,9 @@ CMD ["nginx", "-g", "daemon off;"]
 
 **GitHub Actions workflow:**
 
-De workflow staat in [`.github/workflows/ci_week1.yml`](../.github/workflows/ci_week1.yml) en draait automatisch bij elke push of pull request naar `main`. De relevante stappen voor de opdracht:
+De workflow staat in [`.github/workflows/ci_week1.yml`](../../.github/workflows/ci_week1.yml) en draait automatisch bij elke push of pull request naar `main`. De relevante stappen voor de opdracht:
 
-- **Build:** het Docker image wordt gebouwd vanuit `Week 1/Dockerfile`
+- **Build:** het Docker image wordt gebouwd vanuit `Week 1/Bestanden/Dockerfile`
 - **Login:** inloggen bij DockerHub via repository-secrets (`DOCKER_USERNAME` en `DOCKER_PAT`), alleen bij een directe push naar `main`
 - **Push:** het image wordt gepusht als `stensel8/public-cloud-concepts:latest`, ook alleen bij directe pushes naar `main` (niet bij PRs)
 
@@ -249,5 +249,5 @@ Inloggen op de pod via `kubectl exec` en het bestand direct uitlezen bevestigt d
 
 ---
 
-| [Overzicht](../README.md) | [Week 2 - Kubernetes Networking \& CI/CD](../Week%202/README.md) |
+| [Overzicht](../../README.md) | [Week 2 - Kubernetes Networking \& CI/CD](../../Week%202/README.md) |
 |:---|---:|

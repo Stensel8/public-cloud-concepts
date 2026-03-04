@@ -28,23 +28,23 @@ Deze week maak je kennis met het **Google Cloud Platform** en **Kubernetes**. We
 
 ## Opdrachten & Uitwerkingen
 
-| Bestand | Beschrijving |
+| Map | Beschrijving |
 |---|---|
-| [Assignments week 1.md](Assignments%20week%201.md) | Opdrachten voor week 1 |
-| [My Solution week 1.md](My%20Solution%20week%201.md) | Mijn uitwerkingen voor week 1 |
+| [Opdracht/](Opdracht/) | Opdrachten voor week 1 |
+| [Uitwerking/](Uitwerking/) | Mijn uitwerkingen voor week 1 |
 
 ## Gebruikte Bestanden Deze Week
 
 | Bestand | Beschrijving |
 |---|---|
-| [Dockerfile](Dockerfile) | Docker image definitie voor de Week 1 applicatie |
-| [deployment.yml](deployment.yml) | Kubernetes Deployment manifest |
-| [service.yml](service.yml) | Kubernetes Service manifest |
-| [index.html](index.html) | Statische HTML-pagina geserveerd door de container |
-| [configure_master.sh](configure_master.sh) | Script voor het opzetten van de Kubernetes masternode |
-| [configure_worker.sh](configure_worker.sh) | Script voor het opzetten van een Kubernetes workernode |
-| [Installmastertemplate](Installmastertemplate) | Scriptsjabloon (origineel van cursus) voor de masternode |
-| [installnode](installnode) | Script (origineel van cursus) voor de workernodes |
+| [Dockerfile](Bestanden/Dockerfile) | Docker image definitie voor de Week 1 applicatie |
+| [deployment.yml](Bestanden/deployment.yml) | Kubernetes Deployment manifest |
+| [service.yml](Bestanden/service.yml) | Kubernetes Service manifest |
+| [index.html](Bestanden/index.html) | Statische HTML-pagina geserveerd door de container |
+| [configure_master.sh](Bestanden/configure_master.sh) | Script voor het opzetten van de Kubernetes masternode |
+| [configure_worker.sh](Bestanden/configure_worker.sh) | Script voor het opzetten van een Kubernetes workernode |
+| [Installmastertemplate](Bestanden/Installmastertemplate) | Scriptsjabloon (origineel van cursus) voor de masternode |
+| [installnode](Bestanden/installnode) | Script (origineel van cursus) voor de workernodes |
 
 ---
 
