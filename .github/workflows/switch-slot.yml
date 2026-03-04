@@ -43,8 +43,23 @@ jobs:
 
       - name: Switch service naar ${{ inputs.slot }}
         run: |
-          kubectl patch service public-cloud-concepts \
-            -p '{"spec":{"selector":{"app":"public-cloud-concepts","slot":"${{ inputs.slot }}"}}}'
+          # kubectl apply maakt de service aan als die nog niet bestaat,
+          # en werkt hem bij als die al bestaat - met de juiste slot-selector.
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: public-cloud-concepts
+          spec:
+            type: LoadBalancer
+            selector:
+              app: public-cloud-concepts
+              slot: ${{ inputs.slot }}
+            ports:
+              - protocol: TCP
+                port: 80
+                targetPort: 80
+          EOF
 
       - name: Controleer actieve slot
         run: |
