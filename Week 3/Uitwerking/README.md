@@ -13,10 +13,10 @@ Daarnaast richt ik een CI/CD pipeline in met GitHub Actions die automatisch een 
 
 | Slot | Branch | Docker image tag | Status |
 |------|--------|-----------------|--------|
-| 🔵 Blue | `main` | `blue` | Productie — ontvangt live verkeer |
-| 🟢 Green | `development` | `green` | Test — draait parallel, ontvangt geen verkeer |
+| 🔵 Blue | `main` | `blue` | Productie - ontvangt live verkeer |
+| 🟢 Green | `development` | `green` | Test - draait parallel, ontvangt geen verkeer |
 
-De branchnamen hoeven niet `blue` en `green` te heten — de kleur wordt bepaald door het label `slot: blue` of `slot: green` in de Kubernetes Deployment, en door welke selector de Service gebruikt.
+De branchnamen hoeven niet `blue` en `green` te heten - de kleur wordt bepaald door het label `slot: blue` of `slot: green` in de Kubernetes Deployment, en door welke selector de Service gebruikt.
 
 ---
 
@@ -24,13 +24,13 @@ De branchnamen hoeven niet `blue` en `green` te heten — de kleur wordt bepaald
 
 Eerst ruim ik de werkzaamheden van Week 1 op (de handmatig opgezette deployments op de virtuele machines). Als basis gebruik ik de omgeving van Week 2: een Google Kubernetes Engine cluster, wat beter geschikt is voor een Blue-Green deployment.
 
-De week 2 omgeving draait nog, maar ik bouw hem opnieuw op als `week3-cluster` — dat is netter en overzichtelijker.
+De week 2 omgeving draait nog, maar ik bouw hem opnieuw op als `week3-cluster` - dat is netter en overzichtelijker.
 
 Net zoals bij Week 2 kies ik voor een **standaard cluster**. Dit geeft volledige controle over de configuratie en is goedkoop te houden voor deze opdracht.
 
 **Instellingen:**
-- **2 nodes** — het minimum dat nodig is voor een Blue-Green deployment
-- **Machinetype e2-medium** (2 vCPU's, 4 GB RAM) — voldoende voor de applicatie en nog betaalbaar
+- **2 nodes** - het minimum dat nodig is voor een Blue-Green deployment
+- **Machinetype e2-medium** (2 vCPU's, 4 GB RAM) - voldoende voor de applicatie en nog betaalbaar
 
 Het aanmaken van het cluster duurde ongeveer 5 minuten.
 
@@ -54,7 +54,7 @@ Het service account krijgt de volgende rollen:
 
 ![Rollen toegewezen aan het service account](service-account-permissions.avif)
 
-![Principals with access — stap 3 van het aanmaken](service-account-principals.avif)
+![Principals with access - stap 3 van het aanmaken](service-account-principals.avif)
 
 ---
 
@@ -72,7 +72,7 @@ Een Organization Policy (`iam.disableServiceAccountKeyCreation`) blokkeert het a
 
 ![Organization Policies overzicht met de geblokkeerde policy](org-policy-overview.avif)
 
-In de GUI kan ik de policy niet aanpassen — daarvoor ontbreken de benodigde rechten.
+In de GUI kan ik de policy niet aanpassen - daarvoor ontbreken de benodigde rechten.
 
 ![Bewerkoptie geblokkeerd in de GUI](org-policy-blocked.avif)
 
@@ -137,13 +137,13 @@ gcloud container clusters get-credentials week3-cluster --region europe-west4-a 
 
 Daarna ga ik naar de Artifact Registry om een repository aan te maken voor de container images. Ik kies dezelfde naam als mijn Docker Hub en GitHub repositories: `public-cloud-concepts`.
 
-![Artifact Registry nog leeg — geen repositories aangemaakt](artifact-registry-empty.avif)
+![Artifact Registry nog leeg - geen repositories aangemaakt](artifact-registry-empty.avif)
 
 ![Formulier voor het aanmaken van een Artifact Registry repository](artifact-registry-create.avif)
 
 De instellingen heb ik grotendeels op de standaardwaarden gelaten: Docker-formaat, region `europe-west4`.
 
-Tot slot schakel ik de **Container Scanning API** in. Dit deed ik in Week 1 en 2 ook al met Docker Scout — het geeft een mooi overzicht van kwetsbaarheden in de images.
+Tot slot schakel ik de **Container Scanning API** in. Dit deed ik in Week 1 en 2 ook al met Docker Scout - het geeft een mooi overzicht van kwetsbaarheden in de images.
 
 ![Container Scanning API activeren in Google Cloud](container-scanning-api.avif)
 
@@ -155,6 +155,24 @@ Na het uitvoeren van de Blue-Green deployment via GitHub Actions ziet de workflo
 
 ![GitHub Actions workflow: Build, push & deploy geslaagd](github-actions-run.avif)
 
-In de Artifact Registry staat nu het gebuilde image met tag `green` — 25,2 MB groot.
+In de Artifact Registry staat nu het gebuilde image met tag `green` - 25,2 MB groot.
 
 ![Artifact Registry met het gepushte green image](artifact-registry-result.avif)
+
+## IAM-configuratie
+
+Er zijn twee afzonderlijke identiteiten betrokken bij de deployment:
+
+**GitHub Pipeline Account** (`github-pipeline-account@...`)
+Wordt gebruikt door GitHub Actions tijdens de CI/CD-run. Dit account pusht images naar Artifact Registry en stuurt kubectl-opdrachten naar GKE. Zodra de pipeline klaar is, speelt dit account geen rol meer.
+
+Rollen: Artifact Registry Reader, Artifact Registry Writer, Kubernetes Engine Developer
+
+![IAM-rechten van het GitHub pipeline service account](iam-pipeline-account.avif)
+
+**Compute Engine default service account** (`[PROJECT_NUMBER]-compute@...`)
+Wordt intern door de GKE-nodes gebruikt om container images te pullen op het moment dat een pod gestart wordt. Dit is een volledig apart account - de GitHub Actions credentials worden hier *niet* voor gebruikt. Zonder `Artifact Registry Reader` op dit account krijg je een `ImagePullBackOff` fout, ook al heeft het pipeline account wel de juiste rechten.
+
+![IAM-rechten van het Compute Engine default service account dat door GKE-nodes wordt gebruikt](iam-gke-node-account.avif)
+
+
