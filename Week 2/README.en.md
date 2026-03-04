@@ -2,6 +2,16 @@
 
 ---
 
+> [!NOTE]
+> This repository is maintained primarily in **Dutch**. This English version may be incomplete or outdated. An English translation may be added in the future, but is not guaranteed.
+
+---
+
+| [← Week 1 - Introduction & Deployments](../Week%201/README.en.md) | [Week 3 →](../Week%203/) |
+|:---|---:|
+
+---
+
 # Week 2 - Kubernetes Networking & CI/CD
 
 ## Topics
@@ -237,7 +247,7 @@ After applying the rule, the application is reachable from a browser via `http:/
 This confirms the full NodePort flow: external traffic -> node external IP -> port 32490 -> `kube-proxy` -> ClusterIP -> pods.
 
 > [!NOTE]
-> The firewall rule is the **expected approach** for NodePort on a bare-VM cluster — it is not a hack, it is simply how GCP networking works. The real limitation is NodePort itself: on a production system you do not want to manually manage firewall rules per service. The intended solution is a `LoadBalancer` service on a managed cluster (GKE), which handles this automatically (see assignment 2.2g).
+> The firewall rule is the **expected approach** for NodePort on a bare-VM cluster; it is not a hack, it is simply how GCP networking works. The real limitation is NodePort itself: on a production system you do not want to manually manage firewall rules per service. The intended solution is a `LoadBalancer` service on a managed cluster (GKE), which handles this automatically (see assignment 2.2g).
 
 ---
 
@@ -264,18 +274,18 @@ This is the fundamental difference with managed Kubernetes services like **GKE**
 
 #### Why is pending normal behavior on our setup?
 
-Our kubeadm cluster runs on plain GCP VMs with Kubernetes set up manually. Kubernetes itself has no knowledge of GCP — there is no cloud controller manager present that can call the GCP API. The pending behavior is therefore **completely expected and correct**: Kubernetes is waiting for a signal that will never arrive. This is not an error, but a logical consequence of the setup.
+Our kubeadm cluster runs on plain GCP VMs with Kubernetes set up manually. Kubernetes itself has no knowledge of GCP: there is no cloud controller manager present that can call the GCP API. The pending behavior is therefore **completely expected and correct**: Kubernetes is waiting for a signal that will never arrive. This is not an error, but a logical consequence of the setup.
 
 #### Summary: What are the options?
 
 | Approach | How | When |
 |---|---|---|
-| **Correct way** | Use a managed cluster (GKE) — the cloud controller manager automatically provisions a Load Balancer with an external IP | Production, assignments 2.2g and beyond |
+| **Correct way** | Use a managed cluster (GKE): the cloud controller manager automatically provisions a Load Balancer with an external IP | Production, assignments 2.2g and beyond |
 | **NodePort + firewall rule** | Manually open a GCP firewall rule for the NodePort port | Workaround on kubeadm, for demo/testing only |
-| **Ingress controller** | Install an nginx Ingress controller (itself a LoadBalancer service on GKE) — routes multiple services through a single external IP | Multiple apps behind one load balancer (assignment 2.2h) |
+| **Ingress controller** | Install an nginx Ingress controller (itself a LoadBalancer service on GKE) that routes multiple services through a single external IP | Multiple apps behind one load balancer (assignment 2.2h) |
 
 > [!IMPORTANT]
-> Using **NodePort as an external access method** was the workaround — not the firewall rule itself. For NodePort on GCP, a firewall rule is simply required. The instructor pointed out that the intended approach is to use GKE (assignment 2.2g): the cloud controller manager there automatically provisions a load balancer, without having to manually manage firewall rules.
+> Using **NodePort as an external access method** was the workaround, not the firewall rule itself. For NodePort on GCP, a firewall rule is simply required. The instructor pointed out that the intended approach is to use GKE (assignment 2.2g): the cloud controller manager there automatically provisions a load balancer, without having to manually manage firewall rules.
 
 ---
 
@@ -473,3 +483,8 @@ Both hostnames now resolve to the Ingress Controller, which routes based on the 
 Without Ingress, two separate `LoadBalancer` services would be needed, each provisioning its own Google Cloud Load Balancer and external IP, which costs money and is harder to manage. The Ingress pattern uses a **single load balancer** (`34.91.190.135`) that routes traffic to the correct service based on the `Host` HTTP header. This is the standard way to expose multiple applications in Kubernetes.
 
 The full Ingress flow: browser -> `34.91.190.135` (Google Cloud LB) -> nginx Ingress Controller pod -> `bison-service` or `brightspace-service` (ClusterIP) -> application pods.
+
+---
+
+| [← Week 1 - Introduction \& Deployments](../Week%201/README.en.md) | [Week 3 →](../Week%203/) |
+|:---|---:|

@@ -2,6 +2,16 @@
 
 ---
 
+> [!NOTE]
+> This repository is maintained primarily in **Dutch**. This English version may be incomplete or outdated. An English translation may be added in the future, but is not guaranteed.
+
+---
+
+| [Overview](../README.en.md) | [Week 2 - Kubernetes Networking & CI/CD →](../Week%202/README.en.md) |
+|:---|---:|
+
+---
+
 # Week 1 - Introduction to Google Cloud & Kubernetes
 
 ---
@@ -481,3 +491,8 @@ Logging into the pod from the master with `kubectl exec` and reading the file di
   <title>Sten Tijhuis - Public Cloud Concepts</title>
   <!-- Bootstrap CSS, Google Fonts, icons ... (truncated) -->
 ```
+
+---
+
+| [🏠 Overview](../README.en.md) | [Week 2 - Kubernetes Networking \& CI/CD →](../Week%202/README.en.md) |
+|:---|---:|

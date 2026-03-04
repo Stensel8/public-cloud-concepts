@@ -1,5 +1,8 @@
 🇳🇱 Nederlands | [🇬🇧 English](README.en.md)
 
+> [!NOTE]
+> Deze repository wordt primair in het **Nederlands** bijgehouden. Een Engelse vertaling is mogelijk in de toekomst beschikbaar, maar dit is geen garantie.
+
 ---
 
 # Spring 2026 - Public Cloud Concepts
@@ -22,6 +25,7 @@ Deze repository wordt bijgehouden door [Stensel8](https://github.com/Stensel8) e
 |------|-----------|-----|
 | 1 | Introductie & Deployments | [Week 1](Week%201/) |
 | 2 | Ingress, Services & Apps | [Week 2](Week%202/) |
+| 3 | Blue-Green Deployments & Artifact Registry | [Week 3](Week%203/) |
 
 ## Disclaimer
 
