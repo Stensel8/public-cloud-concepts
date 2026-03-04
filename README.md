@@ -1,7 +1,7 @@
 Nederlands | [English](README.en.md)
 
 > [!NOTE]
-> Deze repository wordt primair in het **Nederlands** bijgehouden. Een Engelse vertaling is mogelijk in de toekomst beschikbaar, maar dit is geen garantie.
+> Deze repository wordt primair in het **Nederlands** bijgehouden. Er is een (niet altijd volledige of actuele) Engelse vertaling beschikbaar in `README.en.md`, maar deze versie heeft geen prioriteit.
 
 ---
 
