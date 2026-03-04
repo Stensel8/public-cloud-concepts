@@ -23,6 +23,80 @@ jobs:
             revert
             ci
 
+  image-format:
+    name: Do not use JPG or PNG
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Find non-AVIF images
+        id: check
+        run: |
+          {
+            echo "files<<EOF"
+            find "Week 1/Uitwerking" "Week 2/Uitwerking" "Week 3/Uitwerking" \
+              -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \) | sort
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          count=$(find "Week 1/Uitwerking" "Week 2/Uitwerking" "Week 3/Uitwerking" \
+            -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \) | wc -l)
+          if [ "$count" -gt 0 ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "All images are AVIF."
+          fi
+
+      - name: Post PR comment
+        if: steps.check.outputs.found == 'true'
+        uses: actions/github-script@v8
+        env:
+          FILES: ${{ steps.check.outputs.files }}
+          ACTOR: ${{ github.event.pull_request.user.login }}
+        with:
+          script: |
+            const files = process.env.FILES.trim().split('\n').map(f => `- \`${f}\``).join('\n');
+            const actor = process.env.ACTOR;
+            const body = [
+              `Hey @${actor}, je hebt nog afbeeldingen die geen AVIF zijn!`,
+              '',
+              'De volgende bestanden in `Uitwerking/` moeten geconverteerd worden:',
+              files,
+              '',
+              'Installeer `avifenc`:',
+              '```bash',
+              'sudo pacman -S libavif',
+              '```',
+              '',
+              'Batch-converteer alle afbeeldingen:',
+              '```bash',
+              'for f in *.png *.jpg *.jpeg; do',
+              '  [ -f "$f" ] && avifenc -q 80 -s 6 "$f" "${f%.*}.avif" && rm "$f"',
+              'done',
+              '```',
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body,
+            });
+
+      - name: Annotate and fail
+        if: steps.check.outputs.found == 'true'
+        env:
+          FILES: ${{ steps.check.outputs.files }}
+        run: |
+          while IFS= read -r f; do
+            echo "::error file=$f::Converteer naar AVIF voor het mergen"
+          done <<< "$FILES"
+          exit 1
+
   dockerfile-lint:
     name: Dockerfile lint
     runs-on: ubuntu-latest

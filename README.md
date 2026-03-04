@@ -26,6 +26,18 @@ Deze repository wordt bijgehouden door [Sten Tijhuis](https://github.com/Stensel
 | 2 | Ingress, Services & Apps | [Week 2](Week%202/) |
 | 3 | Blue-Green Deployments & Artifact Registry | [Week 3](Week%203/) |
 
+## Afbeeldingen
+
+Alle afbeeldingen in deze repository gebruiken het [AVIF](https://en.wikipedia.org/wiki/AVIF)-formaat: open, royalty-free en compacter dan PNG of JPEG bij gelijke kwaliteit.
+
+Batch-converteer PNG/JPG screenshots naar AVIF (converteert en verwijdert originelen):
+
+```bash
+for f in *.png *.jpg *.jpeg; do [ -f "$f" ] && avifenc -q 80 -s 6 "$f" "${f%.*}.avif" && rm "$f"; done
+```
+
+Installeer `avifenc` eerst via `sudo pacman -S libavif` (Arch/CachyOS) of `sudo apt install libavif-bin` (Debian/Ubuntu).
+
 ## Disclaimer
 
 Dit is een lopend project voor educatieve doeleinden. Code, configuraties en documentatie kunnen gedurende de cursus nog veranderen.

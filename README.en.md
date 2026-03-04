@@ -23,6 +23,18 @@ This repository is maintained by [Stensel8](https://github.com/Stensel8) and cov
 | 1 | Introduction & Deployments | [Week 1](Week%201/) |
 | 2 | Ingress, Services & Apps | [Week 2](Week%202/) |
 
+## Image assets
+
+All images in this repository use the [AVIF](https://en.wikipedia.org/wiki/AVIF) format: open, royalty-free, and more efficient than PNG or JPEG at equivalent quality.
+
+Batch-convert PNG/JPG screenshots to AVIF (converts and removes originals):
+
+```bash
+for f in *.png *.jpg *.jpeg; do [ -f "$f" ] && avifenc -q 80 -s 6 "$f" "${f%.*}.avif" && rm "$f"; done
+```
+
+Install `avifenc` first via `sudo pacman -S libavif` (Arch/CachyOS) or `sudo apt install libavif-bin` (Debian/Ubuntu).
+
 ## Disclaimer
 
 This is a work in progress for educational purposes. Code, configurations, and documentation may change significantly as the course progresses.

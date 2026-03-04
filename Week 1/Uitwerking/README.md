@@ -18,15 +18,15 @@ Voltooide badges via [Google Cloud Skills Boost](https://www.skills.google/publi
 >
 > Ubuntu 25.10 komt standaard met `sudo-rs` (een Rust-herimplementatie van sudo) versie 0.2.8, zoals hieronder te zien is:
 >
-> ![sudo-rs versie op een nieuwe Ubuntu 25.10](screenshots/sudo-rs-version.png)
+> ![sudo-rs versie op een nieuwe Ubuntu 25.10](screenshots/sudo-rs-version.avif)
 >
 > Deze versie heeft een bekende sessiebug. `sudo reboot` mislukt bijvoorbeeld met een onverwachte fout in plaats van te herstarten:
 >
-> ![sudo-rs bug: reboot mislukt](screenshots/sudo-rs-bug.png)
+> ![sudo-rs bug: reboot mislukt](screenshots/sudo-rs-bug.avif)
 >
 > Opgelost via een GCP-opstartscript ([AUTOSTART-configure_classic_sudo.sh](../Bestanden/AUTOSTART-configure_classic_sudo.sh)) dat klassieke `sudo` installeert bij elke opstart ter vervanging van `sudo-rs`:
 >
-> ![GCP opstartscript vervangt sudo-rs](screenshots/sudo-rs-startup-script.png)
+> ![GCP opstartscript vervangt sudo-rs](screenshots/sudo-rs-startup-script.avif)
 
 **Gebruikte instanties:**
 
@@ -36,19 +36,19 @@ Voltooide badges via [Google Cloud Skills Boost](https://www.skills.google/publi
 | Worker 1 | worker-brussels | europe-west1-b (Belgie) | e2-medium | Ubuntu 25.10 LTS minimal |
 | Worker 2 | worker-london | europe-west2-b (Verenigd Koninkrijk) | e2-medium | Ubuntu 25.10 LTS minimal |
 
-![VM-instanties in Google Cloud](screenshots/vm-instances-gcp.png)
+![VM-instanties in Google Cloud](screenshots/vm-instances-gcp.avif)
 
-![OS en opslagconfiguratie](screenshots/vm-os-storage-config.png)
+![OS en opslagconfiguratie](screenshots/vm-os-storage-config.avif)
 
 Het cluster heb ik geinstalleerd met twee eigen shell-scripts: [`configure_master.sh`](../Bestanden/configure_master.sh) voor de masternode en [`configure_worker.sh`](../Bestanden/configure_worker.sh) voor de workernodes. Deze scripts automatiseren alle stappen: kernelmoduleconfiguratie, containerd installeren, Kubernetes-pakketinstallatie (v1.35) en clusterinitialisatie.
 
-![configure_master.sh uitvoeren op master-amsterdam](screenshots/configure-master-run.png)
+![configure_master.sh uitvoeren op master-amsterdam](screenshots/configure-master-run.avif)
 
-![configure_worker.sh uitvoeren op worker-brussels](screenshots/configure-worker-run.png)
+![configure_worker.sh uitvoeren op worker-brussels](screenshots/configure-worker-run.avif)
 
 Nadat beide workers klaar waren, heb ik ze via het `kubeadm join`-commando van de master aan het cluster toegevoegd. De screenshot hieronder toont de volledige Flannel-installatie, de twee workers die toetreden en de uiteindelijke `kubectl get nodes` waaruit blijkt dat alle drie nodes `Ready` zijn:
 
-![Workers toegevoegd - alle nodes Ready](screenshots/cluster-nodes-joined.png)
+![Workers toegevoegd - alle nodes Ready](screenshots/cluster-nodes-joined.avif)
 
 **Uitleg van `kubeadm init`:**
 
@@ -79,7 +79,7 @@ master-amsterdam   Ready    control-plane   17m    v1.35.1
 
 **Uitvoer van `kubectl get pods -n kube-system`:**
 
-![kubectl get pods -n kube-system](screenshots/kubectl-get-pods-kube-system.png)
+![kubectl get pods -n kube-system](screenshots/kubectl-get-pods-kube-system.avif)
 
 ```
 NAME                                          READY   STATUS    RESTARTS   AGE
@@ -96,7 +96,7 @@ kube-scheduler-master-amsterdam               1/1     Running   0          17m
 
 > **Opmerking:** De `kube-flannel`-pods staan hier niet bij omdat Flannel zijn eigen `kube-flannel`-namespace aanmaakt. Geverifieerd met `kubectl get pods -n kube-flannel`:
 
-![kubectl get pods -n kube-flannel](screenshots/kubectl-get-pods-kube-flannel.png)
+![kubectl get pods -n kube-flannel](screenshots/kubectl-get-pods-kube-flannel.avif)
 
 ```
 NAME                    READY   STATUS    RESTARTS   AGE
@@ -204,7 +204,7 @@ kubectl apply -f deployment.yml
 
 Na het toepassen van de deployment kwamen beide pods op `Running` in twee verschillende regio's, wat aantoont dat Flannel pod-verkeer correct routeert over GCP-regio's heen:
 
-![Beide pods Running](screenshots/deployment-pods-running.png)
+![Beide pods Running](screenshots/deployment-pods-running.avif)
 
 ```text
 NAME                               READY   STATUS    RESTARTS   AGE   IP           NODE              NOMINATED NODE   READINESS GATES
@@ -214,7 +214,7 @@ first-deployment-5ffbd9444c-s4xdb  1/1     Running   0          88s   10.244.1.2
 
 `curl` uitgevoerd van de masternode naar de pod op `worker-london` (`10.244.2.2`):
 
-![curl en kubectl exec uitvoer](screenshots/curl-pod-and-exec.png)
+![curl en kubectl exec uitvoer](screenshots/curl-pod-and-exec.avif)
 
 ```html
 <!doctype html>
