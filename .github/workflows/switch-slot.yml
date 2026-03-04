@@ -1,4 +1,4 @@
-name: 🔀 Switch Blue-Green Slot
+name: Switch Blue-Green Slot
 
 on:
   workflow_dispatch:
@@ -41,7 +41,7 @@ jobs:
 
       - name: Controleer actieve slot
         run: |
-          echo "✅ Verkeer wordt nu naar '${{ inputs.slot }}' gestuurd."
+          echo "Verkeer wordt nu naar '${{ inputs.slot }}' gestuurd."
           kubectl get service public-cloud-concepts -o jsonpath='{.spec.selector}'
           echo ""
           kubectl get pods -l app=public-cloud-concepts

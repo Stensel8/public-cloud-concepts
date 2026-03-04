@@ -13,8 +13,8 @@ Daarnaast richt ik een CI/CD pipeline in met GitHub Actions die automatisch een 
 
 | Slot | Branch | Docker image tag | Status |
 |------|--------|-----------------|--------|
-| 🔵 Blue | `main` | `blue` | Productie - ontvangt live verkeer |
-| 🟢 Green | `development` | `green` | Test - draait parallel, ontvangt geen verkeer |
+| Blue | `main` | `blue` | Productie - ontvangt live verkeer |
+| Green | `development` | `green` | Test - draait parallel, ontvangt geen verkeer |
 
 De branchnamen hoeven niet `blue` en `green` te heten - de kleur wordt bepaald door het label `slot: blue` of `slot: green` in de Kubernetes Deployment, en door welke selector de Service gebruikt.
 
