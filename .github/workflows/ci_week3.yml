@@ -1,3 +1,21 @@
+# CI Week 3 - Blue-Green deployment naar Google Kubernetes Engine via Artifact Registry.
+#
+# De branch bepaalt welke slot wordt gedeployd:
+#   main        -> slot "blue"  (productie)
+#   development -> slot "green" (test)
+#
+# Stappen:
+#   1. Bepaal de slot op basis van de branch.
+#   2. Authenticeer met GCP via het github-pipeline service account.
+#   3. Configureer Docker voor Artifact Registry en haal GKE-credentials op.
+#   4. Bouw het image en push het naar Artifact Registry met de juiste slot-tag.
+#   5. Deploy naar GKE via envsubst + kubectl apply, forceer een rollout restart
+#      en wacht op een succesvolle rollout (timeout 120s).
+#
+# Let op: de Kubernetes Service wordt hier NIET aangepast. De selector (blue/green)
+# wordt beheerd via de switch-slot.yml workflow. Eenmalig aanmaken via kubectl apply.
+#
+# Secrets benodigd: GCP_PROJECT_ID, GCP_SA_KEY, GKE_CLUSTER, GKE_ZONE
 name: CI Week 3 - Blue-Green Deploy
 
 on:
@@ -49,8 +67,12 @@ jobs:
 
       - name: Build Docker image
         run: |
+          SLOT="${{ steps.slot.outputs.slot }}"
+          SLOT_COLOR=$([ "$SLOT" = "blue" ] && echo "#1a56db" || echo "#057a55")
           docker build \
-            --tag "${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${{ steps.slot.outputs.slot }}" \
+            --build-arg SLOT="${SLOT}" \
+            --build-arg SLOT_COLOR="${SLOT_COLOR}" \
+            --tag "${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${SLOT}" \
             "./Week 1/Bestanden/"
 
       - name: Push to Artifact Registry
@@ -59,17 +81,27 @@ jobs:
 
       - name: Deploy to GKE
         run: |
+          SLOT="${{ steps.slot.outputs.slot }}"
+
           # IMAGE_TAG samenstellen uit de workflow-variabelen, zodat het exact overeenkomt
           # met het image dat hierboven gebouwd en gepusht is.
-          export IMAGE_TAG="${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${{ steps.slot.outputs.slot }}"
+          export IMAGE_TAG="${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${SLOT}"
 
           # envsubst vervangt ${IMAGE_TAG} in het YAML-bestand met de waarde hierboven.
           # Het resultaat wordt direct via stdin naar kubectl gestuurd (geen tijdelijk bestand nodig).
-          envsubst < "Week 3/Bestanden/deployment-${{ steps.slot.outputs.slot }}.yml" | kubectl apply -f -
+          envsubst < "Week 3/Bestanden/deployment-${SLOT}.yml" | kubectl apply -f -
 
           # Forceer een herstart zodat Kubernetes het nieuw gepushte image ophaalt.
           # Zonder dit herkent Kubernetes geen wijziging als de tag (bijv. :green) gelijk blijft.
-          kubectl rollout restart deployment/deployment-${{ steps.slot.outputs.slot }}
+          kubectl rollout restart deployment/deployment-${SLOT}
 
-          kubectl rollout status deployment/deployment-${{ steps.slot.outputs.slot }} --timeout=120s
-          kubectl get pods -l slot=${{ steps.slot.outputs.slot }}
+          # Wacht op succesvolle rollout; toon pod-details als het mislukt (helpt bij debuggen).
+          if ! kubectl rollout status deployment/deployment-${SLOT} --timeout=120s; then
+            echo "--- Rollout mislukt. Pod-status: ---"
+            kubectl get pods -l slot=${SLOT} -o wide
+            echo "--- Pod beschrijving: ---"
+            kubectl describe pods -l slot=${SLOT}
+            exit 1
+          fi
+
+          kubectl get pods -l slot=${SLOT}

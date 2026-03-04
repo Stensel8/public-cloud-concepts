@@ -13,10 +13,10 @@ Daarnaast richt ik een CI/CD pipeline in met GitHub Actions die automatisch een 
 
 | Slot | Branch | Docker image tag | Status |
 |------|--------|-----------------|--------|
-| 🔵 Blue | `main` | `blue` | Productie — ontvangt live verkeer |
-| 🟢 Green | `development` | `green` | Test — draait parallel, ontvangt geen verkeer |
+| Blue | `main` | `blue` | Productie - ontvangt live verkeer |
+| Green | `development` | `green` | Test - draait parallel, ontvangt geen verkeer |
 
-De branchnamen hoeven niet `blue` en `green` te heten — de kleur wordt bepaald door het label `slot: blue` of `slot: green` in de Kubernetes Deployment, en door welke selector de Service gebruikt.
+De branchnamen hoeven niet `blue` en `green` te heten - de kleur wordt bepaald door het label `slot: blue` of `slot: green` in de Kubernetes Deployment, en door welke selector de Service gebruikt.
 
 ---
 
@@ -24,13 +24,13 @@ De branchnamen hoeven niet `blue` en `green` te heten — de kleur wordt bepaald
 
 Eerst ruim ik de werkzaamheden van Week 1 op (de handmatig opgezette deployments op de virtuele machines). Als basis gebruik ik de omgeving van Week 2: een Google Kubernetes Engine cluster, wat beter geschikt is voor een Blue-Green deployment.
 
-De week 2 omgeving draait nog, maar ik bouw hem opnieuw op als `week3-cluster` — dat is netter en overzichtelijker.
+De week 2 omgeving draait nog, maar ik bouw hem opnieuw op als `week3-cluster` - dat is netter en overzichtelijker.
 
 Net zoals bij Week 2 kies ik voor een **standaard cluster**. Dit geeft volledige controle over de configuratie en is goedkoop te houden voor deze opdracht.
 
 **Instellingen:**
-- **2 nodes** — het minimum dat nodig is voor een Blue-Green deployment
-- **Machinetype e2-medium** (2 vCPU's, 4 GB RAM) — voldoende voor de applicatie en nog betaalbaar
+- **2 nodes** - het minimum dat nodig is voor een Blue-Green deployment
+- **Machinetype e2-medium** (2 vCPU's, 4 GB RAM) - voldoende voor de applicatie en nog betaalbaar
 
 Het aanmaken van het cluster duurde ongeveer 5 minuten.
 
@@ -54,7 +54,7 @@ Het service account krijgt de volgende rollen:
 
 ![Rollen toegewezen aan het service account](service-account-permissions.avif)
 
-![Principals with access — stap 3 van het aanmaken](service-account-principals.avif)
+![Principals with access - stap 3 van het aanmaken](service-account-principals.avif)
 
 ---
 
@@ -72,7 +72,7 @@ Een Organization Policy (`iam.disableServiceAccountKeyCreation`) blokkeert het a
 
 ![Organization Policies overzicht met de geblokkeerde policy](org-policy-overview.avif)
 
-In de GUI kan ik de policy niet aanpassen — daarvoor ontbreken de benodigde rechten.
+In de GUI kan ik de policy niet aanpassen - daarvoor ontbreken de benodigde rechten.
 
 ![Bewerkoptie geblokkeerd in de GUI](org-policy-blocked.avif)
 
@@ -137,13 +137,13 @@ gcloud container clusters get-credentials week3-cluster --region europe-west4-a 
 
 Daarna ga ik naar de Artifact Registry om een repository aan te maken voor de container images. Ik kies dezelfde naam als mijn Docker Hub en GitHub repositories: `public-cloud-concepts`.
 
-![Artifact Registry nog leeg — geen repositories aangemaakt](artifact-registry-empty.avif)
+![Artifact Registry nog leeg - geen repositories aangemaakt](artifact-registry-empty.avif)
 
 ![Formulier voor het aanmaken van een Artifact Registry repository](artifact-registry-create.avif)
 
 De instellingen heb ik grotendeels op de standaardwaarden gelaten: Docker-formaat, region `europe-west4`.
 
-Tot slot schakel ik de **Container Scanning API** in. Dit deed ik in Week 1 en 2 ook al met Docker Scout — het geeft een mooi overzicht van kwetsbaarheden in de images.
+Tot slot schakel ik de **Container Scanning API** in. Dit deed ik in Week 1 en 2 ook al met Docker Scout - het geeft een mooi overzicht van kwetsbaarheden in de images.
 
 ![Container Scanning API activeren in Google Cloud](container-scanning-api.avif)
 
@@ -155,6 +155,80 @@ Na het uitvoeren van de Blue-Green deployment via GitHub Actions ziet de workflo
 
 ![GitHub Actions workflow: Build, push & deploy geslaagd](github-actions-run.avif)
 
-In de Artifact Registry staat nu het gebuilde image met tag `green` — 25,2 MB groot.
+In de Artifact Registry staat nu het gebuilde image met tag `green` - 25,2 MB groot.
 
 ![Artifact Registry met het gepushte green image](artifact-registry-result.avif)
+
+## IAM-configuratie
+
+Er zijn twee afzonderlijke identiteiten betrokken bij de deployment:
+
+**GitHub Pipeline Account** (`github-pipeline-account@...`)
+Wordt gebruikt door GitHub Actions tijdens de CI/CD-run. Dit account pusht images naar Artifact Registry en stuurt kubectl-opdrachten naar GKE. Zodra de pipeline klaar is, speelt dit account geen rol meer.
+
+Rollen: Artifact Registry Reader, Artifact Registry Writer, Kubernetes Engine Developer
+
+![IAM-rechten van het GitHub pipeline service account](iam-pipeline-account.avif)
+
+**Compute Engine default service account** (`[PROJECT_NUMBER]-compute@...`)
+Wordt intern door de GKE-nodes gebruikt om container images te pullen op het moment dat een pod gestart wordt. Dit is een volledig apart account - de GitHub Actions credentials worden hier *niet* voor gebruikt. Zonder `Artifact Registry Reader` op dit account krijg je een `ImagePullBackOff` fout, ook al heeft het pipeline account wel de juiste rechten.
+
+![IAM-rechten van het Compute Engine default service account dat door GKE-nodes wordt gebruikt](iam-gke-node-account.avif)
+
+
+
+---
+
+## Verificatie
+
+Na het deployen controleer ik of het cluster, de pods en de website correct draaien.
+
+De twee nodes van het cluster zijn actief in `europe-west4-a`:
+
+![De twee nodes van het week3-cluster in de GCP Console](gke-cluster-nodes.avif)
+
+Via de GKE Console is ook observability beschikbaar - hier zijn de actieve workloads en pods zichtbaar:
+
+![Observability vanuit de GKE Console met actieve pods en deployments](gke-observability.avif)
+
+De Kubernetes Service is eenmalig handmatig aangemaakt via Cloud Shell met `kubectl apply`, omdat de pipeline de service nog niet automatisch toepaste. Dit is later gecorrigeerd in de workflow:
+
+![Kubernetes Service aangemaakt via kubectl apply in Cloud Shell](service-handmatig-aangemaakt.avif)
+
+De website is bereikbaar via het externe IP van de LoadBalancer Service op poort 80:
+
+![De statische website draaiend op het GKE cluster via het externe LoadBalancer-IP](website-draaiend.avif)
+
+De pods draaien correct en zijn voorzien van de juiste labels (`slot=blue` of `slot=green`):
+
+![Overzicht van de draaiende pods in het cluster met slot-labels](gke-pods-overzicht.avif)
+
+---
+
+## Argo CD en Flux CD
+
+De opdracht vraagt om te onderzoeken wat Argo CD en Flux CD zijn en hoe ze zich verhouden tot GitHub Actions.
+
+### Wat zijn het?
+
+**Argo CD** en **Flux CD** zijn GitOps-tools. Bij GitOps is de Git-repository de enige bron van waarheid voor de gewenste staat van het cluster. De tool vergelijkt voortdurend wat er in Git staat met wat er in het cluster draait, en corrigeert automatisch als er een afwijking is.
+
+**Argo CD** biedt een visuele webinterface waarmee je de status van alle deployments in een oogopslag ziet. Het synchroniseert actief vanuit Git naar het cluster en geeft een melding als de werkelijke staat afwijkt van de gewenste staat.
+
+**Flux CD** werkt zonder UI en draait volledig als een set Kubernetes-controllers. Het is meer CLI-gericht en past beter in een volledig geautomatiseerde omgeving zonder handmatige ingrepen.
+
+### Verschil met GitHub Actions
+
+| | GitHub Actions | Argo CD / Flux CD |
+|---|---|---|
+| Model | Push: pipeline stuurt actief naar het cluster | Pull: tool haalt zelf de gewenste staat op uit Git |
+| Trigger | Event in GitHub (push, PR) | Continu polling van Git-repository |
+| Kluster-toegang | Runner heeft directe toegang nodig (kubeconfig/SA key) | Tool draait in het cluster zelf, geen externe toegang nodig |
+| Drift detectie | Geen - pipeline runt alleen bij events | Automatisch - herstelt afwijkingen zonder handmatige trigger |
+| Geschikt voor | CI (bouwen, testen, pushen) | CD (deployen, synchroniseren, bewaken) |
+
+### Conclusie
+
+GitHub Actions is primair een CI-tool die ook CD kan doen, maar dan op een "push"-manier. Argo CD en Flux CD zijn pure CD-tools die beter schalen voor complexe omgevingen met veel teams of clusters, omdat de credentials voor het cluster nooit buiten het cluster hoeven te bestaan en afwijkingen automatisch worden hersteld.
+
+In productie-omgevingen worden GitHub Actions en Argo CD/Flux CD vaak gecombineerd: Actions bouwt en pusht het image, Argo CD of Flux CD pakt het op en deployt het naar het cluster.

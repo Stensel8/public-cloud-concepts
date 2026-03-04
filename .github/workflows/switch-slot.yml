@@ -1,4 +1,11 @@
-name: 🔀 Switch Blue-Green Slot
+# Handmatige workflow om live verkeer te verplaatsen tussen de blue en green slot.
+#
+# Werking: past de selector van de Kubernetes Service aan zodat deze naar de
+# gekozen slot wijst. Er worden geen nieuwe images gebouwd of gedeployd.
+# De andere slot blijft draaien maar ontvangt geen verkeer meer.
+#
+# Secrets benodigd: GCP_SA_KEY, GKE_CLUSTER, GKE_ZONE
+name: Switch Blue-Green Slot
 
 on:
   workflow_dispatch:
@@ -36,12 +43,27 @@ jobs:
 
       - name: Switch service naar ${{ inputs.slot }}
         run: |
-          kubectl patch service public-cloud-concepts \
-            -p '{"spec":{"selector":{"app":"public-cloud-concepts","slot":"${{ inputs.slot }}"}}}'
+          # kubectl apply maakt de service aan als die nog niet bestaat,
+          # en werkt hem bij als die al bestaat - met de juiste slot-selector.
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: public-cloud-concepts
+          spec:
+            type: LoadBalancer
+            selector:
+              app: public-cloud-concepts
+              slot: ${{ inputs.slot }}
+            ports:
+              - protocol: TCP
+                port: 80
+                targetPort: 80
+          EOF
 
       - name: Controleer actieve slot
         run: |
-          echo "✅ Verkeer wordt nu naar '${{ inputs.slot }}' gestuurd."
+          echo "Verkeer wordt nu naar '${{ inputs.slot }}' gestuurd."
           kubectl get service public-cloud-concepts -o jsonpath='{.spec.selector}'
           echo ""
           kubectl get pods -l app=public-cloud-concepts
