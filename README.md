@@ -5,11 +5,10 @@
 
 ---
 
-# Spring 2026 - Public Cloud Concepts
+# Voorjaar 2026 - Public Cloud Concepts
 
-> **Work in progress** - Individuele repository voor de HBO-specialisatie *Cloud Engineering* (Spring 2026, Q3/Q4).
 
-Deze repository wordt bijgehouden door [Stensel8](https://github.com/Stensel8) en bevat de individuele module van de Cloud Engineering-specialisatie.
+Deze repository wordt bijgehouden door [Sten Tijhuis](https://github.com/Stensel8) en bevat de individuele module van de Cloud Engineering-specialisatie.
 
 ## Modules
 
@@ -17,9 +16,9 @@ Deze repository wordt bijgehouden door [Stensel8](https://github.com/Stensel8) e
 |--------|-----|----------|
 | Public Cloud Concepts | 5 EC | Q3 |
 
-> [**Architecting the Cloud**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/architecting-the-cloud) en [**Cloud Automation Concepts**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/cloud-automation-concepts) (5 EC, Q3) zijn gedeelde modules die samen met [Hintenhaus04](https://github.com/Hintenhaus04) worden gedaan en staan in een aparte repository: [Spring 2026 - Cloud Engineering](https://github.com/Stensel8/spring2026-cloud-engineering).
+> [**Architecting the Cloud**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/architecting-the-cloud) en [**Cloud Automation Concepts**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/cloud-automation-concepts) (5 EC, Q3) zijn gedeelde modules die samen met [Hintenhaus04](https://github.com/Hintenhaus04) worden gedaan en staan in een aparte repository: [Voorjaar 2026 - Cloud Engineering](https://github.com/Stensel8/spring2026-cloud-engineering).
 
-## Cursusstructuur
+## Week-overzicht
 
 | Week | Onderwerp | Map |
 |------|-----------|-----|
