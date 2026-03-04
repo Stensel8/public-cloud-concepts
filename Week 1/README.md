@@ -25,27 +25,6 @@ Deze week maak je kennis met het **Google Cloud Platform** en **Kubernetes**. We
 
 ---
 
-## Leermaterialen
-
-### Google Cloud
-
-| Resource | Link |
-|---|---|
-| A Tour of Google Cloud Hands-on Labs (GSP282) | [cloudskillsboost.google](https://www.cloudskillsboost.google/focuses/2794?parent=catalog) |
-| Google Cloud Fundamentals - Core Infrastructure | [cloudskillsboost.google](https://www.cloudskillsboost.google/course_templates/60) |
-| Essential Google Cloud Infrastructure - Core Services | [cloudskillsboost.google](https://www.cloudskillsboost.google/course_templates/49) |
-| Google Compute Engine documentatie | [cloud.google.com](https://cloud.google.com/compute?hl=en) |
-
-### Kubernetes
-
-| Resource | Link |
-|---|---|
-| Getting Started with Google Kubernetes Engine | [cloudskillsboost.google](https://www.cloudskillsboost.google/paths/11/course_templates/2) |
-| Google Kubernetes Engine documentatie | [cloud.google.com](https://cloud.google.com/kubernetes-engine/docs/concepts/kubernetes-engine-overview) |
-| Kubernetes documentatie | [kubernetes.io](https://kubernetes.io/docs/home/) |
-| Kubernetes cluster op Ubuntu (stap-voor-stap handleiding) | [hbayraktar.medium.com](https://hbayraktar.medium.com/how-to-install-kubernetes-cluster-on-ubuntu-22-04-step-by-step-guide-7dbf7e8f5f99) |
-
----
 
 ## Opdrachten & Uitwerkingen
 
