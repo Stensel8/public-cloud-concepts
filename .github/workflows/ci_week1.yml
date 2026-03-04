@@ -1,3 +1,12 @@
+# CI Week 1 - Dockerfile lint, image build, Trivy security scan en Docker Hub push.
+#
+# Stappen:
+#   1. lint    - Controleert de Dockerfile op stijl- en veiligheidsfouten met hadolint.
+#   2. build   - Bouwt het Docker image en scant het op CRITICAL kwetsbaarheden met Trivy.
+#              - Pusht het image naar Docker Hub, maar alleen bij een push naar main
+#                (niet bij pull requests).
+#
+# Secrets benodigd: DOCKER_USERNAME, DOCKER_PAT
 name: CI Week 1
 
 on:

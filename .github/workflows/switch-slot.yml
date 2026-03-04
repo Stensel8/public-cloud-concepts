@@ -1,3 +1,10 @@
+# Handmatige workflow om live verkeer te verplaatsen tussen de blue en green slot.
+#
+# Werking: past de selector van de Kubernetes Service aan zodat deze naar de
+# gekozen slot wijst. Er worden geen nieuwe images gebouwd of gedeployd.
+# De andere slot blijft draaien maar ontvangt geen verkeer meer.
+#
+# Secrets benodigd: GCP_SA_KEY, GKE_CLUSTER, GKE_ZONE
 name: Switch Blue-Green Slot
 
 on:

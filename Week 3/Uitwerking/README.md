@@ -176,3 +176,59 @@ Wordt intern door de GKE-nodes gebruikt om container images te pullen op het mom
 ![IAM-rechten van het Compute Engine default service account dat door GKE-nodes wordt gebruikt](iam-gke-node-account.avif)
 
 
+
+---
+
+## Verificatie
+
+Na het deployen controleer ik of het cluster, de pods en de website correct draaien.
+
+De twee nodes van het cluster zijn actief in `europe-west4-a`:
+
+![De twee nodes van het week3-cluster in de GCP Console](gke-cluster-nodes.avif)
+
+Via de GKE Console is ook observability beschikbaar - hier zijn de actieve workloads en pods zichtbaar:
+
+![Observability vanuit de GKE Console met actieve pods en deployments](gke-observability.avif)
+
+De Kubernetes Service is eenmalig handmatig aangemaakt via Cloud Shell met `kubectl apply`, omdat de pipeline de service nog niet automatisch toepaste. Dit is later gecorrigeerd in de workflow:
+
+![Kubernetes Service aangemaakt via kubectl apply in Cloud Shell](service-handmatig-aangemaakt.avif)
+
+De website is bereikbaar via het externe IP van de LoadBalancer Service op poort 80:
+
+![De statische website draaiend op het GKE cluster via het externe LoadBalancer-IP](website-draaiend.avif)
+
+De pods draaien correct en zijn voorzien van de juiste labels (`slot=blue` of `slot=green`):
+
+![Overzicht van de draaiende pods in het cluster met slot-labels](gke-pods-overzicht.avif)
+
+---
+
+## Argo CD en Flux CD
+
+De opdracht vraagt om te onderzoeken wat Argo CD en Flux CD zijn en hoe ze zich verhouden tot GitHub Actions.
+
+### Wat zijn het?
+
+**Argo CD** en **Flux CD** zijn GitOps-tools. Bij GitOps is de Git-repository de enige bron van waarheid voor de gewenste staat van het cluster. De tool vergelijkt voortdurend wat er in Git staat met wat er in het cluster draait, en corrigeert automatisch als er een afwijking is.
+
+**Argo CD** biedt een visuele webinterface waarmee je de status van alle deployments in een oogopslag ziet. Het synchroniseert actief vanuit Git naar het cluster en geeft een melding als de werkelijke staat afwijkt van de gewenste staat.
+
+**Flux CD** werkt zonder UI en draait volledig als een set Kubernetes-controllers. Het is meer CLI-gericht en past beter in een volledig geautomatiseerde omgeving zonder handmatige ingrepen.
+
+### Verschil met GitHub Actions
+
+| | GitHub Actions | Argo CD / Flux CD |
+|---|---|---|
+| Model | Push: pipeline stuurt actief naar het cluster | Pull: tool haalt zelf de gewenste staat op uit Git |
+| Trigger | Event in GitHub (push, PR) | Continu polling van Git-repository |
+| Kluster-toegang | Runner heeft directe toegang nodig (kubeconfig/SA key) | Tool draait in het cluster zelf, geen externe toegang nodig |
+| Drift detectie | Geen - pipeline runt alleen bij events | Automatisch - herstelt afwijkingen zonder handmatige trigger |
+| Geschikt voor | CI (bouwen, testen, pushen) | CD (deployen, synchroniseren, bewaken) |
+
+### Conclusie
+
+GitHub Actions is primair een CI-tool die ook CD kan doen, maar dan op een "push"-manier. Argo CD en Flux CD zijn pure CD-tools die beter schalen voor complexe omgevingen met veel teams of clusters, omdat de credentials voor het cluster nooit buiten het cluster hoeven te bestaan en afwijkingen automatisch worden hersteld.
+
+In productie-omgevingen worden GitHub Actions en Argo CD/Flux CD vaak gecombineerd: Actions bouwt en pusht het image, Argo CD of Flux CD pakt het op en deployt het naar het cluster.

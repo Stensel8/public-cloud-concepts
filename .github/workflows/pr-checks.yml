@@ -1,3 +1,11 @@
+# Kwaliteitschecks die draaien op elke pull request naar main of development.
+#
+# Jobs:
+#   pr-title        - Controleert of de PR-titel voldoet aan Conventional Commits
+#                     (feat, fix, docs, chore, refactor, style, revert, ci).
+#   image-format    - Weigert PNG/JPG-afbeeldingen in Uitwerking-mappen en plaatst
+#                     een PR-comment met conversieinstructies als ze worden gevonden.
+#   dockerfile-lint - Lint de Dockerfile met hadolint.
 name: PR Checks
 
 on:
