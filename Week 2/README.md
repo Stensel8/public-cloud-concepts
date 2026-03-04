@@ -27,25 +27,6 @@ Deze week gaat het over **Kubernetes Networking**. We maken een Kubernetes Clust
 
 ---
 
-## Leermaterialen
-
-### DevOps & CI/CD
-
-| Resource | Link |
-|---|---|
-| AWS Whitepaper - Practicing Continuous Integration and Continuous Delivery on AWS | [docs.aws.amazon.com (PDF)](https://docs.aws.amazon.com/whitepapers/latest/practicing-continuous-integration-continuous-delivery/welcome.html) |
-| 2023 Accelerate State of DevOps Report | [cloud.google.com](https://cloud.google.com/blog/products/devops-sre/announcing-the-2023-state-of-devops-report) |
-| DORA's Research Program | [dora.dev](https://dora.dev/research/) |
-
-### Kubernetes & GKE
-
-| Resource | Link |
-|---|---|
-| Google Kubernetes Engine documentatie | [cloud.google.com](https://cloud.google.com/kubernetes-engine/docs/#training-and-tutorials) |
-| Getting Started with Kubernetes Engine | [github.com/GoogleCloudPlatform](https://github.com/GoogleCloudPlatform/qwiklabs-training-content/blob/master/labs/GCPFUND-Kubernetes/instructions/en.md) |
-| Kubernetes Engine - Qwik Start (GSP100) | [cloudskillsboost.google](https://www.cloudskillsboost.google/catalog_lab/911?qlcampaign=77-18-gcpd-236&utm_source=gcp&utm_medium=documentation&utm_campaign=kubernetes) |
-
----
 
 ## Opdrachten & Uitwerkingen
 

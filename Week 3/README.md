@@ -25,16 +25,6 @@ Deze week implementeren we een **Blue-Green deployment** voor een applicatie via
 
 ---
 
-## Leermaterialen
-
-| Resource | Link |
-|---|---|
-| Google Artifact Registry documentatie | [cloud.google.com](https://cloud.google.com/artifact-registry/docs) |
-| CI/CD naar GKE met GitHub Actions | [medium.com](https://medium.com/@gravish316/setup-ci-cd-using-github-actions-to-deploy-to-google-kubernetes-engine-ef465a482fd) |
-| Argo CD documentatie | [argo-cd.readthedocs.io](https://argo-cd.readthedocs.io/en/stable/) |
-| Flux CD documentatie | [fluxcd.io](https://fluxcd.io/flux/) |
-
----
 
 ## Opdrachten & Uitwerkingen
 
