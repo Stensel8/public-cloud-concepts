@@ -23,5 +23,6 @@ spec:
           # het juist gebouwde image wordt gebruikt en er geen hardcoded project-id staat.
           # Formaat: <zone>-docker.pkg.dev/<project-id>/<repo>/<image>:<slot>
           image: ${IMAGE_TAG}
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
