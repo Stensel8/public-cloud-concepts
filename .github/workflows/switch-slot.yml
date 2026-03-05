@@ -2,7 +2,17 @@
 #
 # Werking: past de selector van de Kubernetes Service aan zodat deze naar de
 # gekozen slot wijst. Er worden geen nieuwe images gebouwd of gedeployd.
-# De andere slot blijft draaien maar ontvangt geen verkeer meer.
+#
+# BELANGRIJK: Beide deployments blijven draaien! Deze workflow wijzigt alleen
+# welke deployment verkeer ontvangt via de LoadBalancer. De andere slot draait
+# op de achtergrond door en kan gebruikt worden voor testing of als rollback.
+#
+# Voorbeeld scenario:
+#   1. Blue (main) ontvangt verkeer, green (development) draait op de achtergrond
+#   2. Je pushed nieuwe code naar development -> green wordt automatisch geüpdatet
+#   3. Je test green via port-forward of tijdelijke service switch
+#   4. Als alles werkt: run deze workflow met slot=green
+#   5. Verkeer gaat nu naar green, blue blijft draaien (instant rollback mogelijk!)
 #
 # Secrets benodigd: GCP_SA_KEY, GKE_CLUSTER, GKE_ZONE
 name: Switch Blue-Green Slot

@@ -1,8 +1,13 @@
 # CI Week 3 - Blue-Green deployment naar Google Kubernetes Engine via Artifact Registry.
 #
-# De branch bepaalt welke slot wordt gedeployd:
-#   main        -> slot "blue"  (productie)
-#   development -> slot "green" (test)
+# Automatische deployment per branch:
+#   main        -> bouwt en deployed slot "blue"  (productie)
+#   development -> bouwt en deployed slot "green" (test)
+#
+# BELANGRIJK: Beide deployments draaien tegelijkertijd in het cluster!
+# De development branch kan andere code bevatten dan main - ze hoeven niet
+# gesynchroniseerd te zijn. Zo kun je nieuwe features testen op green voordat
+# je ze merged naar main of live zet.
 #
 # Stappen:
 #   1. Bepaal de slot op basis van de branch.

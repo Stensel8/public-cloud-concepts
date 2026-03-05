@@ -19,7 +19,20 @@ Daarnaast richt ik een CI/CD pipeline in met GitHub Actions die automatisch een 
 | Blue | `main` | `blue` | Productie - ontvangt live verkeer |
 | Green | `development` | `green` | Test - draait parallel, ontvangt geen verkeer |
 
-De branchnamen hoeven niet `blue` en `green` te heten - de kleur wordt bepaald door het label `slot: blue` of `slot: green` in de Kubernetes Deployment, en door welke selector de Service gebruikt.
+### Hoe de pipeline werkt
+
+Elke branch heeft zijn eigen deployment:
+- **Push naar `main`** → CI workflow bouwt automatisch het `:blue` image en deployed naar `deployment-blue`
+- **Push naar `development`** → CI workflow bouwt automatisch het `:green` image en deployed naar `deployment-green`
+
+**Beide deployments draaien tegelijkertijd** in het cluster. De code op de `development` branch kan verschillen van `main` - ze hoeven niet gesynchroniseerd te worden. Dit maakt het mogelijk om:
+1. Nieuwe functionaliteiten te ontwikkelen op `development`
+2. Deze te deployen naar de green slot (die draait maar geen verkeer ontvangt)
+3. Te testen of alles werkt
+4. Te switchen naar green met de `switch-slot` workflow
+5. Later (optioneel) de changes te mergen naar `main`
+
+De Kubernetes Service bepaalt welke deployment verkeer ontvangt via de `selector`. De `switch-slot.yml` workflow past alleen deze selector aan - er worden geen nieuwe builds gemaakt bij het switchen.
 
 ---
 
@@ -185,6 +198,36 @@ Wordt intern door de GKE-nodes gebruikt om container images te pullen op het mom
 ## Verificatie
 
 Na het deployen controleer ik of het cluster, de pods en de website correct draaien.
+
+### Beide deployments parallel testen
+
+Omdat beide deployments tegelijkertijd draaien, kunnen we de green versie testen zonder het publieke verkeer te switchen. Dit kan op twee manieren:
+
+**Optie 1: Port-forward naar een specifieke pod**
+```bash
+# Vind de green pod
+kubectl get pods -l slot=green
+
+# Port-forward naar de green pod
+kubectl port-forward deployment/deployment-green 8080:80
+
+# Test via localhost:8080
+```
+
+**Optie 2: Tijdelijk de service wijzigen**
+```bash
+# Switch naar green
+kubectl patch service public-cloud-concepts -p '{"spec":{"selector":{"slot":"green"}}}'
+
+# Test de website via het externe IP
+
+# Switch terug naar blue
+kubectl patch service public-cloud-concepts -p '{"spec":{"selector":{"slot":"blue"}}}'
+```
+
+Dit toont aan dat beide versies parallel draaien en dat green een andere codebase kan hebben dan blue zonder naar main te hoeven mergen.
+
+### Cluster en pods
 
 De twee nodes van het cluster zijn actief in `europe-west4-a`:
 
