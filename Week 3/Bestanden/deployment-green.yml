@@ -24,5 +24,10 @@ spec:
           # Formaat: <zone>-docker.pkg.dev/<project-id>/<repo>/<image>:<slot>
           image: ${IMAGE_TAG}
           imagePullPolicy: Always
+          env:
+            - name: SLOT
+              value: "green"
+            - name: SLOT_COLOR
+              value: "#057a55"
           ports:
             - containerPort: 80
