@@ -37,7 +37,14 @@ jobs:
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GKE_ZONE }}
 
+      - name: Detect current active slot
+        id: active
+        run: |
+          CURRENT_SLOT="$(kubectl get service public-cloud-concepts -o jsonpath='{.spec.selector.slot}' 2>/dev/null || echo none)"
+          echo "current=${CURRENT_SLOT}" >> "$GITHUB_OUTPUT"
+
       - name: Update target deployment to latest slot image
+        if: steps.active.outputs.current != inputs.slot
         run: |
           SLOT="${{ inputs.slot }}"
           IMAGE_TAG="${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${SLOT}"
@@ -47,6 +54,7 @@ jobs:
           kubectl rollout status "deployment/deployment-${SLOT}" --timeout=180s
 
       - name: Switch service naar ${{ inputs.slot }}
+        if: steps.active.outputs.current != inputs.slot
         run: |
           kubectl apply -f - <<EOF
           apiVersion: v1
@@ -66,6 +74,7 @@ jobs:
 
       - name: Controleer actieve slot
         run: |
+          echo "Voor switch: ${{ steps.active.outputs.current }} | Gevraagd: ${{ inputs.slot }}"
           kubectl get service public-cloud-concepts -o jsonpath='{.spec.selector}'
           echo ""
           kubectl get pods -l app=public-cloud-concepts
