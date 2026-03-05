@@ -1,20 +1,3 @@
-# Handmatige workflow om live verkeer te verplaatsen tussen de blue en green slot.
-#
-# Werking: past de selector van de Kubernetes Service aan zodat deze naar de
-# gekozen slot wijst. Er worden geen nieuwe images gebouwd of gedeployd.
-#
-# BELANGRIJK: Beide deployments blijven draaien! Deze workflow wijzigt alleen
-# welke deployment verkeer ontvangt via de LoadBalancer. De andere slot draait
-# op de achtergrond door en kan gebruikt worden voor testing of als rollback.
-#
-# Voorbeeld scenario:
-#   1. Blue (main) ontvangt verkeer, green (development) draait op de achtergrond
-#   2. Je pushed nieuwe code naar development -> green wordt automatisch geüpdatet
-#   3. Je test green via port-forward of tijdelijke service switch
-#   4. Als alles werkt: run deze workflow met slot=green
-#   5. Verkeer gaat nu naar green, blue blijft draaien (instant rollback mogelijk!)
-#
-# Secrets benodigd: GCP_SA_KEY, GKE_CLUSTER, GKE_ZONE
 name: Switch Blue-Green Slot
 
 on:
@@ -33,6 +16,9 @@ env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
   GKE_ZONE: ${{ secrets.GKE_ZONE }}
+  GAR_ZONE: europe-west4
+  GAR_REPO: public-cloud-concepts
+  IMAGE: app
 
 jobs:
   switch:
@@ -40,14 +26,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: "Guard: run vanaf main branch"
-        run: |
-          if [ "${{ github.ref_name }}" != "main" ]; then
-            echo "Gebruik deze workflow vanaf de 'main' branch voor een consistente switch-configuratie."
-            echo "Huidige branch: ${{ github.ref_name }}"
-            exit 1
-          fi
-
       - name: Authenticate with GCP
         uses: google-github-actions/auth@v3
         with:
@@ -59,23 +37,17 @@ jobs:
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GKE_ZONE }}
 
-      - name: "Guard: image-tag bestaat in Artifact Registry"
+      - name: Update target deployment to latest slot image
         run: |
-          IMAGE="europe-west4-docker.pkg.dev/${{ env.PROJECT_ID }}/public-cloud-concepts/app:${{ inputs.slot }}"
-          if ! gcloud artifacts docker images describe "$IMAGE" --location=europe-west4 >/dev/null 2>&1; then
-            echo "Image tag niet gevonden: $IMAGE"
-            echo "Run eerst CI Week 3 voor de bijbehorende branch (main=blue, development=green)."
-            exit 1
-          fi
+          SLOT="${{ inputs.slot }}"
+          IMAGE_TAG="${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${SLOT}"
 
-      - name: "Guard: deployment van target-slot is healthy"
-        run: |
-          kubectl rollout status deployment/deployment-${{ inputs.slot }} --timeout=120s
+          kubectl set image "deployment/deployment-${SLOT}" app="${IMAGE_TAG}"
+          kubectl rollout restart "deployment/deployment-${SLOT}"
+          kubectl rollout status "deployment/deployment-${SLOT}" --timeout=180s
 
       - name: Switch service naar ${{ inputs.slot }}
         run: |
-          # kubectl apply maakt de service aan als die nog niet bestaat,
-          # en werkt hem bij als die al bestaat - met de juiste slot-selector.
           kubectl apply -f - <<EOF
           apiVersion: v1
           kind: Service
@@ -94,7 +66,6 @@ jobs:
 
       - name: Controleer actieve slot
         run: |
-          echo "Verkeer wordt nu naar '${{ inputs.slot }}' gestuurd."
           kubectl get service public-cloud-concepts -o jsonpath='{.spec.selector}'
           echo ""
           kubectl get pods -l app=public-cloud-concepts

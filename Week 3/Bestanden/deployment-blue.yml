@@ -19,15 +19,7 @@ spec:
     spec:
       containers:
         - name: app
-          # IMAGE_TAG wordt ingevuld door de CI-workflow via envsubst, zodat altijd
-          # het juist gebouwde image wordt gebruikt en er geen hardcoded project-id staat.
-          # Formaat: <zone>-docker.pkg.dev/<project-id>/<repo>/<image>:<slot>
           image: ${IMAGE_TAG}
           imagePullPolicy: Always
-          env:
-            - name: SLOT
-              value: "blue"
-            - name: SLOT_COLOR
-              value: "#1a56db"
           ports:
             - containerPort: 80
