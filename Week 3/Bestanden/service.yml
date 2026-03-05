@@ -2,11 +2,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: public-cloud-concepts
+
 spec:
   type: LoadBalancer
+
   selector:
     app: public-cloud-concepts
-    slot: blue  # ← Verander naar "green" om te switchen naar de green versie
+    slot: blue
+
   ports:
     - protocol: TCP
       port: 80

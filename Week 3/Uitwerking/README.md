@@ -32,7 +32,7 @@ Elke branch heeft zijn eigen deployment:
 4. Te switchen naar green met de `switch-slot` workflow
 5. Later (optioneel) de changes te mergen naar `main`
 
-De Kubernetes Service bepaalt welke deployment verkeer ontvangt via de `selector`. De `switch-slot.yml` workflow past alleen deze selector aan - er worden geen nieuwe builds gemaakt bij het switchen.
+De Kubernetes Service bepaalt welke deployment verkeer ontvangt via de `selector`. De `switch-slot.yml` workflow zorgt eerst dat de gekozen slot op het meest recente image voor die slot-tag draait (rollout), en schakelt daarna het verkeer om via de selector.
 
 ---
 
@@ -241,11 +241,11 @@ De Kubernetes Service is eenmalig handmatig aangemaakt via Cloud Shell met `kube
 
 ![Kubernetes Service aangemaakt via kubectl apply in Cloud Shell](service-handmatig-aangemaakt.avif)
 
-De website is bereikbaar via het externe IP van de LoadBalancer Service op poort 80. De gekleurde balk bovenaan geeft aan welke slot actief is - dit wordt ingevoegd op build-tijd via een Docker ARG:
+De website is bereikbaar via het externe IP van de LoadBalancer Service op poort 80. In de definitieve, vereenvoudigde setup gebruik ik geen runtime-injectie of dynamische slot-balk meer. Het onderscheid tussen blue en green houd ik bewust in de branch-content (bijvoorbeeld accentkleur/tekst), zodat de implementatie simpel en opdrachtgericht blijft.
 
 ![De website met actieve blue slot - blauwe balk bovenaan](website-slot-blue.avif)
 
-Na het uitvoeren van de switch-slot workflow naar green verschijnt de groene balk:
+Na het uitvoeren van de switch-slot workflow naar green is de green-versie actief:
 
 ![De website met actieve green slot - groene balk bovenaan](website-slot-green.avif)
 
