@@ -1,6 +1,5 @@
 FROM nginx:1-alpine-slim
 
-# hadolint ignore=DL3017
 RUN apk upgrade --no-cache
 
 COPY static-site/ /usr/share/nginx/html/
