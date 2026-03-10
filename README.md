@@ -34,6 +34,7 @@ Deze repository wordt bijgehouden door [Sten Tijhuis](https://github.com/Stensel
 | 1 | Introductie & Deployments | [Week 1](Week%201/) |
 | 2 | Ingress, Services & Apps | [Week 2](Week%202/) |
 | 3 | Blue-Green Deployments & Artifact Registry | [Week 3](Week%203/) |
+| 4 | Helm & Identity and Access Management | [Week 4](Week%204/) |
 
 ## Google Cloud SDK installeren
 
