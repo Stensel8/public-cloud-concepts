@@ -172,6 +172,33 @@ Deel a) is hiermee afgerond.
 
 ---
 
+### 9. Static-site chart installeren (eigen applicatie)
+
+De tweede chart (`static-site`) deployt mijn eigen applicatie uit Week 1 en 2 via het Docker image `stensel8/public-cloud-concepts:latest`.
+
+```bash
+helm install static-site-v1 ./static-site
+```
+
+![Uitvoer van helm install static-site-v1 met STATUS deployed en REVISION 1](week4-helm-install-static-site.avif)
+
+
+#### App bekijken
+
+Omdat de service type `ClusterIP` is (alleen intern bereikbaar), gebruik je `kubectl port-forward` om de app lokaal te openen:
+
+```bash
+kubectl port-forward svc/static-site-v1 8080:80
+```
+
+![kubectl port-forward tunnelt lokaal poort 8080 naar de pod in GKE](week4-port-forward.avif)
+
+Daarna open je <http://localhost:8080> in de browser en is de applicatie zichtbaar:
+
+![De static-site applicatie draait op localhost:8080 na port-forward](week4-static-site-browser.avif)
+
+---
+
 ## 4.2 Cloud Identity & IAM
 
 > Uitwerking volgt na het bestuderen van het lesmateriaal en het uitvoeren van de opdrachten.
