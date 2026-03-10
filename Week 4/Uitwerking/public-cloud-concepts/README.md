@@ -1,0 +1,1 @@
+Dit is de public-cloud-concepts map, welke de gemaakte helm chart bevat. De opdrachten en uitwerkingen staan een mapje hoger.
