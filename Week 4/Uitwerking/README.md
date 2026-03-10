@@ -98,6 +98,28 @@ De standaardwaarden zijn: `replicaCount: 1`, image `nginx`, `service.type: Clust
 
 ---
 
+### 6. Installeren als v1
+
+Met de standaardwaarden installeer ik de chart als de eerste release:
+
+```bash
+helm install public-cloud-concepts-v1 public-cloud-concepts
+```
+
+![Uitvoer van helm install public-cloud-concepts-v1 met STATUS deployed en REVISION 1](week4-helm-install-v1.avif)
+
+Daarna verifieer ik of de release actief is en de pod en service correct draaien:
+
+```bash
+helm ls
+kubectl get pods
+kubectl get services
+```
+
+![Overzicht van helm ls, kubectl get pods en kubectl get services voor v1](week4-helm-status-v1.avif)
+
+---
+
 ## 4.2 Cloud Identity & IAM
 
 > Uitwerking volgt na het bestuderen van het lesmateriaal en het uitvoeren van de opdrachten.
