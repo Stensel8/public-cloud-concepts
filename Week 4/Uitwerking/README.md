@@ -214,11 +214,16 @@ helm search repo bitnami/wordpress
 
 #### Installeren
 
-De installatie vereist een aantal extra flags voor GKE Autopilot:
+De standaard `helm install bitnami/wordpress` werkt niet direct op GKE Autopilot. Er zijn drie problemen en hun oplossingen:
 
-- `wordpressEmail` is verplicht; zonder geldig e-mailadres faalt WP-CLI tijdens de setup
-- `resources.requests.ephemeral-storage` moet omhoog; de standaardlimiet van 50Mi is te laag voor WordPress
-- Na een mislukte installatie moeten PVCs handmatig verwijderd worden (`helm uninstall` doet dit niet automatisch)
+**Probleem 1: WP-CLI weigert `user@example.com`**
+Het standaard e-mailadres in de Bitnami chart is `user@example.com`. WordPress WP-CLI beschouwt dit als ongeldig en stopt de setup met exit code 1. Oplossing: altijd `--set wordpressEmail` meegeven.
+
+**Probleem 2: Ephemeral storage limiet van 50Mi**
+GKE Autopilot zet standaard een ephemeral storage limiet van 50Mi per container. WordPress schrijft tijdens de setup meer dan 50Mi aan tijdelijke bestanden, waarna de pod door Autopilot wordt geevict. Oplossing: storage requests en limits expliciet hoger instellen.
+
+**Probleem 3: LoadBalancer service niet aangemaakt**
+De Bitnami WordPress chart versie 29.2.0 had een bug waarbij de `my-wordpress` service niet werd aangemaakt. Oplossing: service handmatig uit de Helm manifest halen en toepassen.
 
 ```bash
 helm install my-wordpress bitnami/wordpress \
@@ -232,7 +237,7 @@ helm install my-wordpress bitnami/wordpress \
     --set resources.requests.cpu=300m
 ```
 
-Na installatie miste de `my-wordpress` LoadBalancer service door een bug in de Bitnami chart versie. Handmatig aangemaakt via:
+Service ontbrak na installatie, handmatig aangemaakt:
 
 ```bash
 helm get manifest my-wordpress | awk '/Source: wordpress\/templates\/svc.yaml/,/^---/' | kubectl apply -f -
@@ -244,11 +249,13 @@ helm get manifest my-wordpress | awk '/Source: wordpress\/templates\/svc.yaml/,/
 kubectl get svc my-wordpress
 ```
 
+![kubectl get svc toont my-wordpress als LoadBalancer met extern IP 34.13.227.107](week4-wordpress-svc.avif)
+
 WordPress is bereikbaar op het externe IP dat GKE toekent.
 
-![WordPress draait op extern GKE IP met login pagina zichtbaar](week4-wordpress-login.avif)
+![WordPress login pagina bereikbaar op extern GKE IP](week4-wordpress-login.avif)
 
-![WordPress blog "Mijn Blog" draait publiek bereikbaar op het externe IP](week4-wordpress-blog.avif)
+![WordPress blog "Mijn Blog" draait publiek op het externe IP](week4-wordpress-blog.avif)
 
 ---
 
