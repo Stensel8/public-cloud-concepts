@@ -49,8 +49,6 @@ This week you will learn about **Kubernetes Networking**. You create a Kubernete
 
 | Document | Description |
 |---|---|
-| [Slides week 2 - Kubernetes Networking](Les%202%20Kubernetes%20networking%20ENG.pdf) | Theory about Kubernetes networking |
-| [Assignments week 2 v2](PCC/Assignments%20week%202%20v2.docx) | Assignments for week 2 |
 
 ---
 
