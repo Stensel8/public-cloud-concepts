@@ -234,8 +234,12 @@ helm install my-wordpress bitnami/wordpress \
     --set wordpressBlogName="Mijn Blog" \
     --set resources.requests.ephemeral-storage=1Gi \
     --set resources.limits.ephemeral-storage=2Gi \
-    --set resources.requests.memory=512Mi \
-    --set resources.requests.cpu=300m
+    --set resources.requests.memory=256Mi \
+    --set resources.requests.cpu=100m \
+    --set mariadb.primary.resources.requests.ephemeral-storage=1Gi \
+    --set mariadb.primary.resources.limits.ephemeral-storage=2Gi \
+    --set mariadb.primary.resources.requests.memory=256Mi \
+    --set mariadb.primary.resources.requests.cpu=100m
 ```
 
 Service ontbrak na installatie, handmatig aangemaakt:
