@@ -1,5 +1,6 @@
-# Use the official Nginx base image
-FROM nginx:alpine
+FROM nginx:1-alpine-slim
+
+RUN apk upgrade --no-cache
 
 # Copy the default HTML file to the Nginx default document root
 COPY index.html /usr/share/nginx/html/

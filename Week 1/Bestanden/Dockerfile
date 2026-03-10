@@ -1,4 +1,6 @@
-FROM nginx:alpine
+FROM nginx:1-alpine-slim
+
+RUN apk upgrade --no-cache
 
 COPY static-site/ /usr/share/nginx/html/
 COPY nginx-default.conf /etc/nginx/conf.d/default.conf
