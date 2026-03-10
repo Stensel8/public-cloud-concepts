@@ -199,6 +199,59 @@ Daarna open je <http://localhost:8080> in de browser en is de applicatie zichtba
 
 ---
 
+### 10. WordPress via Bitnami
+
+WordPress installeren via de externe Bitnami Helm repo. Geen lokale chartmap nodig.
+
+#### Repo toevoegen
+
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+helm repo list
+helm search repo bitnami/wordpress
+```
+
+#### Installeren
+
+De installatie vereist een aantal extra flags voor GKE Autopilot:
+
+- `wordpressEmail` is verplicht; zonder geldig e-mailadres faalt WP-CLI tijdens de setup
+- `resources.requests.ephemeral-storage` moet omhoog; de standaardlimiet van 50Mi is te laag voor WordPress
+- Na een mislukte installatie moeten PVCs handmatig verwijderd worden (`helm uninstall` doet dit niet automatisch)
+
+```bash
+helm install my-wordpress bitnami/wordpress \
+    --set wordpressUsername=admin \
+    --set wordpressPassword=MijnWachtwoord123 \
+    --set wordpressEmail=admin@example.com \
+    --set wordpressBlogName="Mijn Blog" \
+    --set resources.requests.ephemeral-storage=1Gi \
+    --set resources.limits.ephemeral-storage=2Gi \
+    --set resources.requests.memory=512Mi \
+    --set resources.requests.cpu=300m
+```
+
+Na installatie miste de `my-wordpress` LoadBalancer service door een bug in de Bitnami chart versie. Handmatig aangemaakt via:
+
+```bash
+helm get manifest my-wordpress | awk '/Source: wordpress\/templates\/svc.yaml/,/^---/' | kubectl apply -f -
+```
+
+#### Extern IP ophalen
+
+```bash
+kubectl get svc my-wordpress
+```
+
+WordPress is bereikbaar op het externe IP dat GKE toekent.
+
+![WordPress draait op extern GKE IP met login pagina zichtbaar](week4-wordpress-login.avif)
+
+![WordPress blog "Mijn Blog" draait publiek bereikbaar op het externe IP](week4-wordpress-blog.avif)
+
+---
+
 ## 4.2 Cloud Identity & IAM
 
 > Uitwerking volgt na het bestuderen van het lesmateriaal en het uitvoeren van de opdrachten.
