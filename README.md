@@ -34,6 +34,72 @@ Deze repository wordt bijgehouden door [Sten Tijhuis](https://github.com/Stensel
 | 1 | Introductie & Deployments | [Week 1](Week%201/) |
 | 2 | Ingress, Services & Apps | [Week 2](Week%202/) |
 | 3 | Blue-Green Deployments & Artifact Registry | [Week 3](Week%203/) |
+| 4 | Helm & Identity and Access Management | [Week 4](Week%204/) |
+
+## Google Cloud SDK installeren
+
+De opdrachten in deze repository maken gebruik van de [Google Cloud CLI (`gcloud`)](https://cloud.google.com/sdk/docs/install). Installeer deze eenmalig via onderstaande instructies.
+
+<details>
+<summary>Linux (inclusief CachyOS / Arch-gebaseerd)</summary>
+
+```bash
+curl https://sdk.cloud.google.com | bash
+```
+
+Volg daarna de wizard. Kies je shell-configuratiebestand (bijv. `~/.config/fish/config.fish` voor Fish of `~/.bashrc` voor Bash) en herstart je terminal of voer het volgende uit:
+
+```bash
+source ~/.bashrc   # of source ~/.config/fish/config.fish voor Fish
+```
+
+Verifieer de installatie:
+
+```bash
+gcloud version
+```
+
+Verwachte uitvoer (versienummers kunnen afwijken):
+
+```
+Google Cloud SDK 559.0.0
+bq 2.1.28
+core 2026.02.27
+gsutil 5.35
+```
+
+Log daarna in met je Google-account:
+
+```bash
+gcloud auth login
+```
+
+Er wordt automatisch een browsertabblad geopend. Na het inloggen zie je een bevestiging in de terminal:
+
+```
+You are now logged in as [jouw-emailadres].
+Your current project is [jouw-project-id].  You can change this setting by running:
+  $ gcloud config set project PROJECT_ID
+```
+
+</details>
+
+<details>
+<summary>Windows</summary>
+
+Via [winget](https://learn.microsoft.com/nl-nl/windows/package-manager/winget/):
+
+```powershell
+winget install -e --id Google.CloudSDK
+```
+
+> Meer informatie: [winstall.app/apps/Google.CloudSDK](https://winstall.app/apps/Google.CloudSDK)
+
+Herstart PowerShell of de opdrachtprompt na de installatie, zodat `gcloud` beschikbaar is.
+
+</details>
+
+---
 
 ## Afbeeldingen
 
