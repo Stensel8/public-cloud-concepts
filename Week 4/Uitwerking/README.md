@@ -170,7 +170,13 @@ Dit zet de release terug naar REVISION 1. De revisiegeschiedenis is op te vragen
 
 ### b) Eigen applicatie
 
-De `static-site` chart is een kopie van de `public-cloud-concepts` chart, aangepast zodat het Docker image uit Week 1 en 2 wordt gebruikt: `stensel8/public-cloud-concepts:latest`.
+De `static-site` chart is een kopie van de `public-cloud-concepts` chart. In `values.yaml` is het image aangepast naar het Docker image uit Week 1 en 2:
+
+```yaml
+image:
+  repository: stensel8/public-cloud-concepts
+  tag: "latest"
+```
 
 ```bash
 helm install static-site-v1 ./static-site
@@ -251,6 +257,19 @@ WordPress is bereikbaar op het externe IP dat GKE toekent.
 ![WordPress login pagina bereikbaar op extern GKE IP](week4-wordpress-login.avif)
 
 ![WordPress blog "Mijn Blog" draait publiek op het externe IP](week4-wordpress-blog.avif)
+
+#### Verwijderen
+
+Na afloop worden de installatie en de bijbehorende opslag verwijderd:
+
+```bash
+helm uninstall my-wordpress
+kubectl delete pvc --selector app.kubernetes.io/instance=my-wordpress
+```
+
+Daarna wordt het GKE-cluster verwijderd via de Google Cloud Console.
+
+![GKE cluster week4-cluster verwijderd via de Google Cloud Console](week4-cluster-verwijderd.avif)
 
 ---
 
