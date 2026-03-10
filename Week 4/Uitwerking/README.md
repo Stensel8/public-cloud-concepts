@@ -120,6 +120,58 @@ kubectl get services
 
 ---
 
+### 7. Aanpassen naar v2
+
+Voor v2 pas ik twee waarden aan in `values.yaml`:
+
+- `replicaCount`: van `1` naar `2`
+- `ingress.enabled`: van `false` naar `true`
+
+![Git diff van values.yaml met replicaCount 1 naar 2 en ingress.enabled false naar true](week4-helm-values-v2-diff.avif)
+
+Daarna upgrade ik de release naar v2:
+
+```bash
+helm upgrade public-cloud-concepts-v1 public-cloud-concepts
+```
+
+![Uitvoer van helm upgrade met STATUS deployed en REVISION 2](week4-helm-upgrade-v2.avif)
+
+Verificatie: beide pods draaien nu:
+
+```bash
+kubectl get pods
+kubectl get services
+```
+
+![Beide pods Running na upgrade naar v2 met replicaCount 2](week4-helm-status-v2.avif)
+
+Met `helm history` is de volledige revisiegeschiedenis zichtbaar: REVISION 1 (superseded) en REVISION 2 (deployed):
+
+```bash
+helm history public-cloud-concepts-v1
+```
+
+![helm history toont REVISION 1 superseded en REVISION 2 deployed](week4-helm-history.avif)
+
+---
+
+### 8. Verwijderen
+
+Om een release te verwijderen gebruik je `helm uninstall`:
+
+```bash
+helm uninstall public-cloud-concepts-v1
+```
+
+Na het verwijderen is de release niet meer zichtbaar in `helm ls` en geeft `helm history` een foutmelding dat de release niet meer bestaat.
+
+![helm uninstall bevestigt dat de release is verwijderd en helm ls toont een lege lijst](week4-helm-uninstall.avif)
+
+Deel a) is hiermee afgerond.
+
+---
+
 ## 4.2 Cloud Identity & IAM
 
 > Uitwerking volgt na het bestuderen van het lesmateriaal en het uitvoeren van de opdrachten.
