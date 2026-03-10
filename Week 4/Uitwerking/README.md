@@ -1,6 +1,6 @@
 # Mijn Uitwerking - Week 4
 
-## 4.1 Helm
+## 1. Helm
 
 Helm is de pakketbeheerder voor Kubernetes. In plaats van handmatig losse `deployment.yaml`- en `service.yaml`-bestanden toe te passen, bundelt Helm alles in een **chart**: één installeerbaar pakket met alle benodigde Kubernetes-resources.
 
@@ -14,14 +14,14 @@ Voor het installeren van Helm volg ik de officiële documentatie: <https://helm.
 
 ---
 
-### 1. Mijn situatie (Dualboot)
+### a) Standaard chart
+
+#### Mijn situatie (Dualboot)
 
 Ik ben een dualboot-gebruiker en werk dus met meerdere besturingssystemen door elkaar.
 Op dit moment doe ik mijn development werk het liefst op Linux, omdat dat voor mij het prettigst werkt.
 
----
-
-### 2. Installatie
+#### Installatie
 
 <details>
 <summary>Linux (Arch / CachyOS)</summary>
@@ -51,9 +51,7 @@ winget install -e --id Helm.Helm
 
 Voor andere systemen en alle officiële installatiemethoden, zie: <https://helm.sh/docs/intro/install/>
 
----
-
-### 3. Cluster aanmaken
+#### Cluster aanmaken
 
 Voordat ik met Helm aan de slag kan, maak ik een Autopilot GKE-cluster aan via de Google Cloud Console.
 
@@ -67,9 +65,7 @@ Als het cluster eenmaal is opgezet, verbind ik ermee en haal ik de credentials o
 
 ![Cluster credentials ophalen via gcloud get-credentials voor week4-cluster](week4-cluster-credentials.avif)
 
----
-
-### 4. Helm chart aanmaken
+#### Helm chart aanmaken
 
 Ik maak een Helm chart aan met de `helm create`-opdracht:
 
@@ -79,9 +75,7 @@ helm create public-cloud-concepts
 
 ![Uitvoer van helm create public-cloud-concepts in de terminal](week4-helm-create.avif)
 
----
-
-### 5. Structuur van de chart
+#### Structuur van de chart
 
 Wanneer je `helm create` gebruikt om een chart te maken, wordt er een standaard structuur aangemaakt. Deze structuur bevat verschillende bestanden en mappen die elk een specifieke rol spelen:
 
@@ -96,9 +90,7 @@ Standaard ziet `values.yaml` er zo uit:
 
 De standaardwaarden zijn: `replicaCount: 1`, image `nginx`, `service.type: ClusterIP` en Ingress uitgeschakeld.
 
----
-
-### 6. Installeren als v1
+#### Installeren als v1
 
 Met de standaardwaarden installeer ik de chart als de eerste release:
 
@@ -118,9 +110,7 @@ kubectl get services
 
 ![Overzicht van helm ls, kubectl get pods en kubectl get services voor v1](week4-helm-status-v1.avif)
 
----
-
-### 7. Aanpassen naar v2
+#### Aanpassen naar v2
 
 Voor v2 pas ik twee waarden aan in `values.yaml`:
 
@@ -154,9 +144,7 @@ helm history public-cloud-concepts-v1
 
 ![helm history toont REVISION 1 superseded en REVISION 2 deployed](week4-helm-history.avif)
 
----
-
-### 8. Verwijderen
+#### Verwijderen
 
 Om een release te verwijderen gebruik je `helm uninstall`:
 
@@ -168,20 +156,27 @@ Na het verwijderen is de release niet meer zichtbaar in `helm ls` en geeft `helm
 
 ![helm uninstall bevestigt dat de release is verwijderd en helm ls toont een lege lijst](week4-helm-uninstall.avif)
 
-Deel a) is hiermee afgerond.
+#### Rollback
+
+Met `helm rollback` zet je een release terug naar een eerdere revisie. Je geeft de naam van de release en het revisienummer mee:
+
+```bash
+helm rollback public-cloud-concepts-v1 1
+```
+
+Dit zet de release terug naar REVISION 1. De revisiegeschiedenis is op te vragen via `helm history`.
 
 ---
 
-### 9. Static-site chart installeren (eigen applicatie)
+### b) Eigen applicatie
 
-De tweede chart (`static-site`) deployt mijn eigen applicatie uit Week 1 en 2 via het Docker image `stensel8/public-cloud-concepts:latest`.
+De `static-site` chart is een kopie van de `public-cloud-concepts` chart, aangepast zodat het Docker image uit Week 1 en 2 wordt gebruikt: `stensel8/public-cloud-concepts:latest`.
 
 ```bash
 helm install static-site-v1 ./static-site
 ```
 
 ![Uitvoer van helm install static-site-v1 met STATUS deployed en REVISION 1](week4-helm-install-static-site.avif)
-
 
 #### App bekijken
 
@@ -199,7 +194,7 @@ Daarna open je <http://localhost:8080> in de browser en is de applicatie zichtba
 
 ---
 
-### 10. WordPress via Bitnami
+### c) WordPress via Bitnami
 
 WordPress installeren via de externe Bitnami Helm repo. Geen lokale chartmap nodig.
 
@@ -259,12 +254,20 @@ WordPress is bereikbaar op het externe IP dat GKE toekent.
 
 ---
 
-## 4.2 Cloud Identity & IAM
+## 2. IAM - EHR Healthcare
 
-> Uitwerking volgt na het bestuderen van het lesmateriaal en het uitvoeren van de opdrachten.
+EHR Healthcare is een bedrijf met een on-premise infrastructuur dat wil migreren naar de cloud. Ze zijn met name geïnteresseerd in beveiliging en IAM.
 
----
+Voor EHR Healthcare ben ik van mening dat alle genoemde onderdelen voor hen van toepassing zijn.
 
-## 4.3 Case Study: EHR Healthcare
+- **Single Sign-On (SSO)** is een must voor een bedrijf als EHR Healthcare. Zodra een medewerker inlogt, moet er toegang zijn tot alle benodigde applicaties zonder dat er opnieuw ingelogd hoeft te worden. Dit verhoogt de productiviteit en vermindert de kans op zwakke wachtwoorden. SSO is ook te configureren voor on-premise applicaties via Azure AD Application Proxy.
 
-> Uitwerking volgt na het lezen van de casestudy.
+- **Conditional Access** is ook belangrijk voor EHR Healthcare, omdat het bedrijf te maken heeft met gevoelige data zoals patientgegevens. Met Conditional Access kunnen ze ervoor zorgen dat alleen geautoriseerde gebruikers toegang hebben tot bepaalde applicaties. Dit verbetert de scheiding en lagen van beveiliging.
+
+- **RBAC** (Role-Based Access Control) is belangrijk. Dit lijkt qua functionaliteit een beetje op Conditional Access, maar is meer bedoeld voor eenvoudige en overzichtelijke toewijzing van rollen en permissies. Het toewijzen van rollen aan individuele gebruikers brengt namelijk extra risico's met zich mee.
+
+- **Identity Protection** is relevant omdat het bedrijf te maken heeft met gevoelige persoonsgegevens. Identity Protection is een verzamelnaam voor verschillende maatregelen die gericht zijn op het beschermen van gebruikersaccounts tegen misbruik. Denk hierbij aan detectie van verdachte inlogpogingen en het automatisch blokkeren van accounts bij verdachte activiteiten.
+
+- **Multi Factor Authentication (MFA)** dwingt tweestapsverificatie af onder bepaalde omstandigheden. Dit is een extra beveiligingslaag die ervoor zorgt dat zelfs als een wachtwoord wordt gelekt, men nog steeds geen toegang heeft en dus geen misbruik kan maken van een gebruikersaccount.
+
+- **Managed Identities en Service Principals** zijn relevant en sluiten aan bij het idee van RBAC. Het is een principle of least privilege, waarbij je ervoor zorgt dat applicaties en services alleen de toegang krijgen die ze nodig hebben en niet meer. Dit vermindert het risico op misbruik van credentials en maakt het beheer van toegangsrechten eenvoudiger. Dit wordt vooral gebruikt om externe applicaties toegang te geven zonder een gebruikersaccount te gebruiken.
