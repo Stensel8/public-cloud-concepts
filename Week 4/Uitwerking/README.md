@@ -271,9 +271,11 @@ helm uninstall my-wordpress
 kubectl delete pvc --selector app.kubernetes.io/instance=my-wordpress
 ```
 
-Daarna wordt het GKE-cluster verwijderd via de Google Cloud Console.
+Daarna wordt het GKE-cluster verwijderd:
 
-![GKE cluster week4-cluster verwijderd via de Google Cloud Console](week4-cluster-verwijderd.avif)
+```bash
+gcloud container clusters delete week4-cluster --region=europe-west4
+```
 
 ---
 
