@@ -245,9 +245,23 @@ Inloggen met gebruikersnaam `saxion`.
 
 ---
 
-## Stap 10 — Eigen applicatie deployen en dashboards instellen
+## Stap 10 — Dashboards instellen
 
-<!-- Wordt uitgewerkt -->
+### Dashboard template
+
+Als basis voor de Kubernetes monitoring heb ik het community dashboard [k8s-custom-metrics (ID 20960)](https://grafana.com/grafana/dashboards/20960-k8s-custom-metrics/) gebruikt, versie 3. Dit dashboard geeft een modern overzicht van cluster- en node-resources via Prometheus metrics:
+
+![Grafana dashboard template k8s-custom-metrics als basis voor eigen dashboard](stap10-dashboard-template.avif)
+
+Het dashboard is geïmporteerd via **Dashboards → Import** met ID `20960`. Als datasource is Prometheus geselecteerd:
+
+![Dashboard importeren in Grafana met Prometheus als datasource](stap10-dashboard-import.avif)
+
+Na het importeren toont het dashboard de cluster- en node-resources op basis van de standaard Prometheus metrics. Cluster CPU en RAM zijn zichtbaar; node-level metrics en pod-data tonen deels nog "No data" omdat er nog geen eigen applicatie draait:
+
+![Kubernetes application insights dashboard actief met cluster CPU 70% en RAM 63%](stap10-dashboard-resultaat.avif)
+
+> Dit is een basale opzet met standaard metrics op clusterniveau. In Poging 2 wordt een eigen applicatie gemonitord en worden de dashboards verder uitgebreid.
 
 ---
 
