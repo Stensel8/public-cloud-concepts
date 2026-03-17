@@ -1,12 +1,18 @@
 [Nederlands](README.md) | English
 
+[![Switch Blue-Green Slot](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml)
+[![PR Checks](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/pr-checks.yml)
+[![Dependabot Updates](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/dependabot/dependabot-updates)
+[![Copilot code review](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer)
+
+> [!NOTE]
+> This repository is primarily maintained in **Dutch**. An English translation is available in `README.en.md`, but it may not always be fully up to date.
+
 ---
 
 # Spring 2026 - Public Cloud Concepts
 
-> **Work in progress** - Individual repository for the HBO specialisation *Cloud Engineering* (Spring 2026, Q3/Q4).
-
-This repository is maintained by [Stensel8](https://github.com/Stensel8) and covers the individual module of the Cloud Engineering specialisation.
+This repository is maintained by [Sten Tijhuis](https://github.com/Stensel8) and covers the individual module of the Cloud Engineering specialisation.
 
 [![GitHub](https://img.shields.io/badge/GitHub-Stensel8%2Fpublic--cloud--concepts-181717?logo=github&logoColor=white)](https://github.com/Stensel8/public-cloud-concepts)
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-stensel8%2Fpublic--cloud--concepts-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/stensel8/public-cloud-concepts)
@@ -20,14 +26,82 @@ This repository is maintained by [Stensel8](https://github.com/Stensel8) and cov
 
 > [**Architecting the Cloud**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/architecting-the-cloud) and [**Cloud Automation Concepts**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/cloud-automation-concepts) (5 EC, Q3) are shared modules done in collaboration with [Wout Achterhuis](https://github.com/Hintenhaus04) and live in their own repository: [Spring 2026 - Cloud Engineering](https://github.com/Stensel8/spring2026-cloud-engineering).
 
-## Course Structure
+## Course Overview
 
 | Week | Topic | Folder |
 |------|-------|--------|
 | 1 | Introduction & Deployments | [Week 1](Week%201/) |
 | 2 | Ingress, Services & Apps | [Week 2](Week%202/) |
+| 3 | Blue-Green Deployments & Artifact Registry | [Week 3](Week%203/) |
+| 4 | Helm & Identity and Access Management | [Week 4](Week%204/) |
+| 5 | Monitoring & Observability | [Week 5](Week%205/) |
 
-## Image assets
+## Installing Google Cloud SDK
+
+The assignments in this repository use the [Google Cloud CLI (`gcloud`)](https://cloud.google.com/sdk/docs/install). Install it once using the instructions below.
+
+<details>
+<summary>Linux (including CachyOS / Arch-based)</summary>
+
+```bash
+curl https://sdk.cloud.google.com | bash
+```
+
+Follow the wizard. Choose your shell config file (e.g. `~/.config/fish/config.fish` for Fish or `~/.bashrc` for Bash) and restart your terminal or run:
+
+```bash
+source ~/.bashrc   # or source ~/.config/fish/config.fish for Fish
+```
+
+Verify the installation:
+
+```bash
+gcloud version
+```
+
+Expected output (version numbers may differ):
+
+```
+Google Cloud SDK 559.0.0
+bq 2.1.28
+core 2026.02.27
+gsutil 5.35
+```
+
+Then log in with your Google account:
+
+```bash
+gcloud auth login
+```
+
+A browser tab will open automatically. After logging in you will see a confirmation in the terminal:
+
+```
+You are now logged in as [your-email-address].
+Your current project is [your-project-id].  You can change this setting by running:
+  $ gcloud config set project PROJECT_ID
+```
+
+</details>
+
+<details>
+<summary>Windows</summary>
+
+Via [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/):
+
+```powershell
+winget install -e --id Google.CloudSDK
+```
+
+> More info: [winstall.app/apps/Google.CloudSDK](https://winstall.app/apps/Google.CloudSDK)
+
+Restart PowerShell or the command prompt after installation so that `gcloud` is available.
+
+</details>
+
+---
+
+## Images
 
 All images in this repository use the [AVIF](https://en.wikipedia.org/wiki/AVIF) format: open, royalty-free, and more efficient than PNG or JPEG at equivalent quality.
 
@@ -41,7 +115,7 @@ Install `avifenc` first via `sudo pacman -S libavif` (Arch/CachyOS) or `sudo apt
 
 ## Disclaimer
 
-This is a work in progress for educational purposes. Code, configurations, and documentation may change significantly as the course progresses.
+This is a work in progress for educational purposes. Code, configurations, and documentation may change as the course progresses.
 
 ---
 

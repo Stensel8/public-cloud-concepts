@@ -36,5 +36,5 @@ Deze week maak je kennis met het **Google Cloud Platform** en **Kubernetes**. We
 | [index.html](Bestanden/index.html) | Statische HTML-pagina geserveerd door de container |
 | [configure_master.sh](Bestanden/configure_master.sh) | Script voor het opzetten van de Kubernetes masternode |
 | [configure_worker.sh](Bestanden/configure_worker.sh) | Script voor het opzetten van een Kubernetes workernode |
-| [Installmastertemplate](Bestanden/Installmastertemplate) | Scriptsjabloon (origineel van cursus) voor de masternode |
-| [installnode](Bestanden/installnode) | Script (origineel van cursus) voor de workernodes |
+| [Installmastertemplate.sh](Bestanden/Installmastertemplate.sh) | Scriptsjabloon (origineel van cursus) voor de masternode |
+| [installnode.sh](Bestanden/installnode.sh) | Script (origineel van cursus) voor de workernodes |

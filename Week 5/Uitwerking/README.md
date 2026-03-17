@@ -3,12 +3,12 @@
 Voor de opdracht van week 5 heb ik een GKE cluster opgezet met Prometheus, Loki, Promtail en Grafana.
 
 Er zijn twee pogingen gedocumenteerd:
-- **Poging 1** — het script zoals aangeleverd vanuit school, inclusief de geconstateerde problemen
-- **Poging 2** — een verbeterde, gemoderniseerde versie met actuele Helm charts
+- **Poging 1**: het script zoals aangeleverd vanuit school, inclusief de geconstateerde problemen
+- **Poging 2**: een verbeterde, gemoderniseerde versie met actuele Helm charts
 
 ---
 
-## Stap 1 — Kubernetes cluster aanmaken
+## Stap 1: Kubernetes cluster aanmaken
 
 Standaard GKE cluster met 2 nodes in `europe-west4`:
 
@@ -25,15 +25,15 @@ gcloud container clusters create week5-cluster \
 | Vlag | Waarde | Toelichting |
 |------|--------|-------------|
 | `--region` | `europe-west4` | Regio dichtstbij Nederland |
-| `--machine-type` | `e2-small` | 2 vCPU, 2GB RAM — één tier onder e2-medium |
+| `--machine-type` | `e2-small` | 2 vCPU, 2GB RAM, één tier onder e2-medium |
 | `--num-nodes` | `2` | 2 nodes per zone (regio heeft 3 zones = 6 nodes totaal) |
-| `--disk-size` | `32` | 32GB per node — standaard is 100GB, te veel voor studentquota |
-| `--disk-type` | `pd-standard` | HDD in plaats van SSD — valt buiten de SSD-quota |
+| `--disk-size` | `32` | 32GB per node, standaard is 100GB wat te veel is voor de studentquota |
+| `--disk-type` | `pd-standard` | HDD in plaats van SSD, valt buiten de SSD-quota |
 
 > **Waarom niet de standaard instellingen?**
 > Een standaard `gcloud container clusters create` zonder extra vlaggen pakt automatisch:
-> - **100GB SSD (`pd-balanced`) per node** — in een regio met 3 zones en 2 nodes per zone zijn dat 6 nodes × 100GB = **600GB SSD**. Het studentproject heeft een SSD-quota van 250GB, waardoor de aanmaak mislukt.
-> - **`e2-medium` als machine type** — groter dan nodig voor deze opdracht.
+> - **100GB SSD (`pd-balanced`) per node**: in een regio met 3 zones en 2 nodes per zone zijn dat 6 nodes × 100GB = **600GB SSD**. Het studentproject heeft een SSD-quota van 250GB, waardoor de aanmaak mislukt.
+> - **`e2-medium` als machine type**: groter dan nodig voor deze opdracht.
 >
 > Door `--disk-size=32`, `--disk-type=pd-standard` en `--machine-type=e2-small` mee te geven blijft het cluster ruim binnen de studentquota.
 
@@ -49,7 +49,7 @@ Na ongeveer 6 minuten is het cluster gereed met status `RUNNING` en 6 nodes (2 p
 
 ---
 
-## Stap 2 — Verbinding maken met het cluster
+## Stap 2: Verbinding maken met het cluster
 
 ```bash
 gcloud container clusters get-credentials week5-cluster \
@@ -63,7 +63,7 @@ Na het uitvoeren wordt de kubeconfig automatisch bijgewerkt. Met `kubectl get no
 
 ---
 
-## Poging 1 — Schoolscript (as-is)
+## Poging 1: Schoolscript (as-is)
 
 ### Script en values.yaml bestuderen
 
@@ -151,10 +151,10 @@ Bij het uitvoeren van het schoolscript zijn de volgende waarschuwingen en proble
 
 | Component | Probleem |
 |-----------|----------|
-| `loki-distributed` | Chart is **deprecated** — Grafana raadt `loki` (SingleBinary/SimpleScalable) aan |
-| `promtail` | Chart is **deprecated** — vervangen door **Grafana Alloy** |
+| `loki-distributed` | Chart is **deprecated**, Grafana raadt `loki` (SingleBinary/SimpleScalable) aan |
+| `promtail` | Chart is **deprecated**, vervangen door **Grafana Alloy** |
 | `grafana/grafana` | Chart geeft **deprecated** waarschuwing |
-| `storageClass: managed-csi` | Azure-specifieke storage class, bestaat niet op GKE — aangepast naar `standard-rwo` |
+| `storageClass: managed-csi` | Azure-specifieke storage class die niet bestaat op GKE, aangepast naar `standard-rwo` |
 
 Deze problemen zijn opgelost in Poging 2.
 
@@ -205,7 +205,7 @@ spec:
 
 Het externe IP is `34.141.226.132` (zichtbaar in de ingress-output hierboven).
 
-De opdracht schrijft voor om het hosts-bestand handmatig aan te passen. Dat is een lokale, niet-schaalbare oplossing die per apparaat herhaald moet worden. In plaats daarvan is een A-record aangemaakt bij Bunny DNS voor `grafana.stijhuis.nl`:
+De opdracht schrijft voor om het hosts-bestand handmatig aan te passen. Dat is een lokale, niet-schaalbare oplossing die per apparaat herhaald moet worden. In plaats daarvan heb ik een A-record aangemaakt bij Bunny DNS voor `grafana.stijhuis.nl`:
 
 ![A-record aanmaken in Bunny DNS voor grafana.stijhuis.nl](media/stap5-dns-record-aanmaken.avif)
 
@@ -227,11 +227,11 @@ helm upgrade --namespace grafana --values grafana-values.yaml grafana grafana/gr
 
 ### Grafana openen en databronnen controleren
 
-Na de DNS-aanpassing was Grafana initieel nog niet bereikbaar — de ingress verwees nog naar de oude hostname `grafana.project.intern`. De `grafana-values.yaml` was al lokaal aangepast maar nog niet naar het cluster gepusht:
+Na de DNS-aanpassing was Grafana nog niet bereikbaar, want de ingress verwees nog naar de oude hostname `grafana.project.intern`. De `grafana-values.yaml` was al lokaal aangepast maar nog niet naar het cluster gepusht:
 
 ![grafana.stijhuis.nl geeft 404 omdat de Helm upgrade nog niet uitgevoerd was](media/stap6-grafana-404.avif)
 
-Na het uitvoeren van de Helm upgrade met de bijgewerkte values was Grafana direct bereikbaar via `http://grafana.stijhuis.nl`:
+Na het uitvoeren van de Helm upgrade was Grafana direct bereikbaar via `http://grafana.stijhuis.nl`:
 
 ![Grafana loginpagina bereikbaar via grafana.stijhuis.nl](media/stap6-grafana-login.avif)
 
@@ -239,13 +239,13 @@ Inloggen met gebruikersnaam `saxion`.
 
 ---
 
-## Poging 2 — Gemoderniseerde opzet
+## Poging 2: Gemoderniseerde opzet
 
 <!-- Wordt uitgewerkt -->
 
 ---
 
-## Stap 10 — Dashboards instellen
+## Stap 10: Dashboards instellen
 
 ### Dashboard template
 
@@ -253,11 +253,11 @@ Als basis voor de Kubernetes monitoring heb ik het community dashboard [k8s-cust
 
 ![Grafana dashboard template k8s-custom-metrics als basis voor eigen dashboard](media/stap10-dashboard-template.avif)
 
-Het dashboard is geïmporteerd via **Dashboards → Import** met ID `20960`. Als datasource is Prometheus geselecteerd:
+Het dashboard is geïmporteerd via **Dashboards > Import** met ID `20960`. Als datasource is Prometheus geselecteerd:
 
 ![Dashboard importeren in Grafana met Prometheus als datasource](media/stap10-dashboard-import.avif)
 
-Na het importeren toont het dashboard de cluster- en node-resources op basis van de standaard Prometheus metrics. Cluster CPU en RAM zijn zichtbaar; node-level metrics en pod-data tonen deels nog "No data" omdat er nog geen eigen applicatie draait:
+Na het importeren toont het dashboard de cluster- en node-resources op basis van de standaard Prometheus metrics. Cluster CPU en RAM zijn zichtbaar, maar node-level metrics en pod-data tonen deels nog "No data" omdat er nog geen eigen applicatie draait:
 
 ![Kubernetes application insights dashboard actief met cluster CPU 70% en RAM 63%](media/stap10-dashboard-resultaat.avif)
 
@@ -265,12 +265,12 @@ Na het importeren toont het dashboard de cluster- en node-resources op basis van
 
 ---
 
-## Stap 11 — Architectuurdiagram
+## Stap 11: Architectuurdiagram
 
 <!-- Voeg architectuurdiagram toe -->
 
 ---
 
-## Stap 12 — Andere monitoring-tools voor Kubernetes
+## Stap 12: Andere monitoring-tools voor Kubernetes
 
 <!-- Vul in -->

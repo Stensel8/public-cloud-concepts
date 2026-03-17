@@ -61,7 +61,7 @@ Also study the relevant topics from the ebook *Production Kubernetes* (see Brigh
 
    > **Use the Flannel CNI** - otherwise the communication between pods on different nodes may not work.
 
-   The bash scripts `Installmastertemplate` and `installnode` are provided (see files in this directory). `Installmastertemplate` still needs to be modified (uncomment the correct lines as indicated at the top of the file) and then run on the master. `installnode` must be executed on the nodes.
+   The bash scripts `Installmastertemplate.sh` and `installnode.sh` are provided (see files in this directory). `Installmastertemplate.sh` still needs to be modified (uncomment the correct lines as indicated at the top of the file) and then run on the master. `installnode.sh` must be executed on the nodes.
 
    After this, the nodes must be added to the cluster with the command visible on the master after executing the script: `sudo kubeadm join....`
    If it is not visible, run on the master: `kubeadm token create --print-join-command`
@@ -176,8 +176,8 @@ We use GitHub to automatically create an image when the code (`index.html`) is m
 | [deployment.yml](deployment.yml) | Kubernetes Deployment manifest |
 | [service.yml](service.yml) | Kubernetes Service manifest |
 | [index.html](index.html) | Static HTML page served by the container |
-| [Installmastertemplate](Installmastertemplate) | Script template for setting up the Kubernetes master node |
-| [installnode](installnode) | Script for setting up a Kubernetes worker node |
+| [Installmastertemplate.sh](Installmastertemplate.sh) | Script template for setting up the Kubernetes master node |
+| [installnode.sh](installnode.sh) | Script for setting up a Kubernetes worker node |
 
 ---
 

@@ -1,4 +1,4 @@
-Nederlands
+Nederlands | [English](README.en.md)
 
 # Week 5 - Monitoring & Observability
 
@@ -31,7 +31,7 @@ Deze week richten we een **monitoringomgeving** in voor Kubernetes bestaande uit
 
 | Bestand | Beschrijving |
 |---|---|
-| [setup-loki-prometheus-grafana](Bestanden/setup-loki-prometheus-grafana) | Installatiescript voor de monitoring stack |
+| [setup-loki-prometheus-grafana.sh](Bestanden/setup-loki-prometheus-grafana.sh) | Installatiescript voor de monitoring stack |
 | [grafana-values.yaml](Bestanden/grafana-values.yaml) | Helm values voor Grafana |
 | [loki-values.yaml](Bestanden/loki-values.yaml) | Helm values voor Loki |
 | [prometheus-values.yaml](Bestanden/prometheus-values.yaml) | Helm values voor Prometheus |
