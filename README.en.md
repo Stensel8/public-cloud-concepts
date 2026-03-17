@@ -10,7 +10,7 @@
 
 ---
 
-# Spring 2026 - Public Cloud Concepts
+# Public Cloud Concepts
 
 This repository is maintained by [Sten Tijhuis](https://github.com/Stensel8) and covers the individual module of the Cloud Engineering specialisation.
 
@@ -118,5 +118,3 @@ Install `avifenc` first via `sudo pacman -S libavif` (Arch/CachyOS) or `sudo apt
 This is a work in progress for educational purposes. Code, configurations, and documentation may change as the course progresses.
 
 ---
-
-*Last updated: March 2026*

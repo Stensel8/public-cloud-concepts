@@ -10,7 +10,7 @@ Nederlands | [English](README.en.md)
 
 ---
 
-# Voorjaar 2026 - Public Cloud Concepts
+# Public Cloud Concepts
 
 
 Deze repository wordt bijgehouden door [Sten Tijhuis](https://github.com/Stensel8) en bevat de individuele module van de Cloud Engineering-specialisatie.
@@ -119,5 +119,3 @@ Installeer `avifenc` eerst via `sudo pacman -S libavif` (Arch/CachyOS) of `sudo 
 Dit is een lopend project voor educatieve doeleinden. Code, configuraties en documentatie kunnen gedurende de cursus nog veranderen.
 
 ---
-
-*Laatst bijgewerkt: maart 2026*
