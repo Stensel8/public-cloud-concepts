@@ -10,13 +10,21 @@ Standaard GKE cluster met 2 nodes in `europe-west4`:
 
 ```bash
 gcloud container clusters create week5-cluster \
-  --region=europe-west4 \        # Regio dichtstbij Nederland
+  --region=europe-west4 \
   --project=project-5b8c5498-4fe2-42b9-bc3 \
-  --machine-type=e2-small \      # 2 vCPU, 2GB RAM — één tier onder e2-medium
-  --num-nodes=2 \                # 2 nodes per zone (regio heeft 3 zones = 6 nodes totaal)
-  --disk-size=32 \               # 32GB per node — standaard is 100GB, te veel voor studentquota
-  --disk-type=pd-standard        # HDD in plaats van SSD — valt buiten de SSD-quota
+  --machine-type=e2-small \
+  --num-nodes=2 \
+  --disk-size=32 \
+  --disk-type=pd-standard
 ```
+
+| Vlag | Waarde | Toelichting |
+|------|--------|-------------|
+| `--region` | `europe-west4` | Regio dichtstbij Nederland |
+| `--machine-type` | `e2-small` | 2 vCPU, 2GB RAM — één tier onder e2-medium |
+| `--num-nodes` | `2` | 2 nodes per zone (regio heeft 3 zones = 6 nodes totaal) |
+| `--disk-size` | `32` | 32GB per node — standaard is 100GB, te veel voor studentquota |
+| `--disk-type` | `pd-standard` | HDD in plaats van SSD — valt buiten de SSD-quota |
 
 > **Waarom niet de standaard instellingen?**
 > Een standaard `gcloud container clusters create` zonder extra vlaggen pakt automatisch:
