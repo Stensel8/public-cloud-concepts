@@ -13,7 +13,7 @@ ingress:
 persistence:
   type: pvc
   enabled: true
-  storageClass: "managed-csi" 
+  storageClass: "standard-rwo"
   accessModes:
     - ReadWriteOnce
   size: 1Gi
