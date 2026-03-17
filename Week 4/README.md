@@ -28,7 +28,3 @@ Deze week werken we met **Helm**, de package manager voor Kubernetes, en verkenn
 | [Opdracht/](Opdracht/) | Opdrachten voor week 4 |
 | [Uitwerking/](Uitwerking/) | Mijn uitwerkingen voor week 4 |
 
-## Lesmateriaal Deze Week
-
-| Bestand | Beschrijving |
-|---|---|

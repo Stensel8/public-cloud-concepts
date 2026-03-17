@@ -1,0 +1,42 @@
+replicas: 1
+adminUser: saxion
+adminPassword: DLLrE5xxKyInitgYX23ppyfP
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  path: /
+  pathType: Prefix
+  hosts:
+    - grafana.project.intern
+
+persistence:
+  type: pvc
+  enabled: true
+  storageClass: "managed-csi" 
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi
+  finalizers:
+    - kubernetes.io/pvc-protection
+  inMemory:
+    enabled: false
+
+serviceAccount:
+  create: true
+  name: grafana-sa
+  
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: loki
+      type: loki
+      orgId: 1
+      url: http://loki-loki-distributed-querier.loki:3100
+      isDefault: false
+    - name: prometheus
+      orgId: 1
+      type: prometheus
+      url: http://prometheus-kube-prometheus-prometheus.prometheus:9090
+      isDefault: true
