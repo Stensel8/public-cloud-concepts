@@ -2,6 +2,10 @@
 
 Voor de opdracht van week 5 heb ik een GKE cluster opgezet met Prometheus, Loki, Promtail en Grafana.
 
+Er zijn twee pogingen gedocumenteerd:
+- **Poging 1** — het script zoals aangeleverd vanuit school, inclusief de geconstateerde problemen
+- **Poging 2** — een verbeterde, gemoderniseerde versie met actuele Helm charts
+
 ---
 
 ## Stap 1 — Kubernetes cluster aanmaken
@@ -39,31 +43,13 @@ Na het uitvoeren van het commando is het cluster zichtbaar in de Google Cloud Co
 
 ![GKE cluster wordt aangemaakt in de GCP Console](stap1-cluster-provisioning.avif)
 
----
+Na ongeveer 6 minuten is het cluster gereed met status `RUNNING` en 6 nodes (2 per zone):
 
-## Stap 2 — Script en values.yaml bestuderen
-
-Het script `setup-loki-prometheus-grafana` installeert vier componenten via Helm:
-
-| Component   | Namespace    | Chart                              |
-|-------------|-------------|-------------------------------------|
-| Loki        | `loki`       | `grafana/loki-distributed`         |
-| Promtail    | `promtail`   | `grafana/promtail`                 |
-| Prometheus  | `prometheus` | `prometheus-community/kube-prometheus-stack` |
-| Grafana     | `grafana`    | `grafana/grafana`                  |
-
-Relevante instellingen uit de values-bestanden:
-
-- **Grafana** gebruikersnaam: `saxion`, wachtwoord: `DLLrE5xxKyInitgYX23ppyfP`
-- **Grafana** draait op poort `80` (intern), bereikbaar via `grafana.project.intern`
-- **Loki** querier URL (voor Grafana datasource): `http://loki-loki-distributed-querier.loki:3100`
-- **Prometheus** URL (voor Grafana datasource): `http://prometheus-kube-prometheus-prometheus.prometheus:9090`
+![Cluster succesvol aangemaakt met status RUNNING](stap1-cluster-gereed.avif)
 
 ---
 
-## Stap 3 — Verbinding maken en script uitvoeren
-
-Verbinding maken met het cluster:
+## Stap 2 — Verbinding maken met het cluster
 
 ```bash
 gcloud container clusters get-credentials week5-cluster \
@@ -71,30 +57,126 @@ gcloud container clusters get-credentials week5-cluster \
   --project=project-5b8c5498-4fe2-42b9-bc3
 ```
 
-Script uitvoeren vanuit de `Bestanden`-map:
+Na het uitvoeren wordt de kubeconfig automatisch bijgewerkt. Met `kubectl get nodes` zijn alle 6 nodes zichtbaar met status `Ready`:
 
-```bash
-cd "Week 5/Bestanden"
-bash setup-loki-prometheus-grafana
-```
+![get-credentials en kubectl get nodes tonen 6 Ready nodes](stap3-cluster-verbinding.avif)
 
 ---
 
-## Stap 4 — Ingress-controller controleren
+## Poging 1 — Schoolscript (as-is)
 
-Op de laatste regel van het script wordt de NGINX ingress-controller geïnstalleerd. Controleren of de pod actief is:
+### Script en values.yaml bestuderen
+
+Het script `setup-loki-prometheus-grafana` installeert vier componenten via Helm:
+
+| Component  | Namespace    | Chart                                        |
+|------------|--------------|----------------------------------------------|
+| Loki       | `loki`       | `grafana/loki-distributed`                   |
+| Promtail   | `promtail`   | `grafana/promtail`                           |
+| Prometheus | `prometheus` | `prometheus-community/kube-prometheus-stack` |
+| Grafana    | `grafana`    | `grafana/grafana`                            |
+
+Relevante instellingen uit de values-bestanden:
+
+- **Grafana** gebruikersnaam: `saxion`, wachtwoord: `DLLrE5xxKyInitgYX23ppyfP`
+- **Grafana** intern bereikbaar via `grafana.grafana.svc.cluster.local`, extern via `grafana.project.intern`
+- **Loki** querier URL (voor Grafana datasource): `http://loki-loki-distributed-querier.loki:3100`
+- **Prometheus** URL (voor Grafana datasource): `http://prometheus-kube-prometheus-prometheus.prometheus:9090`
+
+### Script uitvoeren
+
+```bash
+cd "Week 5/Bestanden"
+bash setup-loki-prometheus-grafana.sh
+```
+
+[▶ Bekijk screencast van de installatie](stap3-script-uitvoeren.mp4)
+
+<details>
+<summary>Volledige output van het script</summary>
+
+```
+"loki" has been added to your repositories
+...Successfully got an update from the "loki" chart repository
+Release "loki" does not exist. Installing it now.
+level=WARN msg="this chart is deprecated"
+NAME: loki
+LAST DEPLOYED: Tue Mar 17 22:29:12 2026
+NAMESPACE: loki
+STATUS: deployed
+REVISION: 1
+
+Installed components:
+* gateway
+* ingester
+* distributor
+* querier
+* query-frontend
+* compactor
+
+Release "promtail" does not exist. Installing it now.
+level=WARN msg="this chart is deprecated"
+NAME: promtail
+LAST DEPLOYED: Tue Mar 17 22:29:23 2026
+NAMESPACE: promtail
+STATUS: deployed
+REVISION: 1
+
+Release "prometheus" does not exist. Installing it now.
+NAME: prometheus
+LAST DEPLOYED: Tue Mar 17 22:29:41 2026
+NAMESPACE: prometheus
+STATUS: deployed
+REVISION: 1
+
+Release "grafana" does not exist. Installing it now.
+level=WARN msg="this chart is deprecated"
+NAME: grafana
+LAST DEPLOYED: Tue Mar 17 22:30:19 2026
+NAMESPACE: grafana
+STATUS: deployed
+REVISION: 1
+
+namespace/ingress-nginx created
+...
+deployment.apps/ingress-nginx-controller created
+ingressclass.networking.k8s.io/nginx created
+```
+
+</details>
+
+### Geconstateerde problemen
+
+Bij het uitvoeren van het schoolscript zijn de volgende waarschuwingen en problemen geconstateerd:
+
+| Component | Probleem |
+|-----------|----------|
+| `loki-distributed` | Chart is **deprecated** — Grafana raadt `loki` (SingleBinary/SimpleScalable) aan |
+| `promtail` | Chart is **deprecated** — vervangen door **Grafana Alloy** |
+| `grafana/grafana` | Chart geeft **deprecated** waarschuwing |
+| `storageClass: managed-csi` | Azure-specifieke storage class, bestaat niet op GKE — aangepast naar `standard-rwo` |
+
+Deze problemen zijn opgelost in Poging 2.
+
+### Ingress-controller controleren
 
 ```bash
 kubectl get pods --namespace ingress-nginx
 ```
 
-![kubectl get pods --namespace ingress-nginx toont de ingress-nginx-controller als Running](images/image-001.png)
+De ingress-controller draait. Tegelijk is het externe IP-adres van de Grafana ingress op te zoeken:
 
----
+```bash
+kubectl get ingress -n grafana
+```
 
-## Stap 5 — Ingress aanmaken voor Grafana
+![ingress-nginx Running en Grafana ingress met extern IP 34.141.226.132](stap4-ingress-status.avif)
 
-De ingress is al geconfigureerd via `grafana-values.yaml` en wordt automatisch aangemaakt door de Helm-installatie. Het volledige `grafana-ingress.yaml` ziet er als volgt uit:
+Het externe IP-adres is `34.141.226.132`.
+
+### Ingress aanmaken voor Grafana
+
+De ingress wordt automatisch aangemaakt via de Helm-installatie (`grafana-values.yaml`). De volledige configuratie:
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -119,60 +201,49 @@ spec:
                   number: 80
 ```
 
----
+### IP-adres opzoeken en DNS instellen
 
-## Stap 6 — IP-adres van de Ingress opzoeken en hosts-bestand aanpassen
+Het externe IP is `34.141.226.132` (zichtbaar in de ingress-output hierboven).
 
-Het externe IP-adres opzoeken:
+De opdracht schrijft voor om het hosts-bestand handmatig aan te passen. Dat is een lokale, niet-schaalbare oplossing die per apparaat herhaald moet worden. In plaats daarvan is een A-record aangemaakt bij Bunny DNS voor `grafana.stijhuis.nl`:
+
+![A-record aanmaken in Bunny DNS voor grafana.stijhuis.nl](stap5-dns-record-aanmaken.avif)
+
+![DNS-overzicht stijhuis.nl met grafana A-record actief](stap5-dns-overzicht.avif)
+
+> **Waarom geen hosts-bestand?**
+> Het handmatig aanpassen van het hosts-bestand is een noodoplossing voor lokale ontwikkeling. Het werkt alleen op het apparaat waar de aanpassing is gedaan, is niet schaalbaar, en vereist beheerdersrechten. Een DNS-record is de correcte productie-aanpak: het werkt direct op alle apparaten wereldwijd, zonder lokale configuratie.
+
+De `grafana-values.yaml` is aangepast zodat de ingress-hostname overeenkomt met het DNS-record:
+
+![grafana-values.yaml met grafana.stijhuis.nl als hostname](stap5-grafana-values-aangepast.avif)
+
+Daarna de Helm-release updaten zodat de nieuwe hostname actief wordt:
 
 ```bash
-kubectl get ingress -n grafana
+cd "Week 5/Bestanden"
+helm upgrade --namespace grafana --values grafana-values.yaml grafana grafana/grafana
 ```
 
-Het IP-adres toevoegen aan het hosts-bestand op de pc. Op Linux/macOS: `/etc/hosts`, op Windows: `C:\Windows\System32\drivers\etc\hosts`:
+### Grafana openen en databronnen controleren
 
-```
-<EXTERNAL-IP>  grafana.project.intern
-```
+Grafana is bereikbaar via `http://grafana.project.intern`. Inloggen met gebruikersnaam `saxion`.
+
+Na het inloggen zijn de twee databronnen zichtbaar onder **Connections → Data sources**: Loki en Prometheus. Via **Test** is te controleren of de verbinding werkt.
+
+<!-- Screenshots toevoegen -->
 
 ---
 
-## Stap 7 — Grafana openen in de browser
+## Poging 2 — Gemoderniseerde opzet
 
-Grafana is bereikbaar via: `http://grafana.project.intern`
-
-Inloggen met:
-- **Gebruikersnaam:** `saxion`
-- **Wachtwoord:** `DLLrE5xxKyInitgYX23ppyfP`
-
----
-
-## Stap 8 & 9 — Databronnen controleren
-
-Na het inloggen zijn de twee databronnen zichtbaar onder **Connections → Data sources**:
-
-- **Loki** — `http://loki-loki-distributed-querier.loki:3100`
-- **Prometheus** — `http://prometheus-kube-prometheus-prometheus.prometheus:9090`
-
-![Grafana Data sources: Loki en Prometheus verbonden](images/image-002.png)
-
-Door een databron te selecteren, naar beneden te scrollen en op **Test** te klikken, is te controleren of de verbinding werkt.
-
-![Test van Prometheus datasource geslaagd](images/image-003.png)
+<!-- Wordt uitgewerkt -->
 
 ---
 
 ## Stap 10 — Eigen applicatie deployen en dashboards instellen
 
-De applicatie uit week 1 en 2 deployen in het cluster:
-
-```bash
-kubectl apply -f <deployment.yaml>
-```
-
-### Dashboards
-
-<!-- Vul aan na instellen van dashboards -->
+<!-- Wordt uitgewerkt -->
 
 ---
 

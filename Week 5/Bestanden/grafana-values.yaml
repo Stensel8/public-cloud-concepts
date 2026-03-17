@@ -8,7 +8,7 @@ ingress:
   path: /
   pathType: Prefix
   hosts:
-    - grafana.project.intern
+    - grafana.stijhuis.nl
 
 persistence:
   type: pvc
