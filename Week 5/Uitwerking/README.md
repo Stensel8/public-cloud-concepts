@@ -227,11 +227,15 @@ helm upgrade --namespace grafana --values grafana-values.yaml grafana grafana/gr
 
 ### Grafana openen en databronnen controleren
 
-Grafana is bereikbaar via `http://grafana.project.intern`. Inloggen met gebruikersnaam `saxion`.
+Na de DNS-aanpassing was Grafana initieel nog niet bereikbaar — de ingress verwees nog naar de oude hostname `grafana.project.intern`. De `grafana-values.yaml` was al lokaal aangepast maar nog niet naar het cluster gepusht:
 
-Na het inloggen zijn de twee databronnen zichtbaar onder **Connections → Data sources**: Loki en Prometheus. Via **Test** is te controleren of de verbinding werkt.
+![grafana.stijhuis.nl geeft 404 omdat de Helm upgrade nog niet uitgevoerd was](stap6-grafana-404.avif)
 
-<!-- Screenshots toevoegen -->
+Na het uitvoeren van de Helm upgrade met de bijgewerkte values was Grafana direct bereikbaar via `http://grafana.stijhuis.nl`:
+
+![Grafana loginpagina bereikbaar via grafana.stijhuis.nl](stap6-grafana-login.avif)
+
+Inloggen met gebruikersnaam `saxion`.
 
 ---
 
