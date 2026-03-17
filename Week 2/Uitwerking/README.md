@@ -11,7 +11,7 @@ De GitHub Actions workflow ([ci_week2.yml](../../.github/workflows/ci_week2.yml)
 | Bison app | `bison` | `docker pull stensel8/public-cloud-concepts:bison` |
 | Brightspace app | `brightspace` | `docker pull stensel8/public-cloud-concepts:brightspace` |
 
-![DockerHub tags: latest, brightspace, bison](screenshots/ci-dockerhub-tags.avif)
+![DockerHub tags: latest, brightspace, bison](media/ci-dockerhub-tags.avif)
 
 ---
 
@@ -21,7 +21,7 @@ De GitHub Actions workflow ([ci_week2.yml](../../.github/workflows/ci_week2.yml)
 
 De Week 1 deployment (`first-deployment`) draait op het kubeadm-cluster met beide pods actief in twee regio's:
 
-![Deployment running - alle nodes Ready, pods Running met IPs](screenshots/2-2a-deployment-running.avif)
+![Deployment running - alle nodes Ready, pods Running met IPs](media/2-2a-deployment-running.avif)
 
 ```
 NAME               STATUS   ROLES           AGE   VERSION
@@ -40,7 +40,7 @@ first-deployment-5ffbd9444c-s4xdb   1/1     Running   1 (105s ago)  10.244.1.3  
 
 Een pod werd verwijderd terwijl de Deployment actief bleef. Kubernetes maakte automatisch een vervangende pod aan met een **ander IP-adres**, wat aantoont dat pod-IPs tijdelijk zijn en geen stabiele identifiers.
 
-![Pod verwijderd - nieuwe pod aangemaakt met ander IP](screenshots/2-2b-pod-delete-new-ip.avif)
+![Pod verwijderd - nieuwe pod aangemaakt met ander IP](media/2-2b-pod-delete-new-ip.avif)
 
 ```
 # Voor verwijdering:
@@ -72,7 +72,7 @@ spec:
       targetPort: 80
 ```
 
-![ClusterIP service aangemaakt met stabiel virtueel IP](screenshots/2-2c-clusterip-service.avif)
+![ClusterIP service aangemaakt met stabiel virtueel IP](media/2-2c-clusterip-service.avif)
 
 ```
 NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
@@ -89,15 +89,15 @@ Het ClusterIP is getest vanaf alle drie de nodes. Alle nodes gaven de HTML-respo
 
 **Vanaf master-amsterdam (`10.164.0.14`):**
 
-![curl via ClusterIP vanaf master](screenshots/2-2d-curl-from-master.avif)
+![curl via ClusterIP vanaf master](media/2-2d-curl-from-master.avif)
 
 **Vanaf worker-brussels (`10.132.0.5`):**
 
-![curl via ClusterIP vanaf worker-brussels](screenshots/2-2d-curl-from-worker-brussels.avif)
+![curl via ClusterIP vanaf worker-brussels](media/2-2d-curl-from-worker-brussels.avif)
 
 **Vanaf worker-london (`10.154.0.5`):**
 
-![curl via ClusterIP vanaf worker-london](screenshots/2-2d-curl-from-worker-london.avif)
+![curl via ClusterIP vanaf worker-london](media/2-2d-curl-from-worker-london.avif)
 
 Alle drie nodes bereikten de applicatie via `curl 10.110.23.98`, wat bewijst dat het ClusterIP clusterbreed bereikbaar is.
 
@@ -124,7 +124,7 @@ spec:
 
 Met `type: NodePort` opent Kubernetes automatisch een poort (hier `32490`) op **elke node** in het cluster. Verkeer dat op die poort binnenkomt op een willekeurige node, wordt doorgestuurd naar de pods via `kube-proxy`. Kubernetes wees poort `32490` toe:
 
-![NodePort service - poort 80:32490/TCP](screenshots/2-2e-nodeport-service.avif)
+![NodePort service - poort 80:32490/TCP](media/2-2e-nodeport-service.avif)
 
 ```
 NAME            TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
@@ -133,7 +133,7 @@ first-service   NodePort   10.110.23.98    <none>        80:32490/TCP   8m39s
 
 **Interne IPs van de nodes:**
 
-![kubectl get nodes -o wide - interne IPs](screenshots/2-2e-nodes-internal-ips.avif)
+![kubectl get nodes -o wide - interne IPs](media/2-2e-nodes-internal-ips.avif)
 
 | Node | Intern IP |
 |------|-----------|
@@ -149,11 +149,11 @@ Voor het testen zonder firewallregels te openen kan `kubectl port-forward` gebru
 kubectl port-forward service/first-service 8080:80
 ```
 
-![kubectl port-forward draaiend - tunnel van localhost:8080 naar service poort 80](screenshots/2-2e-port-forward-running.avif)
+![kubectl port-forward draaiend - tunnel van localhost:8080 naar service poort 80](media/2-2e-port-forward-running.avif)
 
 Vanuit een tweede terminal op dezelfde machine is de service bereikbaar via `curl localhost:8080`:
 
-![curl op localhost:8080 geeft HTML response terug](screenshots/2-2e-port-forward-curl-localhost.avif)
+![curl op localhost:8080 geeft HTML response terug](media/2-2e-port-forward-curl-localhost.avif)
 
 > [!NOTE]
 > `kubectl port-forward` is een **developer-tool voor lokaal testen**, geen externe toegangsoplossing. De tunnel is alleen bereikbaar op de machine waar het commando draait (`127.0.0.1`) en stopt zodra je `Ctrl+C` doet. Voor externe browsertoegang van buiten het cluster is dit niet bruikbaar zonder aanvullende SSH-tunneling.
@@ -162,15 +162,15 @@ Vanuit een tweede terminal op dezelfde machine is de service bereikbaar via `cur
 
 NodePort opent de poort op elke node, maar GCP blokkeert inkomend verkeer standaard via de VPC-firewall. Proberen de applicatie te bereiken via het externe IP (`34.140.10.158`) op poort `32490` vanuit een browser mislukte:
 
-![Browser geblokkeerd voor de firewallregel](screenshots/2-2e-browser-blocked-no-firewall.avif)
+![Browser geblokkeerd voor de firewallregel](media/2-2e-browser-blocked-no-firewall.avif)
 
 In **VPC Network -> Firewall** is een firewallregel aangemaakt om inkomend TCP-verkeer op poort `32490` toe te staan:
 
-![Firewallregel aanmaken in GCP console](screenshots/2-2e-firewall-rule-created.avif)
+![Firewallregel aanmaken in GCP console](media/2-2e-firewall-rule-created.avif)
 
 Na het toepassen is de applicatie bereikbaar via een browser op `http://34.160.10.158:32490`:
 
-![Website bereikbaar via extern IP en NodePort](screenshots/2-2e-browser-working-after-firewall.avif)
+![Website bereikbaar via extern IP en NodePort](media/2-2e-browser-working-after-firewall.avif)
 
 Dit bevestigt de volledige NodePort-flow: extern verkeer -> extern node-IP -> poort 32490 -> `kube-proxy` -> ClusterIP -> pods.
 
@@ -183,7 +183,7 @@ Dit bevestigt de volledige NodePort-flow: extern verkeer -> extern node-IP -> po
 
 De service is bijgewerkt naar type `LoadBalancer`:
 
-![LoadBalancer service aangemaakt - EXTERNAL-IP pending](screenshots/2-2f-loadbalancer-service-created.avif)
+![LoadBalancer service aangemaakt - EXTERNAL-IP pending](media/2-2f-loadbalancer-service-created.avif)
 
 ```
 NAME            TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
@@ -192,7 +192,7 @@ first-service   LoadBalancer   10.110.23.98   <pending>     80:32490/TCP   26m
 
 De `EXTERNAL-IP` blijft `<pending>`, ongeacht hoe vaak `kubectl get service` wordt uitgevoerd:
 
-![LoadBalancer blijft pending na meerdere checks](screenshots/2-2f-loadbalancer-pending.avif)
+![LoadBalancer blijft pending na meerdere checks](media/2-2f-loadbalancer-pending.avif)
 
 **Waarom blijft het pending?**
 
@@ -225,19 +225,19 @@ Een nieuw GKE-cluster `week2-cluster` is aangemaakt via de GCP Console (Kubernet
 
 **Cluster basics** - naam `week2-cluster`, zone `europe-west4-a`, Standard mode, Regular release channel:
 
-![GKE cluster aanmaken - cluster basics](screenshots/2-2g-gke-cluster-create-basics.avif)
+![GKE cluster aanmaken - cluster basics](media/2-2g-gke-cluster-create-basics.avif)
 
 **Node pool - machine type** - `e2-medium` (2 vCPU, 4 GB geheugen), Standard persistent disk, 100 GB boot disk:
 
-![GKE node pool - e2-medium machine type geselecteerd](screenshots/2-2g-gke-cluster-node-machine-type.avif)
+![GKE node pool - e2-medium machine type geselecteerd](media/2-2g-gke-cluster-node-machine-type.avif)
 
 **Node pool - details** - pool naam `default-pool`, 2 nodes, control plane versie `1.34.3-gke.1318000`, zone `europe-west4-a`:
 
-![GKE node pool details - 2 nodes, europe-west4-a](screenshots/2-2g-gke-cluster-node-pool-details.avif)
+![GKE node pool details - 2 nodes, europe-west4-a](media/2-2g-gke-cluster-node-pool-details.avif)
 
 Na het klikken op Create ging het cluster in de provisioningfase:
 
-![GKE week2-cluster provisioning op 33%](screenshots/2-2g-gke-cluster-provisioning.avif)
+![GKE week2-cluster provisioning op 33%](media/2-2g-gke-cluster-provisioning.avif)
 
 ```
 Status: Provisioning   Mode: Standard   Nodes: 2   Zone: europe-west4-a
@@ -275,7 +275,7 @@ gcloud container clusters get-credentials week2-cluster --zone europe-west4-a
 kubectl get nodes
 ```
 
-![GKE cluster verbonden - twee nodes Ready](screenshots/2-2g-gke-kubectl-connected.avif)
+![GKE cluster verbonden - twee nodes Ready](media/2-2g-gke-kubectl-connected.avif)
 
 ```
 NAME                                           STATUS   ROLES    AGE    VERSION
@@ -296,7 +296,7 @@ kubectl apply -f "Week 1/service.yml"
 
 Daarna is het externe IP gevolgd met herhaalde `kubectl get service first-service` aanroepen:
 
-![LoadBalancer op GKE - extern IP toegewezen na ~44 seconden](screenshots/2-2g-gke-loadbalancer-external-ip.avif)
+![LoadBalancer op GKE - extern IP toegewezen na ~44 seconden](media/2-2g-gke-loadbalancer-external-ip.avif)
 
 ```
 NAME            TYPE           CLUSTER-IP       EXTERNAL-IP     PORT(S)        AGE
@@ -311,7 +311,7 @@ Na ~44 seconden had GKE een **Google Cloud Load Balancer** geprovisioneert en he
 
 Navigeren naar `http://34.12.127.52` in de browser bevestigt dat de applicatie publiek bereikbaar is via de GKE LoadBalancer:
 
-![Website bereikbaar via GKE LoadBalancer extern IP](screenshots/2-2g-gke-browser-working.avif)
+![Website bereikbaar via GKE LoadBalancer extern IP](media/2-2g-gke-browser-working.avif)
 
 De volledige LoadBalancer-flow op GKE: browser -> Google Cloud Load Balancer (`34.12.127.52`) -> GKE node -> `kube-proxy` -> ClusterIP -> pods.
 
@@ -334,7 +334,7 @@ Het doel is twee apps beschikbaar stellen via een enkele Ingress:
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.0/deploy/static/provider/cloud/deploy.yaml
 ```
 
-![nginx Ingress Controller geinstalleerd - alle resources aangemaakt](screenshots/2-2h-nginx-ingress-controller-installed.avif)
+![nginx Ingress Controller geinstalleerd - alle resources aangemaakt](media/2-2h-nginx-ingress-controller-installed.avif)
 
 GKE provisioneert automatisch een Google Cloud Load Balancer voor de Ingress Controller. Het externe IP is gevolgd totdat het verscheen:
 
@@ -342,7 +342,7 @@ GKE provisioneert automatisch een Google Cloud Load Balancer voor de Ingress Con
 kubectl get service ingress-nginx-controller -n ingress-nginx
 ```
 
-![nginx Ingress Controller - extern IP 34.91.190.135 toegewezen](screenshots/2-2h-nginx-ingress-controller-external-ip.avif)
+![nginx Ingress Controller - extern IP 34.91.190.135 toegewezen](media/2-2h-nginx-ingress-controller-external-ip.avif)
 
 ```
 NAME                       TYPE           CLUSTER-IP       EXTERNAL-IP      PORT(S)                      AGE
@@ -359,7 +359,7 @@ kubectl apply -f "Week 2/Bestanden/brightspace/service.yml"
 kubectl apply -f "Week 2/Bestanden/ingress.yml"
 ```
 
-![Alle deployments, services en Ingress aangemaakt](screenshots/2-2h-deployments-services-ingress-applied.avif)
+![Alle deployments, services en Ingress aangemaakt](media/2-2h-deployments-services-ingress-applied.avif)
 
 ```
 deployment.apps/bison-deployment created
@@ -375,7 +375,7 @@ ingress.networking.k8s.io/ingress-saxion created
 kubectl get ingress ingress-saxion
 ```
 
-![Ingress saxion - adres 34.91.190.135, beide hosts geregistreerd](screenshots/2-2h-ingress-saxion-address.avif)
+![Ingress saxion - adres 34.91.190.135, beide hosts geregistreerd](media/2-2h-ingress-saxion-address.avif)
 
 ```
 NAME             CLASS   HOSTS                                        ADDRESS          PORTS   AGE
@@ -392,7 +392,7 @@ Omdat `bison.mysaxion.nl` en `brightspace.mysaxion.nl` geen echte DNS-records zi
 echo "34.91.190.135  bison.mysaxion.nl brightspace.mysaxion.nl" | sudo tee -a /etc/hosts
 ```
 
-![/etc/hosts bijgewerkt met beide hostnamen die naar het Ingress-IP wijzen](screenshots/2-2h-hosts-file-updated.avif)
+![/etc/hosts bijgewerkt met beide hostnamen die naar het Ingress-IP wijzen](media/2-2h-hosts-file-updated.avif)
 
 #### Stap 5 - Browser-test
 
@@ -400,11 +400,11 @@ Beide hostnamen worden nu omgezet naar de Ingress Controller, die op basis van d
 
 **bison.mysaxion.nl:**
 
-![bison.mysaxion.nl - Bison-applicatie bereikbaar via Ingress](screenshots/2-2h-browser-bison.avif)
+![bison.mysaxion.nl - Bison-applicatie bereikbaar via Ingress](media/2-2h-browser-bison.avif)
 
 **brightspace.mysaxion.nl:**
 
-![brightspace.mysaxion.nl - Brightspace-applicatie bereikbaar via Ingress](screenshots/2-2h-browser-brightspace.avif)
+![brightspace.mysaxion.nl - Brightspace-applicatie bereikbaar via Ingress](media/2-2h-browser-brightspace.avif)
 
 **Waarom Ingress?**
 

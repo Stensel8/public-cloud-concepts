@@ -57,20 +57,20 @@ Het aanmaken van het cluster duurde ongeveer 5 minuten.
 Terwijl het cluster aangemaakt wordt, begin ik alvast met het opzetten van een Service Account waarmee GitHub Actions met GCP kan communiceren. Ik volg hiervoor deze handleiding:
 [Setup CI/CD using GitHub Actions to deploy to GKE](https://medium.com/@gravish316/setup-ci-cd-using-github-actions-to-deploy-to-google-kubernetes-engine-ef465a482fd)
 
-![Het formulier voor het aanmaken van een service account](service-account-form.avif)
+![Het formulier voor het aanmaken van een service account](media/service-account-form.avif)
 
 Ik vul de naam in als **Github Pipeline Account**.
 
-![Service account aangemaakt met naam en beschrijving](service-account-create.avif)
+![Service account aangemaakt met naam en beschrijving](media/service-account-create.avif)
 
 Het service account krijgt de volgende rollen:
 - Artifact Registry Reader
 - Artifact Registry Writer
 - Kubernetes Engine Developer
 
-![Rollen toegewezen aan het service account](service-account-permissions.avif)
+![Rollen toegewezen aan het service account](media/service-account-permissions.avif)
 
-![Principals with access - stap 3 van het aanmaken](service-account-principals.avif)
+![Principals with access - stap 3 van het aanmaken](media/service-account-principals.avif)
 
 ---
 
@@ -78,19 +78,19 @@ Het service account krijgt de volgende rollen:
 
 Om de GitHub Actions workflow te kunnen authenticeren, maak ik een JSON key aan via **IAM → Service Accounts → Keys → Add Key → JSON**.
 
-![Keys-tabblad van het Github Pipeline Account](service-account-keys.avif)
+![Keys-tabblad van het Github Pipeline Account](media/service-account-keys.avif)
 
 Bij het aanmaken van de key krijg ik de volgende foutmelding:
 
-![Foutmelding: service account key creation is disabled](service-account-key-disabled.avif)
+![Foutmelding: service account key creation is disabled](media/service-account-key-disabled.avif)
 
 Een Organization Policy (`iam.disableServiceAccountKeyCreation`) blokkeert het aanmaken van keys.
 
-![Organization Policies overzicht met de geblokkeerde policy](org-policy-overview.avif)
+![Organization Policies overzicht met de geblokkeerde policy](media/org-policy-overview.avif)
 
 In de GUI kan ik de policy niet aanpassen - daarvoor ontbreken de benodigde rechten.
 
-![Bewerkoptie geblokkeerd in de GUI](org-policy-blocked.avif)
+![Bewerkoptie geblokkeerd in de GUI](media/org-policy-blocked.avif)
 
 ### Oplossing via Cloud Shell
 
@@ -100,7 +100,7 @@ Via de CLI los ik dit in twee stappen op. Eerst zoek ik het organization ID op:
 gcloud organizations list
 ```
 
-![Organization ID opvragen via gcloud](org-list.avif)
+![Organization ID opvragen via gcloud](media/org-list.avif)
 
 Daarna geef ik mezelf de benodigde rechten:
 
@@ -110,7 +110,7 @@ gcloud organizations add-iam-policy-binding 774668784967 \
   --role="roles/orgpolicy.policyAdmin"
 ```
 
-![IAM policy binding toegevoegd aan de organisatie](org-policy-add-binding.avif)
+![IAM policy binding toegevoegd aan de organisatie](media/org-policy-add-binding.avif)
 
 Vervolgens zet ik de policy op projectniveau uit:
 
@@ -119,13 +119,13 @@ gcloud resource-manager org-policies disable-enforce iam.disableServiceAccountKe
   --project=project-5b8c5498-4fe2-42b9-bc3
 ```
 
-![Policy succesvol uitgeschakeld op projectniveau](org-policy-disable-enforce.avif)
+![Policy succesvol uitgeschakeld op projectniveau](media/org-policy-disable-enforce.avif)
 
 De policy is nu uitgeschakeld (`booleanPolicy: {}`), waarna ik de key wel kan aanmaken.
 
-![Bestandsdialoog voor het opslaan van de JSON key](json-key-download.avif)
+![Bestandsdialoog voor het opslaan van de JSON key](media/json-key-download.avif)
 
-![Bevestiging: private key opgeslagen op de computer](json-key-saved.avif)
+![Bevestiging: private key opgeslagen op de computer](media/json-key-saved.avif)
 
 ---
 
@@ -133,11 +133,11 @@ De policy is nu uitgeschakeld (`booleanPolicy: {}`), waarna ik de key wel kan aa
 
 De JSON key en overige projectgegevens voeg ik toe als repository secrets in GitHub via **Settings → Secrets and variables → Actions**.
 
-![GitHub Secrets gedeeltelijk ingesteld (DOCKER_PAT en DOCKER_USERNAME)](github-secrets-partial.avif)
+![GitHub Secrets gedeeltelijk ingesteld (DOCKER_PAT en DOCKER_USERNAME)](media/github-secrets-partial.avif)
 
 De volgende secrets zijn aangemaakt:
 
-![GitHub Secrets volledig ingesteld (GCP_PROJECT_ID, GCP_SA_KEY, GKE_CLUSTER, GKE_ZONE)](github-secrets-complete.avif)
+![GitHub Secrets volledig ingesteld (GCP_PROJECT_ID, GCP_SA_KEY, GKE_CLUSTER, GKE_ZONE)](media/github-secrets-complete.avif)
 
 ---
 
@@ -149,19 +149,19 @@ Daarna maak ik verbinding met het cluster via de gcloud CLI:
 gcloud container clusters get-credentials week3-cluster --region europe-west4-a --project project-5b8c5498-4fe2-42b9-bc3
 ```
 
-![Cluster credentials ophalen via gcloud in Cloud Shell](gcloud-connect-cluster.avif)
+![Cluster credentials ophalen via gcloud in Cloud Shell](media/gcloud-connect-cluster.avif)
 
 Daarna ga ik naar de Artifact Registry om een repository aan te maken voor de container images. Ik kies dezelfde naam als mijn Docker Hub en GitHub repositories: `public-cloud-concepts`.
 
-![Artifact Registry nog leeg - geen repositories aangemaakt](artifact-registry-empty.avif)
+![Artifact Registry nog leeg - geen repositories aangemaakt](media/artifact-registry-empty.avif)
 
-![Formulier voor het aanmaken van een Artifact Registry repository](artifact-registry-create.avif)
+![Formulier voor het aanmaken van een Artifact Registry repository](media/artifact-registry-create.avif)
 
 De instellingen heb ik grotendeels op de standaardwaarden gelaten: Docker-formaat, region `europe-west4`.
 
 Tot slot schakel ik de **Container Scanning API** in. Dit deed ik in Week 1 en 2 ook al met Docker Scout - het geeft een mooi overzicht van kwetsbaarheden in de images.
 
-![Container Scanning API activeren in Google Cloud](container-scanning-api.avif)
+![Container Scanning API activeren in Google Cloud](media/container-scanning-api.avif)
 
 ---
 
@@ -169,11 +169,11 @@ Tot slot schakel ik de **Container Scanning API** in. Dit deed ik in Week 1 en 2
 
 Na het uitvoeren van de Blue-Green deployment via GitHub Actions ziet de workflow er zo uit:
 
-![GitHub Actions workflow: Build, push & deploy geslaagd](github-actions-run.avif)
+![GitHub Actions workflow: Build, push & deploy geslaagd](media/github-actions-run.avif)
 
 In de Artifact Registry staat nu het gebuilde image met tag `green` - 25,2 MB groot.
 
-![Artifact Registry met het gepushte green image](artifact-registry-result.avif)
+![Artifact Registry met het gepushte green image](media/artifact-registry-result.avif)
 
 ## IAM-configuratie
 
@@ -184,12 +184,12 @@ Wordt gebruikt door GitHub Actions tijdens de CI/CD-run. Dit account pusht image
 
 Rollen: Artifact Registry Reader, Artifact Registry Writer, Kubernetes Engine Developer
 
-![IAM-rechten van het GitHub pipeline service account](iam-pipeline-account.avif)
+![IAM-rechten van het GitHub pipeline service account](media/iam-pipeline-account.avif)
 
 **Compute Engine default service account** (`[PROJECT_NUMBER]-compute@...`)
 Wordt intern door de GKE-nodes gebruikt om container images te pullen op het moment dat een pod gestart wordt. Dit is een volledig apart account - de GitHub Actions credentials worden hier *niet* voor gebruikt. Zonder `Artifact Registry Reader` op dit account krijg je een `ImagePullBackOff` fout, ook al heeft het pipeline account wel de juiste rechten.
 
-![IAM-rechten van het Compute Engine default service account dat door GKE-nodes wordt gebruikt](iam-gke-node-account.avif)
+![IAM-rechten van het Compute Engine default service account dat door GKE-nodes wordt gebruikt](media/iam-gke-node-account.avif)
 
 
 
@@ -231,27 +231,27 @@ Dit toont aan dat beide versies parallel draaien en dat green een andere codebas
 
 De twee nodes van het cluster zijn actief in `europe-west4-a`:
 
-![De twee nodes van het week3-cluster in de GCP Console](gke-cluster-nodes.avif)
+![De twee nodes van het week3-cluster in de GCP Console](media/gke-cluster-nodes.avif)
 
 Via de GKE Console is ook observability beschikbaar - hier zijn de actieve workloads en pods zichtbaar:
 
-![Observability vanuit de GKE Console met actieve pods en deployments](gke-observability.avif)
+![Observability vanuit de GKE Console met actieve pods en deployments](media/gke-observability.avif)
 
 De Kubernetes Service is eenmalig handmatig aangemaakt via Cloud Shell met `kubectl apply`, omdat de pipeline de service nog niet automatisch toepaste. Dit is later gecorrigeerd in de workflow:
 
-![Kubernetes Service aangemaakt via kubectl apply in Cloud Shell](service-handmatig-aangemaakt.avif)
+![Kubernetes Service aangemaakt via kubectl apply in Cloud Shell](media/service-handmatig-aangemaakt.avif)
 
 De website is bereikbaar via het externe IP van de LoadBalancer Service op poort 80. In de definitieve, vereenvoudigde setup gebruik ik geen runtime-injectie of dynamische slot-balk meer. Het onderscheid tussen blue en green houd ik bewust in de branch-content (bijvoorbeeld accentkleur/tekst), zodat de implementatie simpel en opdrachtgericht blijft.
 
-![De website met actieve blue slot - blauwe balk bovenaan](website-slot-blue.avif)
+![De website met actieve blue slot - blauwe balk bovenaan](media/website-slot-blue.avif)
 
 Na het uitvoeren van de switch-slot workflow naar green is de green-versie actief:
 
-![De website met actieve green slot - groene balk bovenaan](website-slot-green.avif)
+![De website met actieve green slot - groene balk bovenaan](media/website-slot-green.avif)
 
 De pods draaien correct en zijn voorzien van de juiste labels (`slot=blue` of `slot=green`):
 
-![Overzicht van de draaiende pods in het cluster met slot-labels](gke-pods-overzicht.avif)
+![Overzicht van de draaiende pods in het cluster met slot-labels](media/gke-pods-overzicht.avif)
 
 ---
 

@@ -37,15 +37,15 @@ gcloud container clusters create week5-cluster \
 >
 > Door `--disk-size=32`, `--disk-type=pd-standard` en `--machine-type=e2-small` mee te geven blijft het cluster ruim binnen de studentquota.
 
-![Cluster aanmaken via gcloud CLI](stap1-cluster-aanmaken.avif)
+![Cluster aanmaken via gcloud CLI](media/stap1-cluster-aanmaken.avif)
 
 Na het uitvoeren van het commando is het cluster zichtbaar in de Google Cloud Console. Het cluster wordt aangemaakt in de Standard-modus (niet Autopilot):
 
-![GKE cluster wordt aangemaakt in de GCP Console](stap1-cluster-provisioning.avif)
+![GKE cluster wordt aangemaakt in de GCP Console](media/stap1-cluster-provisioning.avif)
 
 Na ongeveer 6 minuten is het cluster gereed met status `RUNNING` en 6 nodes (2 per zone):
 
-![Cluster succesvol aangemaakt met status RUNNING](stap1-cluster-gereed.avif)
+![Cluster succesvol aangemaakt met status RUNNING](media/stap1-cluster-gereed.avif)
 
 ---
 
@@ -59,7 +59,7 @@ gcloud container clusters get-credentials week5-cluster \
 
 Na het uitvoeren wordt de kubeconfig automatisch bijgewerkt. Met `kubectl get nodes` zijn alle 6 nodes zichtbaar met status `Ready`:
 
-![get-credentials en kubectl get nodes tonen 6 Ready nodes](stap3-cluster-verbinding.avif)
+![get-credentials en kubectl get nodes tonen 6 Ready nodes](media/stap3-cluster-verbinding.avif)
 
 ---
 
@@ -90,7 +90,7 @@ cd "Week 5/Bestanden"
 bash setup-loki-prometheus-grafana.sh
 ```
 
-[▶ Bekijk screencast van de installatie](stap3-script-uitvoeren.mp4)
+[▶ Bekijk screencast van de installatie](media/stap3-script-uitvoeren.mp4)
 
 <details>
 <summary>Volledige output van het script</summary>
@@ -170,7 +170,7 @@ De ingress-controller draait. Tegelijk is het externe IP-adres van de Grafana in
 kubectl get ingress -n grafana
 ```
 
-![ingress-nginx Running en Grafana ingress met extern IP 34.141.226.132](stap4-ingress-status.avif)
+![ingress-nginx Running en Grafana ingress met extern IP 34.141.226.132](media/stap4-ingress-status.avif)
 
 Het externe IP-adres is `34.141.226.132`.
 
@@ -207,16 +207,16 @@ Het externe IP is `34.141.226.132` (zichtbaar in de ingress-output hierboven).
 
 De opdracht schrijft voor om het hosts-bestand handmatig aan te passen. Dat is een lokale, niet-schaalbare oplossing die per apparaat herhaald moet worden. In plaats daarvan is een A-record aangemaakt bij Bunny DNS voor `grafana.stijhuis.nl`:
 
-![A-record aanmaken in Bunny DNS voor grafana.stijhuis.nl](stap5-dns-record-aanmaken.avif)
+![A-record aanmaken in Bunny DNS voor grafana.stijhuis.nl](media/stap5-dns-record-aanmaken.avif)
 
-![DNS-overzicht stijhuis.nl met grafana A-record actief](stap5-dns-overzicht.avif)
+![DNS-overzicht stijhuis.nl met grafana A-record actief](media/stap5-dns-overzicht.avif)
 
 > **Waarom geen hosts-bestand?**
 > Het handmatig aanpassen van het hosts-bestand is een noodoplossing voor lokale ontwikkeling. Het werkt alleen op het apparaat waar de aanpassing is gedaan, is niet schaalbaar, en vereist beheerdersrechten. Een DNS-record is de correcte productie-aanpak: het werkt direct op alle apparaten wereldwijd, zonder lokale configuratie.
 
 De `grafana-values.yaml` is aangepast zodat de ingress-hostname overeenkomt met het DNS-record:
 
-![grafana-values.yaml met grafana.stijhuis.nl als hostname](stap5-grafana-values-aangepast.avif)
+![grafana-values.yaml met grafana.stijhuis.nl als hostname](media/stap5-grafana-values-aangepast.avif)
 
 Daarna de Helm-release updaten zodat de nieuwe hostname actief wordt:
 
@@ -229,11 +229,11 @@ helm upgrade --namespace grafana --values grafana-values.yaml grafana grafana/gr
 
 Na de DNS-aanpassing was Grafana initieel nog niet bereikbaar — de ingress verwees nog naar de oude hostname `grafana.project.intern`. De `grafana-values.yaml` was al lokaal aangepast maar nog niet naar het cluster gepusht:
 
-![grafana.stijhuis.nl geeft 404 omdat de Helm upgrade nog niet uitgevoerd was](stap6-grafana-404.avif)
+![grafana.stijhuis.nl geeft 404 omdat de Helm upgrade nog niet uitgevoerd was](media/stap6-grafana-404.avif)
 
 Na het uitvoeren van de Helm upgrade met de bijgewerkte values was Grafana direct bereikbaar via `http://grafana.stijhuis.nl`:
 
-![Grafana loginpagina bereikbaar via grafana.stijhuis.nl](stap6-grafana-login.avif)
+![Grafana loginpagina bereikbaar via grafana.stijhuis.nl](media/stap6-grafana-login.avif)
 
 Inloggen met gebruikersnaam `saxion`.
 
@@ -251,15 +251,15 @@ Inloggen met gebruikersnaam `saxion`.
 
 Als basis voor de Kubernetes monitoring heb ik het community dashboard [k8s-custom-metrics (ID 20960)](https://grafana.com/grafana/dashboards/20960-k8s-custom-metrics/) gebruikt, versie 3. Dit dashboard geeft een modern overzicht van cluster- en node-resources via Prometheus metrics:
 
-![Grafana dashboard template k8s-custom-metrics als basis voor eigen dashboard](stap10-dashboard-template.avif)
+![Grafana dashboard template k8s-custom-metrics als basis voor eigen dashboard](media/stap10-dashboard-template.avif)
 
 Het dashboard is geïmporteerd via **Dashboards → Import** met ID `20960`. Als datasource is Prometheus geselecteerd:
 
-![Dashboard importeren in Grafana met Prometheus als datasource](stap10-dashboard-import.avif)
+![Dashboard importeren in Grafana met Prometheus als datasource](media/stap10-dashboard-import.avif)
 
 Na het importeren toont het dashboard de cluster- en node-resources op basis van de standaard Prometheus metrics. Cluster CPU en RAM zijn zichtbaar; node-level metrics en pod-data tonen deels nog "No data" omdat er nog geen eigen applicatie draait:
 
-![Kubernetes application insights dashboard actief met cluster CPU 70% en RAM 63%](stap10-dashboard-resultaat.avif)
+![Kubernetes application insights dashboard actief met cluster CPU 70% en RAM 63%](media/stap10-dashboard-resultaat.avif)
 
 > Dit is een basale opzet met standaard metrics op clusterniveau. In Poging 2 wordt een eigen applicatie gemonitord en worden de dashboards verder uitgebreid.
 
