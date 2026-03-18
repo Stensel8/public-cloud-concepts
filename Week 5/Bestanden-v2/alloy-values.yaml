@@ -1,14 +1,21 @@
+# Bronnen:
+# - Officiële Grafana Alloy docs voor Kubernetes pod logs:
+#   https://grafana.com/docs/alloy/latest/monitor/monitor-kubernetes-logs/
+# - Alloy configureren op Kubernetes:
+#   https://grafana.com/docs/alloy/latest/configure/kubernetes/
+
 alloy:
   configMap:
     content: |
       // Kubernetes pod discovery
-      discovery.kubernetes "pods" {
+      // Zie: https://grafana.com/docs/alloy/latest/monitor/monitor-kubernetes-logs/
+      discovery.kubernetes "pod" {
         role = "pod"
       }
 
       // Voeg labels toe aan log targets op basis van pod-metadata
-      discovery.relabel "pods" {
-        targets = discovery.kubernetes.pods.targets
+      discovery.relabel "pod_logs" {
+        targets = discovery.kubernetes.pod.targets
 
         rule {
           source_labels = ["__meta_kubernetes_namespace"]
@@ -29,12 +36,12 @@ alloy:
       }
 
       // Lees logs van de Kubernetes pods
-      loki.source.kubernetes "pods" {
-        targets    = discovery.relabel.pods.output
+      loki.source.kubernetes "logs" {
+        targets    = discovery.relabel.pod_logs.output
         forward_to = [loki.write.loki.receiver]
       }
 
-      // Stuur logs naar Loki
+      // Stuur logs naar Loki (SingleBinary service: loki.loki.svc.cluster.local)
       loki.write "loki" {
         endpoint {
           url = "http://loki.loki.svc.cluster.local:3100/loki/api/v1/push"

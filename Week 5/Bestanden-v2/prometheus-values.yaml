@@ -30,7 +30,7 @@ prometheus:
     scrapeInterval: 10s
     evaluationInterval: 30s
     retention: 4d
-    replicas: 2
+    replicas: 1
     shards: 1
 
     podMonitorSelectorNilUsesHelmValues: false

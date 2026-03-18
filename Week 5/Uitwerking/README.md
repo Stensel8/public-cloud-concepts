@@ -10,7 +10,20 @@ Er zijn twee pogingen gedocumenteerd:
 
 ## Stap 1: Kubernetes cluster aanmaken
 
-Standaard GKE cluster met 2 nodes in `europe-west4`:
+GKE **Standard** cluster met 2 nodes per zone in `europe-west4`, afgestemd op de studentquota.
+
+> **Waarom Standard en niet Autopilot?**
+> GKE biedt twee cluster-modi: **Autopilot** en **Standard**.
+>
+> Autopilot beheert nodes volledig automatisch en legt beperkingen op aan workloads: DaemonSets worden beperkt uitgevoerd, privileged containers zijn standaard geblokkeerd en resource requests zijn verplicht voor elke pod. Dit conflicteert direct met de monitoring stack in deze opdracht:
+>
+> - **Alloy** draait als DaemonSet met toegang tot `/var/log/pods` op de host — Autopilot beperkt dit soort host-toegang
+> - **Prometheus node-exporter** heeft privileged toegang nodig tot host-metrics
+> - **ingress-nginx** vereist een specifieke poortconfiguratie die Autopilot niet altijd toestaat
+>
+> De opdracht en docent schrijven dan ook expliciet een Standard cluster voor. Standard geeft volledige controle over node-configuratie, DaemonSets en privileged workloads — wat noodzakelijk is voor een monitoring stack die op node-niveau moet kunnen meekijken.
+
+GKE Standard cluster met 2 nodes per zone, afgestemd op de studentquota:
 
 ```bash
 gcloud container clusters create week5-cluster \
@@ -18,28 +31,37 @@ gcloud container clusters create week5-cluster \
   --project=project-5b8c5498-4fe2-42b9-bc3 \
   --machine-type=e2-small \
   --num-nodes=2 \
-  --disk-size=32 \
-  --disk-type=pd-standard
+  --disk-size=50 \
+  --disk-type=pd-balanced \
+  --release-channel=regular \
+  --cluster-version=1.35.1-gke.1396001
 ```
 
 | Vlag | Waarde | Toelichting |
 |------|--------|-------------|
 | `--region` | `europe-west4` | Regio dichtstbij Nederland |
-| `--machine-type` | `e2-small` | 2 vCPU, 2GB RAM, één tier onder e2-medium |
+| `--machine-type` | `e2-small` | 2 vCPU, 2GB RAM |
 | `--num-nodes` | `2` | 2 nodes per zone (regio heeft 3 zones = 6 nodes totaal) |
-| `--disk-size` | `32` | 32GB per node, standaard is 100GB wat te veel is voor de studentquota |
-| `--disk-type` | `pd-standard` | HDD in plaats van SSD, valt buiten de SSD-quota |
+| `--disk-size` | `50` | 50GB SSD per node: 6 × 50 = 300GB, past binnen het SSD-quota van 500GB |
+| `--disk-type` | `pd-balanced` | SSD (balanced), betere I/O voor Prometheus TSDB writes |
+| `--release-channel` | `regular` | Stabiele GKE-versies met automatische upgrades; aanbevolen voor de meeste workloads ([GKE release channels](https://docs.cloud.google.com/kubernetes-engine/docs/concepts/release-channels)) |
+| `--cluster-version` | `1.35.1-gke.1396001` | Pinned initiële versie voor reproduceerbaarheid; de release channel beheert daarna automatische upgrades |
 
-> **Waarom niet de standaard instellingen?**
-> Een standaard `gcloud container clusters create` zonder extra vlaggen pakt automatisch:
-> - **100GB SSD (`pd-balanced`) per node**: in een regio met 3 zones en 2 nodes per zone zijn dat 6 nodes × 100GB = **600GB SSD**. Het studentproject heeft een SSD-quota van 250GB, waardoor de aanmaak mislukt.
-> - **`e2-medium` als machine type**: groter dan nodig voor deze opdracht.
+> **Studentquota — werkelijke limieten (gemeten):**
 >
-> Door `--disk-size=32`, `--disk-type=pd-standard` en `--machine-type=e2-small` mee te geven blijft het cluster ruim binnen de studentquota.
+> | Resource | Quota | Gebruik vóór dit cluster |
+> |---|---|---|
+> | Persistent Disk SSD (GB) | **500 GB** | 2 GB |
+> | Persistent Disk Standard (GB) | **4,096 GB** | 64 GB |
+>
+> De standaard GKE-instellingen (`pd-balanced`, 100GB per node) zouden 6 × 100GB = **600GB SSD** vereisen, wat boven het SSD-quota van 500GB uitkomt. Door `--disk-size=50` te gebruiken met `pd-balanced` past alles ruim: 6 × 50GB = 300GB SSD.
+
+> **Waarom `e2-small` met de monitoring stack?**
+> De monitoring stack (Loki, Alloy, Prometheus, Grafana) is RAM-intensief. Prometheus kan per replica 400–600MB gebruiken. Om te voorkomen dat dit de e2-small-nodes (2GB RAM) overbelast, is in `prometheus-values.yaml` gekozen voor **1 Prometheus-replica** in plaats van 2. Met 6 nodes in totaal is één replica ruim voldoende voor een demo-omgeving.
 
 ![Cluster aanmaken via gcloud CLI](media/stap1-cluster-aanmaken.avif)
 
-Na het uitvoeren van het commando is het cluster zichtbaar in de Google Cloud Console. Het cluster wordt aangemaakt in de Standard-modus (niet Autopilot):
+Na het uitvoeren van het commando is het cluster zichtbaar in de Google Cloud Console. Het cluster wordt aangemaakt in de **Standard**-modus (niet Autopilot — zie toelichting hierboven):
 
 ![GKE cluster wordt aangemaakt in de GCP Console](media/stap1-cluster-provisioning.avif)
 
@@ -241,7 +263,18 @@ Inloggen met gebruikersnaam `saxion`.
 
 ## Poging 2: Gemoderniseerde opzet
 
-Bij Poging 1 gaf Helm drie `level=WARN msg="this chart is deprecated"` waarschuwingen. In Poging 2 zijn alle deprecated charts vervangen door hun actuele opvolgers en is de bijbehorende configuratie aangepast.
+Bij Poging 1 gaf Helm drie `level=WARN msg="this chart is deprecated"` waarschuwingen. In Poging 2 zijn alle deprecated charts vervangen door hun actuele opvolgers en is de bijbehorende configuratie aangepast. Tijdens het uitvoeren van Poging 2 bleek ook dat de nieuwe `grafana/loki` chart een verplichte `schemaConfig` vereist die in Poging 1 niet nodig was — dit is gedocumenteerd onder [loki-values.yaml](#loki-valuesyaml-1).
+
+### Bronnen
+
+| Onderwerp | Bron |
+|---|---|
+| Helm installatie | [helm.sh/docs/intro/install/](https://helm.sh/docs/intro/install/) |
+| Loki monolithic (SingleBinary) installatie | [grafana.com/docs/enterprise-logs/latest/setup/install/helm/install-monolithic/](https://grafana.com/docs/enterprise-logs/latest/setup/install/helm/install-monolithic/) |
+| Loki schema configuratie | [grafana.com/docs/loki/latest/operations/storage/schema/](https://grafana.com/docs/loki/latest/operations/storage/schema/) |
+| Alloy Kubernetes pod logs (aanbevolen aanpak met k8s-monitoring) | [grafana.com/docs/alloy/latest/monitor/monitor-kubernetes-logs/](https://grafana.com/docs/alloy/latest/monitor/monitor-kubernetes-logs/) |
+| Alloy configureren op Kubernetes (standalone chart) | [grafana.com/docs/alloy/latest/configure/kubernetes/](https://grafana.com/docs/alloy/latest/configure/kubernetes/) |
+| Alloy voorbeeldscenario's | [github.com/grafana/alloy-scenarios](https://github.com/grafana/alloy-scenarios) |
 
 ### Overzicht wijzigingen
 
@@ -268,17 +301,45 @@ De twee deprecated Helm releases zijn vervangen:
 
 De `loki-distributed` chart werkte met meerdere losse componenten (ingester, distributor, querier, query-frontend, compactor, gateway). De nieuwe `grafana/loki` chart ondersteunt een **SingleBinary**-modus waarbij alles in één pod draait — geschikt voor een demo-omgeving.
 
-Belangrijkste wijzigingen:
+Bij het uitvoeren van de eerste versie van Poging 2 gaf Helm de volgende foutmelding:
+
+```
+Error: execution error at (loki/templates/validate.yaml:40:4): You must provide a
+schema_config for Loki, one is not provided as this will be individual for every Loki
+cluster. See https://grafana.com/docs/loki/latest/operations/storage/schema/ for schema
+information.
+```
+
+De nieuwe `grafana/loki` chart vereist een expliciete `schemaConfig`, terwijl `loki-distributed` dit automatisch invulde. Op basis van de [officiële Loki schema docs](https://grafana.com/docs/loki/latest/operations/storage/schema/) en de [monolithic installatie docs](https://grafana.com/docs/loki/latest/setup/install/helm/install-monolithic/) is de volgende configuratie toegevoegd:
+
+```yaml
+schemaConfig:
+  configs:
+    - from: "2024-04-01"
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: loki_index_
+        period: 24h
+```
+
+Overige wijzigingen ten opzichte van de `loki-distributed` config, op basis van de [officiële monolithic install docs](https://grafana.com/docs/enterprise-logs/latest/setup/install/helm/install-monolithic/):
 
 - `deploymentMode: SingleBinary` toegevoegd
 - `singleBinary.replicas: 1` met resource requests
-- `singleBinary.persistence.storageClass: standard-rwo` (GKE-compatibel)
-- Gedistribueerde componenten (`read`, `write`, `backend`) uitgeschakeld met `replicas: 0`
-- `minio.enabled: false` (niet nodig bij filesystem storage)
+- `singleBinary.persistence.storageClass: standard-rwo` (GKE-compatibel, in plaats van `managed-csi` dat Azure-specifiek is)
+- `pattern_ingester.enabled: true`, `limits_config.allow_structured_metadata: true` en `ruler.enable_api: true` (vereist door nieuwe chart versie)
+- Alle gedistribueerde componenten expliciet op `replicas: 0` (vereist door de chart om conflicten te voorkomen)
+- `minio.enabled: false` (niet nodig bij filesystem storage — MinIO is alleen vereist bij S3-gebaseerde opslag voor HA-setups)
 
 #### `promtail-values.yaml` → `alloy-values.yaml`
 
-Promtail werd geconfigureerd via YAML met een `config.clients[].url`. Alloy gebruikt een eigen declaratieve taal (River/Alloy flow language). De nieuwe config doet hetzelfde als Promtail:
+Promtail werd geconfigureerd via YAML met een `config.clients[].url`. Alloy gebruikt een eigen declaratieve taal (Alloy flow language).
+
+> **Twee geldige aanpakken:** De officiële Grafana tutorial voor Kubernetes log monitoring ([monitor-kubernetes-logs](https://grafana.com/docs/alloy/latest/monitor/monitor-kubernetes-logs/)) gebruikt de `grafana/k8s-monitoring` chart — een kant-en-klare bundel die Alloy intern inzet. Voor meer controle en transparantie is het ook volledig ondersteund om de standalone `grafana/alloy` chart te gebruiken met een zelf geschreven config, zoals beschreven in de [configure/kubernetes docs](https://grafana.com/docs/alloy/latest/configure/kubernetes/). Gezien de leerdoelstelling — begrijpen wat er onder de motorkap gebeurt — is gekozen voor de standalone aanpak.
+
+Op basis van de [officiële Alloy docs](https://grafana.com/docs/alloy/latest/configure/kubernetes/) (Method 1: embed in `values.yaml`) doet de nieuwe config hetzelfde als Promtail:
 
 1. Kubernetes pods ontdekken (`discovery.kubernetes`)
 2. Labels toevoegen op basis van pod-metadata (`discovery.relabel`)
