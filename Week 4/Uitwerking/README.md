@@ -55,15 +55,15 @@ Voor andere systemen en alle officiële installatiemethoden, zie: <https://helm.
 
 Voordat ik met Helm aan de slag kan, maak ik een Autopilot GKE-cluster aan via de Google Cloud Console.
 
-![Autopilot cluster week4-cluster aanmaken in de Google Cloud Console](week4-cluster-aanmaken.avif)
+![Autopilot cluster week4-cluster aanmaken in de Google Cloud Console](media/week4-cluster-aanmaken.avif)
 
 In Google Cloud ziet het opgezette cluster er als volgt uit:
 
-![Overzicht van het actieve week4-cluster in de Google Cloud Console](week4-cluster-overzicht.avif)
+![Overzicht van het actieve week4-cluster in de Google Cloud Console](media/week4-cluster-overzicht.avif)
 
 Als het cluster eenmaal is opgezet, verbind ik ermee en haal ik de credentials op via de CLI:
 
-![Cluster credentials ophalen via gcloud get-credentials voor week4-cluster](week4-cluster-credentials.avif)
+![Cluster credentials ophalen via gcloud get-credentials voor week4-cluster](media/week4-cluster-credentials.avif)
 
 #### Helm chart aanmaken
 
@@ -73,7 +73,7 @@ Ik maak een Helm chart aan met de `helm create`-opdracht:
 helm create public-cloud-concepts
 ```
 
-![Uitvoer van helm create public-cloud-concepts in de terminal](week4-helm-create.avif)
+![Uitvoer van helm create public-cloud-concepts in de terminal](media/week4-helm-create.avif)
 
 #### Structuur van de chart
 
@@ -86,7 +86,7 @@ Wanneer je `helm create` gebruikt om een chart te maken, wordt er een standaard 
 
 Standaard ziet `values.yaml` er zo uit:
 
-![Inhoud van values.yaml na helm create](week4-helm-values.avif)
+![Inhoud van values.yaml na helm create](media/week4-helm-values.avif)
 
 De standaardwaarden zijn: `replicaCount: 1`, image `nginx`, `service.type: ClusterIP` en Ingress uitgeschakeld.
 
@@ -98,7 +98,7 @@ Met de standaardwaarden installeer ik de chart als de eerste release:
 helm install public-cloud-concepts-v1 public-cloud-concepts
 ```
 
-![Uitvoer van helm install public-cloud-concepts-v1 met STATUS deployed en REVISION 1](week4-helm-install-v1.avif)
+![Uitvoer van helm install public-cloud-concepts-v1 met STATUS deployed en REVISION 1](media/week4-helm-install-v1.avif)
 
 Daarna verifieer ik of de release actief is en de pod en service correct draaien:
 
@@ -108,7 +108,7 @@ kubectl get pods
 kubectl get services
 ```
 
-![Overzicht van helm ls, kubectl get pods en kubectl get services voor v1](week4-helm-status-v1.avif)
+![Overzicht van helm ls, kubectl get pods en kubectl get services voor v1](media/week4-helm-status-v1.avif)
 
 #### Aanpassen naar v2
 
@@ -117,7 +117,7 @@ Voor v2 pas ik twee waarden aan in `values.yaml`:
 - `replicaCount`: van `1` naar `2`
 - `ingress.enabled`: van `false` naar `true`
 
-![Git diff van values.yaml met replicaCount 1 naar 2 en ingress.enabled false naar true](week4-helm-values-v2-diff.avif)
+![Git diff van values.yaml met replicaCount 1 naar 2 en ingress.enabled false naar true](media/week4-helm-values-v2-diff.avif)
 
 Daarna upgrade ik de release naar v2:
 
@@ -125,7 +125,7 @@ Daarna upgrade ik de release naar v2:
 helm upgrade public-cloud-concepts-v1 public-cloud-concepts
 ```
 
-![Uitvoer van helm upgrade met STATUS deployed en REVISION 2](week4-helm-upgrade-v2.avif)
+![Uitvoer van helm upgrade met STATUS deployed en REVISION 2](media/week4-helm-upgrade-v2.avif)
 
 Verificatie: beide pods draaien nu:
 
@@ -134,7 +134,7 @@ kubectl get pods
 kubectl get services
 ```
 
-![Beide pods Running na upgrade naar v2 met replicaCount 2](week4-helm-status-v2.avif)
+![Beide pods Running na upgrade naar v2 met replicaCount 2](media/week4-helm-status-v2.avif)
 
 Met `helm history` is de volledige revisiegeschiedenis zichtbaar: REVISION 1 (superseded) en REVISION 2 (deployed):
 
@@ -142,7 +142,7 @@ Met `helm history` is de volledige revisiegeschiedenis zichtbaar: REVISION 1 (su
 helm history public-cloud-concepts-v1
 ```
 
-![helm history toont REVISION 1 superseded en REVISION 2 deployed](week4-helm-history.avif)
+![helm history toont REVISION 1 superseded en REVISION 2 deployed](media/week4-helm-history.avif)
 
 #### Verwijderen
 
@@ -154,7 +154,7 @@ helm uninstall public-cloud-concepts-v1
 
 Na het verwijderen is de release niet meer zichtbaar in `helm ls` en geeft `helm history` een foutmelding dat de release niet meer bestaat.
 
-![helm uninstall bevestigt dat de release is verwijderd en helm ls toont een lege lijst](week4-helm-uninstall.avif)
+![helm uninstall bevestigt dat de release is verwijderd en helm ls toont een lege lijst](media/week4-helm-uninstall.avif)
 
 #### Rollback
 
@@ -182,7 +182,7 @@ image:
 helm install static-site-v1 ./static-site
 ```
 
-![Uitvoer van helm install static-site-v1 met STATUS deployed en REVISION 1](week4-helm-install-static-site.avif)
+![Uitvoer van helm install static-site-v1 met STATUS deployed en REVISION 1](media/week4-helm-install-static-site.avif)
 
 #### App bekijken
 
@@ -192,11 +192,11 @@ Omdat de service type `ClusterIP` is (alleen intern bereikbaar), gebruik je `kub
 kubectl port-forward svc/static-site-v1 8080:80
 ```
 
-![kubectl port-forward tunnelt lokaal poort 8080 naar de pod in GKE](week4-port-forward.avif)
+![kubectl port-forward tunnelt lokaal poort 8080 naar de pod in GKE](media/week4-port-forward.avif)
 
 Daarna open je <http://localhost:8080> in de browser en is de applicatie zichtbaar:
 
-![De static-site applicatie draait op localhost:8080 na port-forward](week4-static-site-browser.avif)
+![De static-site applicatie draait op localhost:8080 na port-forward](media/week4-static-site-browser.avif)
 
 ---
 
@@ -254,13 +254,13 @@ helm get manifest my-wordpress | awk '/Source: wordpress\/templates\/svc.yaml/,/
 kubectl get svc my-wordpress
 ```
 
-![kubectl get svc toont my-wordpress als LoadBalancer met extern IP 34.13.227.107](week4-wordpress-svc.avif)
+![kubectl get svc toont my-wordpress als LoadBalancer met extern IP 34.13.227.107](media/week4-wordpress-svc.avif)
 
 WordPress is bereikbaar op het externe IP dat GKE toekent.
 
-![WordPress login pagina bereikbaar op extern GKE IP](week4-wordpress-login.avif)
+![WordPress login pagina bereikbaar op extern GKE IP](media/week4-wordpress-login.avif)
 
-![WordPress blog "Mijn Blog" draait publiek op het externe IP](week4-wordpress-blog.avif)
+![WordPress blog "Mijn Blog" draait publiek op het externe IP](media/week4-wordpress-blog.avif)
 
 #### Verwijderen
 
@@ -271,9 +271,11 @@ helm uninstall my-wordpress
 kubectl delete pvc --selector app.kubernetes.io/instance=my-wordpress
 ```
 
-Daarna wordt het GKE-cluster verwijderd via de Google Cloud Console.
+Daarna wordt het GKE-cluster verwijderd:
 
-![GKE cluster week4-cluster verwijderd via de Google Cloud Console](week4-cluster-verwijderd.avif)
+```bash
+gcloud container clusters delete week4-cluster --region=europe-west4
+```
 
 ---
 

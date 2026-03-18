@@ -10,7 +10,7 @@ Nederlands | [English](README.en.md)
 
 ---
 
-# Voorjaar 2026 - Public Cloud Concepts
+# Public Cloud Concepts
 
 
 Deze repository wordt bijgehouden door [Sten Tijhuis](https://github.com/Stensel8) en bevat de individuele module van de Cloud Engineering-specialisatie.
@@ -35,6 +35,7 @@ Deze repository wordt bijgehouden door [Sten Tijhuis](https://github.com/Stensel
 | 2 | Ingress, Services & Apps | [Week 2](Week%202/) |
 | 3 | Blue-Green Deployments & Artifact Registry | [Week 3](Week%203/) |
 | 4 | Helm & Identity and Access Management | [Week 4](Week%204/) |
+| 5 | Monitoring & Observability | [Week 5](Week%205/) |
 
 ## Google Cloud SDK installeren
 
@@ -118,5 +119,3 @@ Installeer `avifenc` eerst via `sudo pacman -S libavif` (Arch/CachyOS) of `sudo 
 Dit is een lopend project voor educatieve doeleinden. Code, configuraties en documentatie kunnen gedurende de cursus nog veranderen.
 
 ---
-
-*Laatst bijgewerkt: maart 2026*
