@@ -241,7 +241,68 @@ Inloggen met gebruikersnaam `saxion`.
 
 ## Poging 2: Gemoderniseerde opzet
 
-<!-- Wordt uitgewerkt -->
+Bij Poging 1 gaf Helm drie `level=WARN msg="this chart is deprecated"` waarschuwingen. In Poging 2 zijn alle deprecated charts vervangen door hun actuele opvolgers en is de bijbehorende configuratie aangepast.
+
+### Overzicht wijzigingen
+
+| | Poging 1 | Poging 2 | Reden |
+|---|---|---|---|
+| Loki chart | `grafana/loki-distributed` | `grafana/loki` (SingleBinary) | `loki-distributed` is deprecated |
+| Log collector | `grafana/promtail` | `grafana/alloy` | `promtail` is deprecated |
+| Loki datasource URL | `loki-loki-distributed-querier.loki:3100` | `loki.loki.svc.cluster.local:3100` | Nieuwe service-naam van `grafana/loki` |
+| Config-formaat log collector | YAML (`config.clients`) | Alloy flow language | Alloy gebruikt eigen River/Alloy syntax |
+| Prometheus | `prometheus-community/kube-prometheus-stack` | `prometheus-community/kube-prometheus-stack` | Ongewijzigd |
+
+### Gewijzigde bestanden
+
+De bestanden voor Poging 2 staan in [`Bestanden-v2/`](../Bestanden-v2/).
+
+#### `setup-loki-prometheus-grafana.sh`
+
+De twee deprecated Helm releases zijn vervangen:
+
+- `loki/loki-distributed` → `grafana/loki`
+- `grafana/promtail` → `grafana/alloy` (in namespace `alloy`)
+
+#### `loki-values.yaml`
+
+De `loki-distributed` chart werkte met meerdere losse componenten (ingester, distributor, querier, query-frontend, compactor, gateway). De nieuwe `grafana/loki` chart ondersteunt een **SingleBinary**-modus waarbij alles in één pod draait — geschikt voor een demo-omgeving.
+
+Belangrijkste wijzigingen:
+
+- `deploymentMode: SingleBinary` toegevoegd
+- `singleBinary.replicas: 1` met resource requests
+- `singleBinary.persistence.storageClass: standard-rwo` (GKE-compatibel)
+- Gedistribueerde componenten (`read`, `write`, `backend`) uitgeschakeld met `replicas: 0`
+- `minio.enabled: false` (niet nodig bij filesystem storage)
+
+#### `promtail-values.yaml` → `alloy-values.yaml`
+
+Promtail werd geconfigureerd via YAML met een `config.clients[].url`. Alloy gebruikt een eigen declaratieve taal (River/Alloy flow language). De nieuwe config doet hetzelfde als Promtail:
+
+1. Kubernetes pods ontdekken (`discovery.kubernetes`)
+2. Labels toevoegen op basis van pod-metadata (`discovery.relabel`)
+3. Logs lezen van de pods (`loki.source.kubernetes`)
+4. Logs doorsturen naar Loki (`loki.write`)
+
+#### `grafana-values.yaml`
+
+Alleen de Loki datasource-URL is gewijzigd, want de service-naam van de nieuwe `grafana/loki` chart verschilt van `loki-distributed`:
+
+```
+# Poging 1
+url: http://loki-loki-distributed-querier.loki:3100
+
+# Poging 2
+url: http://loki.loki.svc.cluster.local:3100
+```
+
+### Script uitvoeren
+
+```bash
+cd "Week 5/Bestanden-v2"
+bash setup-loki-prometheus-grafana.sh
+```
 
 ---
 
