@@ -6,7 +6,7 @@
 [![Copilot code review](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer)
 
 > [!NOTE]
-> This repository is primarily maintained in **Dutch**. An English translation is available in `README.en.md`, but it may not always be fully up to date.
+> This repository is primarily maintained in **Dutch**. The original documentation is in `README.md`; this file (`README.en.md`) is an English translation and may not always be fully up to date.
 
 ---
 
