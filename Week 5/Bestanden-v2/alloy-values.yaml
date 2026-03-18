@@ -41,10 +41,10 @@ alloy:
         forward_to = [loki.write.loki.receiver]
       }
 
-      // Stuur logs naar Loki (SingleBinary service: loki.loki.svc.cluster.local)
+      // Stuur logs naar Loki via de gateway (nginx gateway die Loki SingleBinary voor zit)
       loki.write "loki" {
         endpoint {
-          url = "http://loki.loki.svc.cluster.local:3100/loki/api/v1/push"
+          url = "http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push"
         }
       }
 

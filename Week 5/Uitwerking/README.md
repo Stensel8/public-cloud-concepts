@@ -1,6 +1,6 @@
 # Week 5 - Monitoring & Observability
 
-Voor de opdracht van week 5 heb ik een GKE cluster opgezet met Prometheus, Loki, Promtail en Grafana.
+Voor de opdracht van week 5 heb ik een GKE cluster opgezet met Prometheus, Loki en Grafana. Voor log collection is in Poging 1 Promtail gebruikt en in Poging 2 Grafana Alloy.
 
 Er zijn twee pogingen gedocumenteerd:
 - **Poging 1**: het script zoals aangeleverd vanuit school, inclusief de geconstateerde problemen
@@ -112,7 +112,7 @@ cd "Week 5/Bestanden"
 bash setup-loki-prometheus-grafana.sh
 ```
 
-[▶ Bekijk screencast van de installatie](media/stap3-script-uitvoeren.mp4)
+[▶ Bekijk screencast van de installatie](media/stap3-script-uitvoeren.avif)
 
 <details>
 <summary>Volledige output van het script</summary>
@@ -282,7 +282,8 @@ Bij Poging 1 gaf Helm drie `level=WARN msg="this chart is deprecated"` waarschuw
 |---|---|---|---|
 | Loki chart | `grafana/loki-distributed` | `grafana/loki` (SingleBinary) | `loki-distributed` is deprecated |
 | Log collector | `grafana/promtail` | `grafana/alloy` | `promtail` is deprecated |
-| Loki datasource URL | `loki-loki-distributed-querier.loki:3100` | `loki.loki.svc.cluster.local:3100` | Nieuwe service-naam van `grafana/loki` |
+| Grafana | losse `grafana/grafana` release | gebundeld in `kube-prometheus-stack` | `grafana/grafana` standalone chart is deprecated |
+| Loki datasource URL | `loki-loki-distributed-querier.loki:3100` | `loki-gateway.loki.svc.cluster.local` | Nieuwe chart gebruikt nginx gateway |
 | Config-formaat log collector | YAML (`config.clients`) | Alloy flow language | Alloy gebruikt eigen River/Alloy syntax |
 | Prometheus | `prometheus-community/kube-prometheus-stack` | `prometheus-community/kube-prometheus-stack` | Ongewijzigd |
 
@@ -292,10 +293,12 @@ De bestanden voor Poging 2 staan in [`Bestanden-v2/`](../Bestanden-v2/).
 
 #### `setup-loki-prometheus-grafana.sh`
 
-De twee deprecated Helm releases zijn vervangen:
+Drie wijzigingen ten opzichte van het schoolscript:
 
-- `loki/loki-distributed` → `grafana/loki`
+- `loki/loki-distributed` → `grafana/loki` (SingleBinary)
 - `grafana/promtail` → `grafana/alloy` (in namespace `alloy`)
+- Losse `grafana/grafana` release vervalt — Grafana is nu gebundeld in de `kube-prometheus-stack`
+- **ingress-nginx staat nu als eerste stap**, vóór Prometheus/Grafana — de Grafana ingress triggert anders de admission webhook van ingress-nginx voordat die beschikbaar is
 
 #### `loki-values.yaml`
 
@@ -346,16 +349,32 @@ Op basis van de [officiële Alloy docs](https://grafana.com/docs/alloy/latest/co
 3. Logs lezen van de pods (`loki.source.kubernetes`)
 4. Logs doorsturen naar Loki (`loki.write`)
 
-#### `grafana-values.yaml`
+#### `grafana-values.yaml` en `alloy-values.yaml` — Loki gateway URL
 
-Alleen de Loki datasource-URL is gewijzigd, want de service-naam van de nieuwe `grafana/loki` chart verschilt van `loki-distributed`:
+De nieuwe `grafana/loki` chart zet standaard een **nginx gateway** voor de Loki pod. Dit bleek pas bij het daadwerkelijk uitvoeren van het script: de Helm-installatie output meldde expliciet:
 
 ```
-# Poging 1
+Loki has been configured with a gateway (nginx) to support reads and writes from a single component.
+
+You can send logs from inside the cluster using the cluster DNS:
+http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push
+
+If Grafana operates within the cluster, you'll set up a new Loki datasource by utilizing the following URL:
+http://loki-gateway.loki.svc.cluster.local/
+```
+
+Alle drie de Loki-URL's zijn hierop aangepast:
+
+```
+# Poging 1 (loki-distributed, directe querier)
 url: http://loki-loki-distributed-querier.loki:3100
 
-# Poging 2
+# Poging 2 — eerste poging (directe pod, incorrect)
 url: http://loki.loki.svc.cluster.local:3100
+
+# Poging 2 — gecorrigeerd (via nginx gateway)
+url: http://loki-gateway.loki.svc.cluster.local        ← Grafana datasource
+url: http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push  ← Alloy push
 ```
 
 ### Script uitvoeren
@@ -364,6 +383,22 @@ url: http://loki.loki.svc.cluster.local:3100
 cd "Week 5/Bestanden-v2"
 bash setup-loki-prometheus-grafana.sh
 ```
+
+![Cluster aanmaken met verbeterd commando (pd-balanced, release-channel, cluster-version)](media/poging2-stap1-cluster-aanmaken.avif)
+
+![GKE console toont week5-cluster: Standard modus, 6 nodes, versie 1.35.1-gke.1396001, Regular release channel](media/poging2-stap1-cluster-details.avif)
+
+### IP-adres ophalen en DNS instellen
+
+Na de installatie is het externe IP van de Grafana ingress op te halen via:
+
+```bash
+kubectl get ingress -n prometheus
+```
+
+![kubectl get ingress toont IP 34.90.109.80 voor grafana.stijhuis.nl](media/poging2-stap4-ingress-ip.avif)
+
+Het externe IP (`34.90.109.80`) wordt vervolgens als A-record ingesteld bij Bunny DNS voor `grafana.stijhuis.nl`, zoals ook gedaan in Poging 1.
 
 ---
 

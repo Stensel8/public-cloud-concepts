@@ -1,8 +1,44 @@
 alertmanager:
   enabled: false
 
+# Grafana wordt hier gebundeld met kube-prometheus-stack in plaats van als
+# losse Helm release (grafana/grafana chart is deprecated).
+# De Prometheus datasource wordt automatisch geconfigureerd door de stack.
 grafana:
-  enabled: false
+  enabled: true
+
+  adminUser: sten
+  adminPassword: DLLrEfene@lwf3i23p_pyfP
+
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    path: /
+    pathType: Prefix
+    hosts:
+      - grafana.stijhuis.nl
+
+  persistence:
+    type: pvc
+    enabled: true
+    storageClass: "standard-rwo"
+    accessModes:
+      - ReadWriteOnce
+    size: 1Gi
+    finalizers:
+      - kubernetes.io/pvc-protection
+
+  serviceAccount:
+    create: true
+    name: grafana-sa
+
+  # Loki toevoegen als extra datasource; Prometheus wordt automatisch toegevoegd
+  additionalDataSources:
+    - name: loki
+      type: loki
+      orgId: 1
+      url: http://loki-gateway.loki.svc.cluster.local
+      isDefault: false
 
 kubeEtcd:
   enabled: false
@@ -19,9 +55,6 @@ prometheus:
   serviceAccount:
     create: true
     name: "prometheus-sa"
-
-  collector:
-    disable-defaults: true
 
   ingress:
     enabled: false
