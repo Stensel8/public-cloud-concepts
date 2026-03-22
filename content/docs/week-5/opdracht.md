@@ -11,7 +11,7 @@ Het bedrijf TerramEarth (zie de casebeschrijving) wil monitoring en observabilit
 
 ### Installatie
 
-1. Maak een Kubernetes-cluster aan in Google Cloud. Gebruik de **Standard**-optie in plaats van het geautomatiseerde Autopilot-cluster — het Autopilot-cluster werkt niet voor deze opdracht.
+1. Maak een Kubernetes-cluster aan in Google Cloud. Gebruik de **Standard**-optie in plaats van het geautomatiseerde Autopilot-cluster; het Autopilot-cluster werkt niet voor deze opdracht.
 
 2. Bestudeer het script `setup-loki-prometheus-grafana` en de bijbehorende `values.yaml`-bestanden. Stel vast welke gebruikersnamen en wachtwoorden worden gebruikt (of pas ze aan), en welke poorten er worden gebruikt.
 

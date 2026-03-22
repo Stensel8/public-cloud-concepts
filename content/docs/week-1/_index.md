@@ -1,5 +1,5 @@
 ---
-title: "Week 1 — Containerisatie & Kubernetes"
+title: "Week 1: Containerisatie & Kubernetes"
 linkTitle: "Week 1"
 weight: 1
 ---

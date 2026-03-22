@@ -45,17 +45,17 @@ De originele bestanden staan in [`Week 5/Opdracht/Bestanden/`](https://github.co
 {{< callout type="info" >}}
 **Waarom Standard en niet Autopilot?**
 
-Autopilot beperkt DaemonSets, blokkeert privileged containers standaard en vereist resource requests voor elke pod. Dit conflicteert direct met de monitoring stack:
+Autopilot beperkt DaemonSets, blokkeert standaard privileged containers en vereist resource requests voor elke pod. Dat botst met de monitoring stack:
 
 - **Alloy** draait als DaemonSet met toegang tot `/var/log/pods` op de host
 - **Prometheus node-exporter** heeft privileged toegang nodig tot host-metrics
 - **ingress-nginx** vereist poortconfiguratie die Autopilot niet altijd toestaat
 
-Standard geeft volledige controle over node-configuratie, DaemonSets en privileged workloads.
+Met Standard heb je gewoon volledige controle over node-configuratie, DaemonSets en privileged workloads.
 {{< /callout >}}
 
-{{< tabs items="Linux / macOS,Windows (PowerShell)" >}}
-{{< tab >}}
+{{< tabs >}}
+{{< tab name="Linux / macOS" >}}
 ```bash
 gcloud container clusters create week5-cluster \
   --region=europe-west4 \
@@ -68,7 +68,7 @@ gcloud container clusters create week5-cluster \
   --cluster-version=1.35.1-gke.1396001
 ```
 {{< /tab >}}
-{{< tab >}}
+{{< tab name="Windows (PowerShell)" >}}
 ```powershell
 gcloud container clusters create "week5-cluster" `
   --region "europe-west4" `
@@ -146,11 +146,11 @@ bash setup-loki-prometheus-grafana.sh
 Het script installeert de stack in vijf stappen: Helm repos toevoegen, ingress-nginx (met `kubectl wait`), Loki, Alloy, Prometheus + Grafana.
 
 **Waarom ingress-nginx als eerste?**
-De `kube-prometheus-stack` maakt bij installatie direct een Grafana Ingress-object aan. De admission webhook van ingress-nginx valideert dat object — als ingress-nginx nog niet draait, mislukt de Helm-installatie met een webhook-fout. Door ingress-nginx eerst te installeren en te wachten tot de controller `Ready` is, wordt dit voorkomen.
+De `kube-prometheus-stack` maakt bij installatie direct een Grafana Ingress-object aan. De ingress-nginx controller valideert dat object via een webhook; als ingress-nginx nog niet draait, mislukt de Helm-installatie met een webhook-fout. Door ingress-nginx eerst te installeren en te wachten tot de controller `Ready` is, voorkom je dat.
 
 ### `loki-values.yaml`
 
-De `grafana/loki` chart vereist een expliciete `schemaConfig` — zonder dit geeft Helm een harde fout:
+De `grafana/loki` chart vereist een expliciete `schemaConfig`, anders geeft Helm een harde fout:
 
 ```
 Error: You must provide a schema_config for Loki.
@@ -192,9 +192,9 @@ minio:
   enabled: false
 ```
 
-- `storageClass: standard-rwo` — GKE-compatibel (schoolscript gebruikte `managed-csi`, wat Azure-specifiek is)
-- Alle gedistribueerde componenten expliciet op `replicas: 0` — vereist door de chart
-- `minio.enabled: false` — niet nodig bij filesystem storage
+- `storageClass: standard-rwo`: GKE-compatibel; het schoolscript gebruikte `managed-csi`, wat Azure-specifiek is
+- Alle gedistribueerde componenten staan expliciet op `replicas: 0`, dat is vereist door de chart
+- `minio.enabled: false`, want we gebruiken filesystem storage
 
 ### `alloy-values.yaml`
 
@@ -219,7 +219,7 @@ http://loki-gateway.loki.svc.cluster.local
 
 ### `prometheus-values.yaml`
 
-Grafana is ingebouwd in `kube-prometheus-stack` (`grafana.enabled: true`). Dit elimineert de behoefte aan een losse `grafana/grafana` release. Prometheus is ingesteld op 1 replica — de monitoring stack is RAM-intensief en de `e2-small` nodes (2GB) zouden anders te zwaar belast worden.
+Grafana is ingebouwd in `kube-prometheus-stack` (`grafana.enabled: true`), dus je hebt geen aparte `grafana/grafana` chart nodig. Prometheus staat op 1 replica, want de monitoring stack is RAM-intensief en de `e2-small` nodes (2GB) kunnen anders niet mee.
 
 ---
 
@@ -237,7 +237,7 @@ kubectl get ingress -n prometheus
 
 ## Stap 5: DNS instellen
 
-Het externe IP is als A-record ingesteld bij Bunny DNS voor `grafana.stijhuis.nl` — in plaats van het `hosts`-bestand handmatig aan te passen. Een DNS-record werkt direct op alle apparaten wereldwijd, zonder lokale configuratie.
+Het externe IP is als A-record ingesteld bij Bunny DNS voor `grafana.stijhuis.nl`, in plaats van het `hosts`-bestand handmatig aan te passen. Een DNS-record werkt direct op alle apparaten wereldwijd, zonder lokale configuratie.
 
 ![Grafana values aangepast met de hostnaam](../media/stap5-grafana-values-aangepast.avif)
 
@@ -251,7 +251,7 @@ Het externe IP is als A-record ingesteld bij Bunny DNS voor `grafana.stijhuis.nl
 
 Via `https://grafana.stijhuis.nl` in de browser:
 
-![Grafana 404 bij eerste bezoek — DNS nog niet gepropageerd](../media/stap6-grafana-404.avif)
+![Grafana 404 bij eerste bezoek, DNS nog niet gepropageerd](../media/stap6-grafana-404.avif)
 
 ![Grafana login pagina bereikbaar](../media/stap6-grafana-login.avif)
 
@@ -269,7 +269,7 @@ Dashboard geïmporteerd via **Dashboards > Import** met ID `20960`, Prometheus a
 
 ![Dashboard importeren in Grafana met Prometheus als datasource](../media/stap10-dashboard-import.avif)
 
-![Kubernetes application insights dashboard actief — cluster CPU 70%, RAM 63%](../media/stap10-dashboard-resultaat.avif)
+![Kubernetes application insights dashboard actief, cluster CPU 70%, RAM 63%](../media/stap10-dashboard-resultaat.avif)
 
 ---
 
