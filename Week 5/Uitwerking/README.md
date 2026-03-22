@@ -1,5 +1,6 @@
-# Week 5 - Monitoring & Observability
+# Uitwerking Week 5
 
+<<<<<<< HEAD
 Voor de opdracht van week 5 heb ik een GKE cluster opgezet met Prometheus, Loki en Grafana. Voor log collection is in Poging 1 Promtail gebruikt en in Poging 2 Grafana Alloy.
 
 Er zijn twee pogingen gedocumenteerd:
