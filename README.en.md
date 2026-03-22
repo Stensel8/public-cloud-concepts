@@ -31,13 +31,13 @@ This repository is maintained by [Sten Tijhuis](https://github.com/Stensel8) and
 
 ## Course Overview
 
-| Week | Topic | Folder |
-|------|-------|--------|
-| 1 | Introduction & Deployments | [Week 1](Week%201/) |
-| 2 | Ingress, Services & Apps | [Week 2](Week%202/) |
-| 3 | Blue-Green Deployments & Artifact Registry | [Week 3](Week%203/) |
-| 4 | Helm & Identity and Access Management | [Week 4](Week%204/) |
-| 5 | Monitoring & Observability | [Week 5](Week%205/) |
+| Week | Topic | Files |
+|------|-------|-------|
+| 1 | Introduction & Deployments | [Week 1/Bestanden](static/docs/week-1/bestanden/) |
+| 2 | Ingress, Services & Apps | [Week 2/Bestanden](static/docs/week-2/bestanden/) |
+| 3 | Blue-Green Deployments & Artifact Registry | [Week 3/Bestanden](static/docs/week-3/bestanden/) |
+| 4 | Helm & Identity and Access Management | [Week 4/Bestanden](static/docs/week-4/bestanden/) |
+| 5 | Monitoring & Observability | [Week 5](static/docs/week-5/) |
 
 ## Installing Google Cloud SDK
 

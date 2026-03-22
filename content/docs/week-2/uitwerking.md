@@ -144,10 +144,6 @@ Na het aanmaken van de firewallregel werkt de site:
 ![curl via localhost:8080 werkt via port-forward](../media/2-2e-port-forward-curl-localhost.avif)
 {{< /callout >}}
 
-{{< callout type="info" >}}
-`kubectl port-forward` is een developer-tool voor lokaal testen, geen externe toegangsoplossing. De tunnel is alleen bereikbaar op de machine waar het commando draait en stopt bij `Ctrl+C`.
-{{< /callout >}}
-
 ---
 
 ### Opdracht 2.2f - LoadBalancer op het kubeadm-cluster

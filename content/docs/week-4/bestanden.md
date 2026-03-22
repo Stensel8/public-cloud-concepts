@@ -3,7 +3,7 @@ title: "Bestanden"
 weight: 3
 ---
 
-De Helm charts die aangemaakt zijn voor Week 4. De broncode staat op [GitHub](https://github.com/Stensel8/public-cloud-concepts/tree/main/Week%204/Uitwerking).
+De Helm charts die aangemaakt zijn voor Week 4. De broncode staat op [GitHub](https://github.com/Stensel8/public-cloud-concepts/tree/main/static/docs/week-4/bestanden).
 
 ---
 

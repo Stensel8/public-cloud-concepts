@@ -75,7 +75,7 @@ jobs:
           SLOT="${{ steps.slot.outputs.slot }}"
           docker build \
             --tag "${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${SLOT}" \
-            "./Week 1/Bestanden/"
+            "./static/docs/week-1/bestanden/"
 
       - name: Push to Artifact Registry
         run: |
@@ -91,7 +91,7 @@ jobs:
 
           # envsubst vervangt ${IMAGE_TAG} in het YAML-bestand met de waarde hierboven.
           # Het resultaat wordt direct via stdin naar kubectl gestuurd (geen tijdelijk bestand nodig).
-          envsubst < "Week 3/Bestanden/deployment-${SLOT}.yml" | kubectl apply -f -
+          envsubst < "static/docs/week-3/bestanden/deployment-${SLOT}.yml" | kubectl apply -f -
 
           # Forceer een herstart zodat Kubernetes het nieuw gepushte image ophaalt.
           # Zonder dit herkent Kubernetes geen wijziging als de tag (bijv. :green) gelijk blijft.
