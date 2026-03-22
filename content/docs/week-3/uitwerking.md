@@ -28,6 +28,17 @@ Bij een **Blue-Green deployment** draaien twee versies van de applicatie tegelij
 
 **Beide deployments draaien tegelijkertijd.** Dit maakt het mogelijk om nieuwe functionaliteiten te ontwikkelen op `development`, te testen in de green slot, en daarna te switchen via de `switch-slot` workflow.
 
+### Switchen tussen slots
+
+De `switch-slot` workflow is een handmatige workflow (`workflow_dispatch`) die via GitHub Actions gestart wordt. Je kiest `blue` of `green`, waarna de Service selector wordt aangepast met:
+
+```bash
+kubectl patch service public-cloud-concepts \
+  -p '{"spec":{"selector":{"slot":"<blue|green>"}}}'
+```
+
+`kubectl apply` wordt gebruikt zodat de Service ook aangemaakt wordt als die nog niet bestaat — handig bij een vers cluster. Na de switch verifieert de pipeline de actieve slot en toont de draaiende pods.
+
 ---
 
 ## Stap 1: Kubernetes Cluster aanmaken
@@ -153,12 +164,9 @@ Er zijn twee identiteiten betrokken:
 
 ### Beide deployments parallel testen
 
-```bash
-# Port-forward naar de green pod
-kubectl get pods -l slot=green
-kubectl port-forward deployment/deployment-green 8080:80
+Verkeer switchen naar green (of terug naar blue) via de `switch-slot` workflow in GitHub Actions, of handmatig:
 
-# Of: tijdelijk verkeer switchen
+```bash
 kubectl patch service public-cloud-concepts -p '{"spec":{"selector":{"slot":"green"}}}'
 ```
 

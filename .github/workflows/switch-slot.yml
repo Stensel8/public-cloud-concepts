@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       slot:
-        description: "Stuur verkeer naar welke versie?"
+        description: "Stuur verkeer naar welke slot?"
         required: true
         default: blue
         type: choice
@@ -13,12 +13,8 @@ on:
           - green
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
   GKE_ZONE: ${{ secrets.GKE_ZONE }}
-  GAR_ZONE: europe-west4
-  GAR_REPO: public-cloud-concepts
-  IMAGE: app
 
 jobs:
   switch:
@@ -37,24 +33,7 @@ jobs:
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GKE_ZONE }}
 
-      - name: Detect current active slot
-        id: active
-        run: |
-          CURRENT_SLOT="$(kubectl get service public-cloud-concepts -o jsonpath='{.spec.selector.slot}' 2>/dev/null || echo none)"
-          echo "current=${CURRENT_SLOT}" >> "$GITHUB_OUTPUT"
-
-      - name: Update target deployment to latest slot image
-        if: steps.active.outputs.current != inputs.slot
-        run: |
-          SLOT="${{ inputs.slot }}"
-          IMAGE_TAG="${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${SLOT}"
-
-          kubectl set image "deployment/deployment-${SLOT}" app="${IMAGE_TAG}"
-          kubectl rollout restart "deployment/deployment-${SLOT}"
-          kubectl rollout status "deployment/deployment-${SLOT}" --timeout=180s
-
       - name: Switch service naar ${{ inputs.slot }}
-        if: steps.active.outputs.current != inputs.slot
         run: |
           kubectl apply -f - <<EOF
           apiVersion: v1
@@ -74,7 +53,6 @@ jobs:
 
       - name: Controleer actieve slot
         run: |
-          echo "Voor switch: ${{ steps.active.outputs.current }} | Gevraagd: ${{ inputs.slot }}"
-          kubectl get service public-cloud-concepts -o jsonpath='{.spec.selector}'
-          echo ""
+          kubectl get service public-cloud-concepts \
+            -o jsonpath='Actieve slot: {.spec.selector.slot}{"\n"}'
           kubectl get pods -l app=public-cloud-concepts
