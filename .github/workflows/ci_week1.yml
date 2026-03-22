@@ -27,7 +27,7 @@ jobs:
           wget -qO /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
           chmod +x /usr/local/bin/hadolint
       - name: Lint Dockerfile
-        run: hadolint "Week 1/Bestanden/Dockerfile"
+        run: hadolint "static/docs/week-1/bestanden/Dockerfile"
 
   build:
     name: Build & scan
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Build Docker image
-        run: docker build -t stensel8/public-cloud-concepts:latest "./Week 1/Bestanden/"
+        run: docker build -t stensel8/public-cloud-concepts:latest "./static/docs/week-1/bestanden/"
 
       - name: Scan image with Trivy
         uses: aquasecurity/trivy-action@0.35.0
