@@ -37,6 +37,25 @@ gcloud container clusters create week5-cluster \
   --cluster-version=1.35.1-gke.1396001
 ```
 
+<details>
+<summary>PowerShell (Windows)</summary>
+
+```powershell
+gcloud container clusters create "week5-cluster" `
+  --region "europe-west4" `
+  --project "project-5b8c5498-4fe2-42b9-bc3" `
+  --machine-type "e2-small" `
+  --num-nodes "2" `
+  --disk-size "50" `
+  --disk-type "pd-balanced" `
+  --release-channel "regular" `
+  --cluster-version "1.35.1-gke.1396001"
+```
+
+PowerShell gebruikt de backtick (`` ` ``) als regelvervolg in plaats van `\`.
+
+</details>
+
 | Vlag | Waarde | Toelichting |
 |------|--------|-------------|
 | `--region` | `europe-west4` | Regio dichtstbij Nederland |
@@ -108,8 +127,8 @@ Relevante instellingen uit de values-bestanden:
 ### Script uitvoeren
 
 ```bash
-cd "Week 5/Bestanden"
-bash setup-loki-prometheus-grafana.sh
+cd "Week 5/Opdracht/Bestanden"
+bash setup-loki-prometheus-grafana
 ```
 
 [▶ Bekijk screencast van de installatie](media/stap3-script-uitvoeren.avif)
@@ -243,7 +262,7 @@ De `grafana-values.yaml` is aangepast zodat de ingress-hostname overeenkomt met 
 Daarna de Helm-release updaten zodat de nieuwe hostname actief wordt:
 
 ```bash
-cd "Week 5/Bestanden"
+cd "Week 5/Opdracht/Bestanden"
 helm upgrade --namespace grafana --values grafana-values.yaml grafana grafana/grafana
 ```
 
@@ -289,7 +308,7 @@ Bij Poging 1 gaf Helm drie `level=WARN msg="this chart is deprecated"` waarschuw
 
 ### Gewijzigde bestanden
 
-De bestanden voor Poging 2 staan in [`Bestanden-v2/`](../Bestanden-v2/).
+De bestanden voor Poging 2 staan in [`Bestanden/`](Bestanden/).
 
 #### `setup-loki-prometheus-grafana.sh`
 
@@ -380,7 +399,7 @@ url: http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push  ← Alloy push
 ### Script uitvoeren
 
 ```bash
-cd "Week 5/Bestanden-v2"
+cd "Week 5/Uitwerking/Bestanden"
 bash setup-loki-prometheus-grafana.sh
 ```
 

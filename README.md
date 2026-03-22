@@ -100,6 +100,27 @@ Herstart PowerShell of de opdrachtprompt na de installatie, zodat `gcloud` besch
 
 </details>
 
+## GKE Auth Plugin installeren
+
+Om `kubectl` te kunnen gebruiken met Google Kubernetes Engine (GKE) clusters is de `gke-gcloud-auth-plugin` vereist. Zonder deze plugin geeft `gcloud container clusters create` de volgende foutmelding:
+
+```
+CRITICAL: ACTION REQUIRED: gke-gcloud-auth-plugin, which is needed for continued use of kubectl,
+was not found or is not executable.
+```
+
+Installeer de plugin eenmalig via:
+
+```bash
+gcloud components install gke-gcloud-auth-plugin
+```
+
+Verifieer daarna de installatie met:
+
+```bash
+gke-gcloud-auth-plugin --version
+```
+
 ---
 
 ## Afbeeldingen
