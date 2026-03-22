@@ -1,3 +1,6 @@
 
 *.pdf
 *.docx
+
+# Hugo build output
+/public/

@@ -1,0 +1,101 @@
+baseURL = 'https://public-cloud-concepts.stensel.nl/'
+title = 'Public Cloud Concepts'
+defaultContentLanguage = 'nl'
+enableRobotsTXT = true
+disableKinds = ['taxonomy', 'term']
+enableGitInfo = true
+
+[languages]
+  [languages.nl]
+    languageName = 'Nederlands'
+    weight = 1
+    title = 'Public Cloud Concepts'
+  [languages.en]
+    languageName = 'English'
+    weight = 2
+    title = 'Public Cloud Concepts'
+
+[menu]
+  [[menu.main]]
+    identifier = 'docs'
+    name = 'Weken'
+    pageRef = '/docs'
+    weight = 1
+  [[menu.main]]
+    name = 'Search'
+    weight = 2
+    [menu.main.params]
+      type = 'search'
+  [[menu.main]]
+    name = 'GitHub'
+    weight = 3
+    url = 'https://github.com/Stensel8/public-cloud-concepts'
+    [menu.main.params]
+      icon = 'github'
+  [[menu.main]]
+    name = 'Language'
+    weight = 4
+    [menu.main.params]
+      type = 'language-switch'
+  [[menu.main]]
+    name = 'Theme'
+    weight = 5
+    [menu.main.params]
+      type = 'theme-toggle'
+
+[params]
+  description = 'Uitwerkingen en documentatie voor de cursus Public Cloud Concepts — GKE, monitoring, CI/CD en meer.'
+
+  [params.navbar]
+    displayTitle = true
+    displayLogo = false
+    width = 'wide'
+
+  [params.theme]
+    default = 'system'
+    displayToggle = false
+
+  [params.footer]
+    enable = true
+    displayCopyright = false
+    displayPoweredBy = false
+    width = 'normal'
+
+  displayUpdatedDate = true
+  dateFormat = 'January 2, 2006'
+
+  [params.search]
+    enable = true
+    type = 'flexsearch'
+    [params.search.flexsearch]
+      index = 'content'
+      tokenize = 'forward'
+
+  [params.editURL]
+    enable = true
+    base = 'https://github.com/Stensel8/public-cloud-concepts/edit/main/content'
+
+  [params.highlight]
+    [params.highlight.copy]
+      enable = true
+      display = 'hover'
+
+  [params.page]
+    width = 'wide'
+
+  [params.imageZoom]
+    enable = true
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    noClasses = false
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4
+
+[module]
+  [[module.imports]]
+    path = "github.com/imfing/hextra"
