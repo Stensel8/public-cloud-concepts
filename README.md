@@ -1,6 +1,7 @@
 Nederlands | [English](README.en.md)
 
 [![Switch Blue-Green Slot](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml)
+[![Deploy Hugo site to Pages](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/hugo.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/hugo.yml)
 [![PR Checks](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/pr-checks.yml)
 [![Dependabot Updates](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/dependabot/dependabot-updates)
 [![Copilot code review](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer)
@@ -12,8 +13,9 @@ Nederlands | [English](README.en.md)
 
 # Public Cloud Concepts
 
-
 Deze repository wordt bijgehouden door [Sten Tijhuis](https://github.com/Stensel8) en bevat de individuele module van de Cloud Engineering-specialisatie.
+
+**Documentatie:** [public-cloud-concepts.stensel.nl](https://public-cloud-concepts.stensel.nl)
 
 [![GitHub](https://img.shields.io/badge/GitHub-Stensel8%2Fpublic--cloud--concepts-181717?logo=github&logoColor=white)](https://github.com/Stensel8/public-cloud-concepts)
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-stensel8%2Fpublic--cloud--concepts-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/stensel8/public-cloud-concepts)
@@ -25,7 +27,7 @@ Deze repository wordt bijgehouden door [Sten Tijhuis](https://github.com/Stensel
 |--------|-----|----------|
 | Public Cloud Concepts | 5 EC | Q3 |
 
-> [**Architecting the Cloud**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/architecting-the-cloud) en [**Cloud Automation Concepts**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/cloud-automation-concepts) (5 EC, Q3) zijn gedeelde modules die samen met [Wout Achterhuis](https://github.com/Hintenhaus04) worden gedaan en staan in een aparte repository: [Voorjaar 2026 - Cloud Engineering](https://github.com/Stensel8/spring2026-cloud-engineering).
+> [**Architecting the Cloud**](https://github.com/Stensel8/cloud-engineering/tree/main/architecting-the-cloud) en [**Cloud Automation Concepts**](https://github.com/Stensel8/cloud-engineering/tree/main/cloud-automation-concepts) (5 EC, Q3) zijn gedeelde modules die samen met [Wout Achterhuis](https://github.com/Hintenhaus04) worden gedaan en staan in een aparte repository: [cloud-engineering](https://github.com/Stensel8/cloud-engineering).
 
 ## Week-overzicht
 
@@ -100,6 +102,15 @@ Herstart PowerShell of de opdrachtprompt na de installatie, zodat `gcloud` besch
 
 </details>
 
+## GKE Auth Plugin installeren
+
+Om `kubectl` te gebruiken met GKE-clusters is `gke-gcloud-auth-plugin` vereist:
+
+```bash
+gcloud components install gke-gcloud-auth-plugin
+gke-gcloud-auth-plugin --version
+```
+
 ---
 
 ## Afbeeldingen
@@ -114,8 +125,3 @@ find . -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \) | while
 
 Installeer `avifenc` eerst via `sudo pacman -S libavif` (Arch/CachyOS) of `sudo apt install libavif-bin` (Debian/Ubuntu).
 
-## Disclaimer
-
-Dit is een lopend project voor educatieve doeleinden. Code, configuraties en documentatie kunnen gedurende de cursus nog veranderen.
-
----

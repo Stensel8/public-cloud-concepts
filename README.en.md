@@ -1,6 +1,7 @@
 [Nederlands](README.md) | English
 
 [![Switch Blue-Green Slot](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml)
+[![Deploy Hugo site to Pages](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/hugo.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/hugo.yml)
 [![PR Checks](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/pr-checks.yml)
 [![Dependabot Updates](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/dependabot/dependabot-updates)
 [![Copilot code review](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer)
@@ -14,6 +15,8 @@
 
 This repository is maintained by [Sten Tijhuis](https://github.com/Stensel8) and covers the individual module of the Cloud Engineering specialisation.
 
+**Documentation:** [public-cloud-concepts.stensel.nl](https://public-cloud-concepts.stensel.nl)
+
 [![GitHub](https://img.shields.io/badge/GitHub-Stensel8%2Fpublic--cloud--concepts-181717?logo=github&logoColor=white)](https://github.com/Stensel8/public-cloud-concepts)
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-stensel8%2Fpublic--cloud--concepts-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/stensel8/public-cloud-concepts)
 [![Artifact Registry](https://img.shields.io/badge/Artifact%20Registry-europe--west4-4285F4?logo=google-cloud&logoColor=white)](https://console.cloud.google.com/artifacts/docker/project-5b8c5498-4fe2-42b9-bc3/europe-west4/public-cloud-concepts)
@@ -24,7 +27,7 @@ This repository is maintained by [Sten Tijhuis](https://github.com/Stensel8) and
 |--------|-----|---------|
 | Public Cloud Concepts | 5 EC | Q3 |
 
-> [**Architecting the Cloud**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/architecting-the-cloud) and [**Cloud Automation Concepts**](https://github.com/Stensel8/spring2026-cloud-engineering/tree/main/cloud-automation-concepts) (5 EC, Q3) are shared modules done in collaboration with [Wout Achterhuis](https://github.com/Hintenhaus04) and live in their own repository: [Spring 2026 - Cloud Engineering](https://github.com/Stensel8/spring2026-cloud-engineering).
+> [**Architecting the Cloud**](https://github.com/Stensel8/cloud-engineering/tree/main/architecting-the-cloud) and [**Cloud Automation Concepts**](https://github.com/Stensel8/cloud-engineering/tree/main/cloud-automation-concepts) (5 EC, Q3) are shared modules done in collaboration with [Wout Achterhuis](https://github.com/Hintenhaus04) and live in their own repository: [cloud-engineering](https://github.com/Stensel8/cloud-engineering).
 
 ## Course Overview
 
@@ -99,6 +102,27 @@ Restart PowerShell or the command prompt after installation so that `gcloud` is 
 
 </details>
 
+## Installing the GKE Auth Plugin
+
+To use `kubectl` with Google Kubernetes Engine (GKE) clusters, the `gke-gcloud-auth-plugin` is required. Without it, `gcloud container clusters create` will show the following error:
+
+```
+CRITICAL: ACTION REQUIRED: gke-gcloud-auth-plugin, which is needed for continued use of kubectl,
+was not found or is not executable.
+```
+
+Install the plugin once via:
+
+```bash
+gcloud components install gke-gcloud-auth-plugin
+```
+
+Then verify the installation:
+
+```bash
+gke-gcloud-auth-plugin --version
+```
+
 ---
 
 ## Images
@@ -113,8 +137,3 @@ find . -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \) | while
 
 Install `avifenc` first via `sudo pacman -S libavif` (Arch/CachyOS) or `sudo apt install libavif-bin` (Debian/Ubuntu).
 
-## Disclaimer
-
-This is a work in progress for educational purposes. Code, configurations, and documentation may change as the course progresses.
-
----

@@ -1,0 +1,56 @@
+# Bronnen:
+# - Officiële Grafana Alloy docs voor Kubernetes pod logs:
+#   https://grafana.com/docs/alloy/latest/monitor/monitor-kubernetes-logs/
+# - Alloy configureren op Kubernetes:
+#   https://grafana.com/docs/alloy/latest/configure/kubernetes/
+
+alloy:
+  configMap:
+    content: |
+      // Kubernetes pod discovery
+      // Zie: https://grafana.com/docs/alloy/latest/monitor/monitor-kubernetes-logs/
+      discovery.kubernetes "pod" {
+        role = "pod"
+      }
+
+      // Voeg labels toe aan log targets op basis van pod-metadata
+      discovery.relabel "pod_logs" {
+        targets = discovery.kubernetes.pod.targets
+
+        rule {
+          source_labels = ["__meta_kubernetes_namespace"]
+          target_label  = "namespace"
+        }
+        rule {
+          source_labels = ["__meta_kubernetes_pod_name"]
+          target_label  = "pod"
+        }
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_name"]
+          target_label  = "container"
+        }
+        rule {
+          source_labels = ["__meta_kubernetes_pod_node_name"]
+          target_label  = "node"
+        }
+      }
+
+      // Lees logs van de Kubernetes pods
+      loki.source.kubernetes "logs" {
+        targets    = discovery.relabel.pod_logs.output
+        forward_to = [loki.write.loki.receiver]
+      }
+
+      // Stuur logs naar Loki via de gateway (nginx gateway die Loki SingleBinary voor zit)
+      loki.write "loki" {
+        endpoint {
+          url = "http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push"
+        }
+      }
+
+serviceAccount:
+  create: true
+  name: alloy-sa
+
+rbac:
+  create: true
