@@ -3,7 +3,22 @@ title: "Uitwerking"
 weight: 2
 ---
 
-GKE **Standard** cluster opgezet met een moderne monitoring stack: Loki (SingleBinary), Grafana Alloy en Prometheus via `kube-prometheus-stack`. Geen deprecated Helm charts, geen Promtail.
+GKE **Standard** cluster opgezet met een moderne monitoring stack: Loki (SingleBinary), Grafana Alloy en Prometheus via `kube-prometheus-stack`.
+
+{{< callout type="warning" >}}
+**Afwijkingen t.o.v. het aangeleverde schoolmateriaal**
+
+Het originele script van de docent gebruikt drie deprecated Helm charts. Deze zijn vervangen:
+
+| Schoolscript | Verbeterd | Reden |
+|---|---|---|
+| `grafana/loki-distributed` | `grafana/loki` (SingleBinary) | `loki-distributed` is deprecated |
+| `grafana/promtail` | `grafana/alloy` | `promtail` is deprecated |
+| losse `grafana/grafana` release | gebundeld in `kube-prometheus-stack` | standalone chart is deprecated |
+| `storageClass: managed-csi` | `standard-rwo` | Azure-specifiek, werkt niet op GKE |
+
+De originele bestanden staan in [`Week 5/Opdracht/Bestanden/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/Week%205/Opdracht/Bestanden). De verbeterde versie staat in [`Week 5/Uitwerking/Bestanden/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/Week%205/Uitwerking/Bestanden).
+{{< /callout >}}
 
 **Gebruikte charts:**
 
@@ -39,6 +54,8 @@ Autopilot beperkt DaemonSets, blokkeert privileged containers standaard en verei
 Standard geeft volledige controle over node-configuratie, DaemonSets en privileged workloads.
 {{< /callout >}}
 
+{{< tabs items="Linux / macOS,Windows (PowerShell)" >}}
+{{< tab >}}
 ```bash
 gcloud container clusters create week5-cluster \
   --region=europe-west4 \
@@ -50,27 +67,42 @@ gcloud container clusters create week5-cluster \
   --release-channel=regular \
   --cluster-version=1.35.1-gke.1396001
 ```
+{{< /tab >}}
+{{< tab >}}
+```powershell
+gcloud container clusters create "week5-cluster" `
+  --region "europe-west4" `
+  --project "project-5b8c5498-4fe2-42b9-bc3" `
+  --machine-type "e2-small" `
+  --num-nodes "2" `
+  --disk-size "50" `
+  --disk-type "pd-balanced" `
+  --release-channel "regular" `
+  --cluster-version "1.35.1-gke.1396001"
+```
+PowerShell gebruikt de backtick (`` ` ``) als regelvervolg in plaats van `\`.
+{{< /tab >}}
+{{< /tabs >}}
 
 | Vlag | Waarde | Toelichting |
 |------|--------|-------------|
 | `--region` | `europe-west4` | Regio dichtstbij Nederland |
 | `--machine-type` | `e2-small` | 2 vCPU, 2GB RAM |
-| `--num-nodes` | `2` | 2 per zone x 3 zones = 6 nodes totaal |
-| `--disk-size` | `50` | 6 x 50GB = 300GB, past binnen SSD-quota van 500GB |
+| `--num-nodes` | `2` | 2 nodes per zone × 3 zones = 6 nodes totaal |
+| `--disk-size` | `50` | 6 × 50GB = 300GB SSD, past binnen het quota van 500GB |
 | `--disk-type` | `pd-balanced` | SSD (balanced), betere I/O voor Prometheus TSDB writes |
 | `--release-channel` | `regular` | Stabiele GKE-versies met automatische upgrades |
 | `--cluster-version` | `1.35.1-gke.1396001` | Gepinde initiële versie voor reproduceerbaarheid |
 
-**Studentquota (gemeten):**
-
-| Resource | Quota | Gebruik voor dit cluster |
-|---|---|---|
-| Persistent Disk SSD (GB) | **500 GB** | 2 GB |
-| Persistent Disk Standard (GB) | **4.096 GB** | 64 GB |
-
 {{< callout type="warning" >}}
-De standaard GKE-instellingen (`pd-balanced`, 100GB per node) zouden 6 x 100GB = **600GB SSD** vereisen, wat boven het quota uitkomt. Met `--disk-size=50` past alles: 6 x 50GB = 300GB SSD.
+**Studentquota:** De standaard GKE-instellingen (`pd-balanced`, 100GB per node) zouden 6 × 100GB = **600GB SSD** vereisen, wat boven het quota van 500GB uitkomt. Met `--disk-size=50` past alles: 6 × 50GB = 300GB SSD.
 {{< /callout >}}
+
+Na het installeren van de auth plugin:
+
+```bash
+gcloud components install gke-gcloud-auth-plugin
+```
 
 <video controls width="100%" style="max-width:800px">
   <source src="../media/Cluster-create-week5.webm" type="video/webm">
@@ -101,7 +133,7 @@ gcloud container clusters get-credentials week5-cluster \
 ## Stap 3: Stack deployen
 
 ```bash
-cd "Week 5/Bestanden-v2"
+cd "Week 5/Uitwerking/Bestanden"
 bash setup-loki-prometheus-grafana.sh
 ```
 
@@ -114,11 +146,17 @@ bash setup-loki-prometheus-grafana.sh
 Het script installeert de stack in vijf stappen: Helm repos toevoegen, ingress-nginx (met `kubectl wait`), Loki, Alloy, Prometheus + Grafana.
 
 **Waarom ingress-nginx als eerste?**
-De `kube-prometheus-stack` maakt bij installatie direct een Grafana Ingress-object aan. De admission webhook van ingress-nginx valideert dat object - als ingress-nginx nog niet draait, mislukt de Helm-installatie met een webhook-fout. Door ingress-nginx eerst te installeren en te wachten tot de controller `Ready` is, wordt dit voorkomen.
+De `kube-prometheus-stack` maakt bij installatie direct een Grafana Ingress-object aan. De admission webhook van ingress-nginx valideert dat object — als ingress-nginx nog niet draait, mislukt de Helm-installatie met een webhook-fout. Door ingress-nginx eerst te installeren en te wachten tot de controller `Ready` is, wordt dit voorkomen.
 
 ### `loki-values.yaml`
 
-De `grafana/loki` chart vereist een expliciete `schemaConfig` - zonder dit geeft Helm een harde fout. Op basis van de [officiële Loki schema docs](https://grafana.com/docs/loki/latest/operations/storage/schema/):
+De `grafana/loki` chart vereist een expliciete `schemaConfig` — zonder dit geeft Helm een harde fout:
+
+```
+Error: You must provide a schema_config for Loki.
+```
+
+Op basis van de [officiële Loki schema docs](https://grafana.com/docs/loki/latest/operations/storage/schema/):
 
 ```yaml
 deploymentMode: SingleBinary
@@ -154,13 +192,13 @@ minio:
   enabled: false
 ```
 
-- `storageClass: standard-rwo` - GKE-compatibel (het schoolscript gebruikte `managed-csi`, wat Azure-specifiek is)
-- Alle gedistribueerde componenten expliciet op `replicas: 0` - vereist door de chart om conflicten te voorkomen
-- `minio.enabled: false` - niet nodig bij filesystem storage
+- `storageClass: standard-rwo` — GKE-compatibel (schoolscript gebruikte `managed-csi`, wat Azure-specifiek is)
+- Alle gedistribueerde componenten expliciet op `replicas: 0` — vereist door de chart
+- `minio.enabled: false` — niet nodig bij filesystem storage
 
 ### `alloy-values.yaml`
 
-Alloy vervangt Promtail en gebruikt de Alloy flow language. De config doet hetzelfde, maar declaratief:
+Alloy vervangt Promtail en gebruikt de Alloy flow language. De config doet hetzelfde als Promtail, maar declaratief:
 
 1. Kubernetes pods ontdekken (`discovery.kubernetes`)
 2. Labels toevoegen op basis van pod-metadata (`discovery.relabel`)
@@ -181,11 +219,11 @@ http://loki-gateway.loki.svc.cluster.local
 
 ### `prometheus-values.yaml`
 
-Grafana is ingebouwd in `kube-prometheus-stack` (`grafana.enabled: true`). Dit elimineert de behoefte aan een losse `grafana/grafana` release en de bijbehorende deprecated waarschuwing. Prometheus is ingesteld op 1 replica - de monitoring stack is RAM-intensief en de `e2-small` nodes (2GB) zouden anders te zwaar belast worden.
+Grafana is ingebouwd in `kube-prometheus-stack` (`grafana.enabled: true`). Dit elimineert de behoefte aan een losse `grafana/grafana` release. Prometheus is ingesteld op 1 replica — de monitoring stack is RAM-intensief en de `e2-small` nodes (2GB) zouden anders te zwaar belast worden.
 
 ---
 
-## Stap 4: IP-adres ophalen en DNS instellen
+## Stap 4: IP-adres ophalen
 
 ```bash
 kubectl get ingress -n prometheus
@@ -195,11 +233,11 @@ kubectl get ingress -n prometheus
 
 ![Ingress status met adres en hostnaam](../media/stap4-ingress-status.avif)
 
-Het externe IP is als A-record ingesteld bij Bunny DNS voor `grafana.stijhuis.nl` - in plaats van het hosts-bestand handmatig aan te passen. Een DNS-record werkt direct op alle apparaten wereldwijd, zonder lokale configuratie.
-
 ---
 
-## Stap 5: DNS configuratie
+## Stap 5: DNS instellen
+
+Het externe IP is als A-record ingesteld bij Bunny DNS voor `grafana.stijhuis.nl` — in plaats van het `hosts`-bestand handmatig aan te passen. Een DNS-record werkt direct op alle apparaten wereldwijd, zonder lokale configuratie.
 
 ![Grafana values aangepast met de hostnaam](../media/stap5-grafana-values-aangepast.avif)
 
@@ -213,7 +251,7 @@ Het externe IP is als A-record ingesteld bij Bunny DNS voor `grafana.stijhuis.nl
 
 Via `https://grafana.stijhuis.nl` in de browser:
 
-![Grafana 404 bij eerste bezoek - SSL nog niet actief](../media/stap6-grafana-404.avif)
+![Grafana 404 bij eerste bezoek — DNS nog niet gepropageerd](../media/stap6-grafana-404.avif)
 
 ![Grafana login pagina bereikbaar](../media/stap6-grafana-login.avif)
 
@@ -231,4 +269,16 @@ Dashboard geïmporteerd via **Dashboards > Import** met ID `20960`, Prometheus a
 
 ![Dashboard importeren in Grafana met Prometheus als datasource](../media/stap10-dashboard-import.avif)
 
-![Kubernetes application insights dashboard actief - cluster CPU 70%, RAM 63%](../media/stap10-dashboard-resultaat.avif)
+![Kubernetes application insights dashboard actief — cluster CPU 70%, RAM 63%](../media/stap10-dashboard-resultaat.avif)
+
+---
+
+## Stap 8: Architectuurdiagram
+
+<!-- Voeg architectuurdiagram toe -->
+
+---
+
+## Stap 9: Andere monitoring-tools voor Kubernetes
+
+<!-- Vul in -->
