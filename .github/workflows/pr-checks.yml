@@ -49,12 +49,12 @@ jobs:
         run: |
           {
             echo "files<<EOF"
-            find "Week 1/Uitwerking" "Week 2/Uitwerking" "Week 3/Uitwerking" \
+            find "static/docs" \
               -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \) | sort
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-          count=$(find "Week 1/Uitwerking" "Week 2/Uitwerking" "Week 3/Uitwerking" \
+          count=$(find "static/docs" \
             -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \) | wc -l)
           if [ "$count" -gt 0 ]; then
             echo "found=true" >> "$GITHUB_OUTPUT"
@@ -119,4 +119,4 @@ jobs:
           wget -qO /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
           chmod +x /usr/local/bin/hadolint
       - name: Lint Dockerfile
-        run: hadolint "Week 1/Bestanden/Dockerfile"
+        run: hadolint "static/docs/week-1/bestanden/Dockerfile"
