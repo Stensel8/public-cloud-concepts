@@ -88,6 +88,7 @@ jobs:
 
       - name: Mark run as cancelled when environment is unavailable
         if: steps.cluster_check.outputs.available != 'true'
+        continue-on-error: true
         uses: actions/github-script@v8
         with:
           script: |
