@@ -1,10 +1,10 @@
 # Bronnen:
-# - Officiële Grafana Loki SimpleScalable install docs:
-#   https://grafana.com/docs/loki/latest/setup/install/helm/install-scalable/
+# - Officiële Grafana Loki SingleBinary install docs:
+#   https://grafana.com/docs/loki/latest/setup/install/helm/install-monolithic/
 # - Loki schema configuratie:
 #   https://grafana.com/docs/loki/latest/operations/storage/schema/
 
-deploymentMode: SimpleScalable
+deploymentMode: SingleBinary
 
 loki:
   auth_enabled: false
@@ -34,16 +34,7 @@ loki:
   ruler:
     enable_api: true
 
-# Read path: query-frontend + querier
-read:
-  replicas: 1
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi
-
-# Write path: distributor + ingester (met WAL persistentie)
-write:
+singleBinary:
   replicas: 1
   resources:
     requests:
@@ -53,36 +44,19 @@ write:
     storageClass: standard-rwo
     size: 5Gi
 
-# Backend: compactor + ruler + index-gateway
-backend:
-  replicas: 1
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi
-  persistence:
-    storageClass: standard-rwo
-    size: 2Gi
-
-# Memcached caches — zinvol in gedistribueerde (SimpleScalable) mode
-# De grafana/loki chart schakelt deze standaard in; in SingleBinary zijn ze overbodig
-chunksCache:
-  enabled: true
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi
-
-resultsCache:
-  enabled: true
-  resources:
-    requests:
-      cpu: 50m
-      memory: 64Mi
-
-# SingleBinary uitschakelen (vereist voor SimpleScalable)
-singleBinary:
+# SimpleScalable components uitgeschakeld
+read:
   replicas: 0
+write:
+  replicas: 0
+backend:
+  replicas: 0
+
+# Caches alleen zinvol in gedistribueerde mode
+chunksCache:
+  enabled: false
+resultsCache:
+  enabled: false
 
 minio:
   enabled: false

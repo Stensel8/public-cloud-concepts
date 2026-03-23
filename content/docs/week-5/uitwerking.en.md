@@ -3,7 +3,7 @@ title: "Solution"
 weight: 2
 ---
 
-GKE **Standard** cluster set up with a modern monitoring stack: Loki (SimpleScalable), Grafana Alloy, and Prometheus via `kube-prometheus-stack`.
+GKE **Standard** cluster set up with a modern monitoring stack: Loki (SingleBinary), Grafana Alloy, and Prometheus via `kube-prometheus-stack`.
 
 {{< callout type="warning" >}}
 **Deviations from the school material**
@@ -12,7 +12,7 @@ The script from school contained some mistakes and outdated components. When run
 
 | School script | My version | Reason |
 |---|---|---|
-| `grafana/loki-distributed` | `grafana/loki` (SimpleScalable) | `loki-distributed` chart is deprecated; functionality is now in the main chart |
+| `grafana/loki-distributed` | `grafana/loki` (SingleBinary) | `loki-distributed` chart is deprecated; functionality is now in the main chart |
 | `grafana/promtail` | `grafana/alloy` | `promtail` is deprecated |
 | standalone `grafana/grafana` release | bundled in `kube-prometheus-stack` | standalone chart is deprecated |
 | `storageClass: managed-csi` | `standard-rwo` | Azure-specific, does not work on GKE |
@@ -24,7 +24,7 @@ The original script is in [`Week 5/Opdracht/Bestanden/`](https://github.com/Sten
 
 | Component | Namespace | Chart |
 |-----------|-----------|-------|
-| Loki | `loki` | `grafana/loki` (SimpleScalable) |
+| Loki | `loki` | `grafana/loki` (SingleBinary) |
 | Log collector | `alloy` | `grafana/alloy` |
 | Prometheus + Grafana | `prometheus` | `prometheus-community/kube-prometheus-stack` |
 | Ingress | `ingress-nginx` | `ingress-nginx/ingress-nginx` |
@@ -88,7 +88,7 @@ PowerShell uses the backtick (`` ` ``) as a line continuation character instead 
 |------|-------|------|
 | `--region` | `europe-west4` | Region closest to the Netherlands |
 | `--node-locations` | `europe-west4-a,europe-west4-b` | Zones a and b only; zone-c had continuous `GCE_STOCKOUT` errors |
-| `--machine-type` | `e2-medium` | 2 vCPU, 4GB RAM, sufficient for SimpleScalable Loki + Prometheus + Grafana |
+| `--machine-type` | `e2-medium` | 2 vCPU, 4GB RAM, sufficient for SingleBinary Loki + Prometheus + Grafana |
 | `--num-nodes` | `2` | 2 nodes per zone × 2 zones = 4 nodes total |
 | `--disk-size` | `50` | 4 × 50GB = 200GB SSD, well within the 500GB quota |
 | `--disk-type` | `pd-balanced` | SSD (balanced), better I/O for Prometheus TSDB writes |
@@ -201,10 +201,18 @@ The `grafana/loki` chart supports three deployment modes. The choice depends on 
 
 **Distributed is not always better.** The principle is that read and write paths scale independently, but if you end up with 1 replica per component you only add network hops and memory overhead. On a cluster of 4× e2-medium nodes Distributed is simply wasteful.
 
-**SimpleScalable** is the middle ground: read/write/backend run as separate deployments (separation of concerns), but without the overhead of full microservices. The memcached caches (`chunks-cache`, `results-cache`) are useful in this mode: the querier caches frequently used log chunks and reuses identical query results.
+**SimpleScalable** sounds like the logical middle ground, but it requires an object storage backend (GCS, S3, or MinIO). Filesystem storage is the simplest option in a learning environment, but it is not supported in SimpleScalable mode. This produces the following error during `helm install`:
+
+```
+Error: Cannot run scalable targets (backend, read, write) or distributed targets without an object storage backend.
+```
+
+SimpleScalable would be a good fit if object storage is already available (e.g. a GCS bucket), but setting that up adds significant overhead for a lab environment.
+
+**SingleBinary** is therefore the right choice here: one pod, filesystem storage, no object storage required. The memcached caches (`chunks-cache`, `results-cache`) are pointless in this mode and are disabled. Everything runs in-process, so an external caching service only adds overhead.
 
 {{< callout type="info" >}}
-**Relation to the assignment:** The teacher used the `grafana/loki-distributed` chart, which is now deprecated. That does not mean *distributed Loki* is deprecated; the functionality is now in the main chart (`grafana/loki`). SimpleScalable is the logical replacement for a learning environment.
+**Relation to the assignment:** The teacher used the `grafana/loki-distributed` chart, which is now deprecated. That does not mean *distributed Loki* is deprecated; the functionality is now in the main chart (`grafana/loki`). For a learning environment using filesystem storage, SingleBinary is the correct choice.
 {{< /callout >}}
 
 The full file is on [GitHub](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-5/bestanden/uitwerking/loki-values.yaml). Other choices:
