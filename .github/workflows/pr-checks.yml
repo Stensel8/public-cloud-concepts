@@ -12,6 +12,9 @@ on:
   pull_request:
     branches: [main, development]
 
+permissions:
+  contents: read
+
 jobs:
   pr-title:
     name: Semantic PR title

@@ -28,6 +28,9 @@ on:
     branches: [main, development]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}

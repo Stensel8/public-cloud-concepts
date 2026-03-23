@@ -12,6 +12,9 @@ on:
           - blue
           - green
 
+permissions:
+  contents: read
+
 env:
   GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
   GKE_ZONE: ${{ secrets.GKE_ZONE }}
