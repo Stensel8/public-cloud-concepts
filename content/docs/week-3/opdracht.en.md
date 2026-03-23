@@ -13,7 +13,7 @@ To store the docker images we now use the Google Artifact Registry, an alternati
 
 A pipeline is created so that when the code changes, the docker image is built and the image is started in a pod on the Kubernetes cluster in Google.
 
-![](../media/opdracht/image-001.avif)
+![](/docs/week-3/media/opdracht/image-001.avif)
 
 Do the following steps:
 

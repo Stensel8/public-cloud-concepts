@@ -16,7 +16,7 @@ Om de Docker-images op te slaan, gebruiken we nu de Google Artifact Registry - e
 
 Er wordt een pipeline aangemaakt zodat wanneer de code verandert, het Docker-image wordt gebouwd en het image gestart wordt in een pod op het Kubernetes-cluster in Google.
 
-![](../media/opdracht/image-001.avif)
+![](/docs/week-3/media/opdracht/image-001.avif)
 
 Voer de volgende stappen uit:
 

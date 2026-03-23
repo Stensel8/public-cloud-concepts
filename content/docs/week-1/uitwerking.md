@@ -42,11 +42,11 @@ De opdracht specificeert Ubuntu 24.04 LTS minimal. Ik heb **Ubuntu 25.10 LTS min
 Ubuntu 25.10 komt standaard met `sudo-rs` (een Rust-herimplementatie van sudo) versie 0.2.8. Deze versie heeft een bekende sessiebug - `sudo reboot` mislukt met een onverwachte fout. Opgelost via een GCP-opstartscript dat klassieke `sudo` installeert bij elke opstart.
 {{< /callout >}}
 
-![sudo-rs versie op een nieuwe Ubuntu 25.10](../media/sudo-rs-version.avif)
+![sudo-rs versie op een nieuwe Ubuntu 25.10](/docs/week-1/media/sudo-rs-version.avif)
 
-![sudo-rs bug: reboot mislukt](../media/sudo-rs-bug.avif)
+![sudo-rs bug: reboot mislukt](/docs/week-1/media/sudo-rs-bug.avif)
 
-![GCP opstartscript vervangt sudo-rs](../media/sudo-rs-startup-script.avif)
+![GCP opstartscript vervangt sudo-rs](/docs/week-1/media/sudo-rs-startup-script.avif)
 
 **Gebruikte instanties:**
 
@@ -56,17 +56,17 @@ Ubuntu 25.10 komt standaard met `sudo-rs` (een Rust-herimplementatie van sudo) v
 | Worker 1 | worker-brussels | europe-west1-b (België) | e2-medium | Ubuntu 25.10 LTS minimal |
 | Worker 2 | worker-london | europe-west2-b (Verenigd Koninkrijk) | e2-medium | Ubuntu 25.10 LTS minimal |
 
-![VM-instanties in Google Cloud](../media/vm-instances-gcp.avif)
+![VM-instanties in Google Cloud](/docs/week-1/media/vm-instances-gcp.avif)
 
-![OS en opslagconfiguratie](../media/vm-os-storage-config.avif)
+![OS en opslagconfiguratie](/docs/week-1/media/vm-os-storage-config.avif)
 
 Het cluster is geïnstalleerd met twee shell-scripts: `configure_master.sh` voor de masternode en `configure_worker.sh` voor de workernodes. Deze scripts automatiseren kernelmoduleconfiguratie, containerd installeren, Kubernetes-pakketinstallatie (v1.35) en clusterinitialisatie.
 
-![configure_master.sh uitvoeren op master-amsterdam](../media/configure-master-run.avif)
+![configure_master.sh uitvoeren op master-amsterdam](/docs/week-1/media/configure-master-run.avif)
 
-![configure_worker.sh uitvoeren op worker-brussels](../media/configure-worker-run.avif)
+![configure_worker.sh uitvoeren op worker-brussels](/docs/week-1/media/configure-worker-run.avif)
 
-![Workers toegevoegd - alle nodes Ready](../media/cluster-nodes-joined.avif)
+![Workers toegevoegd - alle nodes Ready](/docs/week-1/media/cluster-nodes-joined.avif)
 
 **Uitleg van `kubeadm init`:**
 
@@ -95,9 +95,9 @@ worker-london      Ready    <none>          7m     v1.35.1
 master-amsterdam   Ready    control-plane   17m    v1.35.1
 ```
 
-![kubectl get pods -n kube-system](../media/kubectl-get-pods-kube-system.avif)
+![kubectl get pods -n kube-system](/docs/week-1/media/kubectl-get-pods-kube-system.avif)
 
-![kubectl get pods -n kube-flannel](../media/kubectl-get-pods-kube-flannel.avif)
+![kubectl get pods -n kube-flannel](/docs/week-1/media/kubectl-get-pods-kube-flannel.avif)
 
 **Verklaring van de kube-system pods:**
 
@@ -134,10 +134,10 @@ first-deployment-5ffbd9444c-5hkzs  10.244.2.2   worker-london
 first-deployment-5ffbd9444c-s4xdb  10.244.1.2   worker-brussels
 ```
 
-![kubectl apply uitvoer - pods in Pending status](../media/deployment-apply-pods-pending.avif)
+![kubectl apply uitvoer - pods in Pending status](/docs/week-1/media/deployment-apply-pods-pending.avif)
 
-![Beide pods Running](../media/deployment-pods-running.avif)
+![Beide pods Running](/docs/week-1/media/deployment-pods-running.avif)
 
-![curl en kubectl exec uitvoer](../media/curl-pod-and-exec.avif)
+![curl en kubectl exec uitvoer](/docs/week-1/media/curl-pod-and-exec.avif)
 
 De respons bevestigt dat de nginx-container draait en de statische site serveert via het interne Flannel-IP. Externe toegang vereist een Kubernetes Service (Week 2).

@@ -20,7 +20,7 @@ Nu je de basiskennis van Google Cloud hebt, duiken we in Google Kubernetes Engin
 
 Voeg de Proof of Completion (Course Badge) toe aan je portfolio.
 
-![](../media/opdracht/image-001.avif)
+![](/docs/week-1/media/opdracht/image-001.avif)
 
 ## 1.2 Kubernetes
 
@@ -34,7 +34,7 @@ Je mag hiervoor uiteraard allerlei bronnen gebruiken, zoals ChatGPT of handleidi
 
 1. Maak drie Ubuntu 24.04 LTS minimal-instances aan in Google (kies type e2-standard-2 als node) en kies Ubuntu 24.04 LTS minimal als besturingssysteem. Om te zien dat een virtueel netwerk in Google meerdere regio's direct verbindt, kun je de master in Nederland plaatsen, een node in Brussel en een node in Londen.
 
-![](../media/opdracht/image-002.avif)
+![](/docs/week-1/media/opdracht/image-002.avif)
 
 Installeer een Kubernetes master en 2 Kubernetes workernodes.
 
@@ -72,7 +72,7 @@ Controleer dit op de master met:
 kubectl get nodes
 ```
 
-![](../media/opdracht/image-003.avif)
+![](/docs/week-1/media/opdracht/image-003.avif)
 
 Gebruik het volgende commando om te controleren welke pods draaien in de namespace `kube-system`. Het ziet er ongeveer zo uit:
 
@@ -80,11 +80,11 @@ Gebruik het volgende commando om te controleren welke pods draaien in de namespa
 kubectl get pods -n kube-system
 ```
 
-![](../media/opdracht/image-004.avif)
+![](/docs/week-1/media/opdracht/image-004.avif)
 
 Leg deze pods uit aan de hand van de onderstaande figuur uit het boek "Production Kubernetes":
 
-![](../media/opdracht/image-005.avif)
+![](/docs/week-1/media/opdracht/image-005.avif)
 
 2. We willen nu een gecontaineriseerde applicatie in dit cluster draaien.
 
@@ -96,7 +96,7 @@ We gebruiken GitHub om automatisch een image te maken als de code (`index.html`)
 
 Daarna kunnen we het image draaien in het Google Kubernetes-cluster. Dit is schematisch weergegeven hieronder:
 
-![](../media/opdracht/image-006.avif)
+![](/docs/week-1/media/opdracht/image-006.avif)
 
 Maak een repository aan in GitHub (bijv. "container"). Zorg dat git is geïnstalleerd op je pc en clone de GitHub-repository naar je eigen pc. Plaats de Dockerfile en het `index.html`-bestand daar.
 

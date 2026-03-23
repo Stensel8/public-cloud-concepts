@@ -23,9 +23,9 @@ Installatie via de [officiële Helm docs](https://helm.sh/docs/intro/install/).
 
 Een Autopilot GKE-cluster aangemaakt: `week4-cluster`.
 
-![Autopilot cluster week4-cluster aanmaken in de Google Cloud Console](../media/week4-cluster-aanmaken.avif)
+![Autopilot cluster week4-cluster aanmaken in de Google Cloud Console](/docs/week-4/media/week4-cluster-aanmaken.avif)
 
-![Overzicht van het actieve week4-cluster](../media/week4-cluster-overzicht.avif)
+![Overzicht van het actieve week4-cluster](/docs/week-4/media/week4-cluster-overzicht.avif)
 
 {{< tabs >}}
 {{< tab name="Linux" >}}
@@ -40,7 +40,7 @@ gcloud container clusters get-credentials week4-cluster --region=europe-west4
 {{< /tab >}}
 {{< /tabs >}}
 
-![Verbinding maken met het cluster via gcloud](../media/week4-cluster-credentials.avif)
+![Verbinding maken met het cluster via gcloud](/docs/week-4/media/week4-cluster-credentials.avif)
 
 **Helm chart aanmaken:**
 
@@ -48,7 +48,7 @@ gcloud container clusters get-credentials week4-cluster --region=europe-west4
 helm create public-cloud-concepts
 ```
 
-![Uitvoer van helm create public-cloud-concepts](../media/week4-helm-create.avif)
+![Uitvoer van helm create public-cloud-concepts](/docs/week-4/media/week4-helm-create.avif)
 
 **Chartstructuur:**
 
@@ -59,7 +59,7 @@ helm create public-cloud-concepts
 
 Standaardwaarden: `replicaCount: 1`, image `nginx`, `service.type: ClusterIP`, Ingress uitgeschakeld.
 
-![Inhoud van values.yaml bekijken](../media/week4-helm-values.avif)
+![Inhoud van values.yaml bekijken](/docs/week-4/media/week4-helm-values.avif)
 
 **Installeren als v1:**
 
@@ -67,9 +67,9 @@ Standaardwaarden: `replicaCount: 1`, image `nginx`, `service.type: ClusterIP`, I
 helm install public-cloud-concepts-v1 public-cloud-concepts
 ```
 
-![Uitvoer van helm install met STATUS deployed en REVISION 1](../media/week4-helm-install-v1.avif)
+![Uitvoer van helm install met STATUS deployed en REVISION 1](/docs/week-4/media/week4-helm-install-v1.avif)
 
-![helm ls, kubectl get pods en kubectl get services voor v1](../media/week4-helm-status-v1.avif)
+![helm ls, kubectl get pods en kubectl get services voor v1](/docs/week-4/media/week4-helm-status-v1.avif)
 
 **Aanpassen naar v2:**
 
@@ -84,15 +84,15 @@ Twee waarden aangepast in `values.yaml`:
 +  enabled: true
 ```
 
-![Diff van values.yaml - v1 naar v2 wijzigingen](../media/week4-helm-values-v2-diff.avif)
+![Diff van values.yaml - v1 naar v2 wijzigingen](/docs/week-4/media/week4-helm-values-v2-diff.avif)
 
 ```bash
 helm upgrade public-cloud-concepts-v1 public-cloud-concepts
 ```
 
-![Uitvoer van helm upgrade met STATUS deployed en REVISION 2](../media/week4-helm-upgrade-v2.avif)
+![Uitvoer van helm upgrade met STATUS deployed en REVISION 2](/docs/week-4/media/week4-helm-upgrade-v2.avif)
 
-![Beide pods Running na upgrade naar v2](../media/week4-helm-status-v2.avif)
+![Beide pods Running na upgrade naar v2](/docs/week-4/media/week4-helm-status-v2.avif)
 
 ```bash
 helm history public-cloud-concepts-v1
@@ -100,7 +100,7 @@ helm history public-cloud-concepts-v1
 # REVISION 2: deployed
 ```
 
-![helm history toont revisions 1 (superseded) en 2 (deployed)](../media/week4-helm-history.avif)
+![helm history toont revisions 1 (superseded) en 2 (deployed)](/docs/week-4/media/week4-helm-history.avif)
 
 **Rollback:**
 
@@ -114,7 +114,7 @@ helm rollback public-cloud-concepts-v1 1
 helm uninstall public-cloud-concepts-v1
 ```
 
-![helm uninstall uitvoer](../media/week4-helm-uninstall.avif)
+![helm uninstall uitvoer](/docs/week-4/media/week4-helm-uninstall.avif)
 
 ---
 
@@ -133,15 +133,15 @@ De `static-site` chart gebruikt het Docker-image uit Week 1 en 2. In `values.yam
 helm install static-site-v1 ./static-site
 ```
 
-![helm install static-site uitvoer](../media/week4-helm-install-static-site.avif)
+![helm install static-site uitvoer](/docs/week-4/media/week4-helm-install-static-site.avif)
 
 ```bash
 kubectl port-forward svc/static-site-v1 8080:80
 ```
 
-![kubectl port-forward tunnelt lokaal poort 8080 naar de pod in GKE](../media/week4-port-forward.avif)
+![kubectl port-forward tunnelt lokaal poort 8080 naar de pod in GKE](/docs/week-4/media/week4-port-forward.avif)
 
-![De static-site applicatie draait op localhost:8080](../media/week4-static-site-browser.avif)
+![De static-site applicatie draait op localhost:8080](/docs/week-4/media/week4-static-site-browser.avif)
 
 ---
 
@@ -182,11 +182,11 @@ Service ontbrak na installatie, handmatig aangemaakt:
 helm get manifest my-wordpress | awk '/Source: wordpress\/templates\/svc.yaml/,/^---/' | kubectl apply -f -
 ```
 
-![kubectl get svc toont my-wordpress als LoadBalancer met extern IP](../media/week4-wordpress-svc.avif)
+![kubectl get svc toont my-wordpress als LoadBalancer met extern IP](/docs/week-4/media/week4-wordpress-svc.avif)
 
-![WordPress login pagina bereikbaar op extern GKE IP](../media/week4-wordpress-login.avif)
+![WordPress login pagina bereikbaar op extern GKE IP](/docs/week-4/media/week4-wordpress-login.avif)
 
-![WordPress blog "Mijn Blog" draait publiek](../media/week4-wordpress-blog.avif)
+![WordPress blog "Mijn Blog" draait publiek](/docs/week-4/media/week4-wordpress-blog.avif)
 
 **Opruimen:**
 
