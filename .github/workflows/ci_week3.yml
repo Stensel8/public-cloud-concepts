@@ -26,6 +26,9 @@ name: CI Week 3 - Blue-Green Deploy
 on:
   push:
     branches: [main, development]
+    paths:
+      - '.github/workflows/ci_week3.yml'
+      - 'static/docs/week-3/**'
   workflow_dispatch:
 
 permissions:

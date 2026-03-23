@@ -14,6 +14,35 @@ echo "=================================================="
 echo ""
 sleep 2
 
+wait_for_pods() {
+  local namespace="$1"
+  local selector="$2"
+  local appear_timeout="$3"
+  local ready_timeout="$4"
+  local waited=0
+
+  echo "      Wachten tot pods bestaan voor selector: ${selector}"
+  while true; do
+    if kubectl -n "${namespace}" get pods -l "${selector}" --no-headers 2>/dev/null | grep -q .; then
+      break
+    fi
+
+    if [ "${waited}" -ge "${appear_timeout}" ]; then
+      echo "FOUT: Geen pods gevonden in namespace '${namespace}' met selector '${selector}' na ${appear_timeout}s."
+      kubectl -n "${namespace}" get pods -o wide || true
+      exit 1
+    fi
+
+    sleep 5
+    waited=$((waited + 5))
+  done
+
+  kubectl wait --namespace "${namespace}" \
+    --for=condition=ready pod \
+    --selector="${selector}" \
+    --timeout="${ready_timeout}"
+}
+
 # ------------------------------------------------------------------------------
 echo "[1/5] Helm repositories toevoegen en updaten..."
 # ------------------------------------------------------------------------------
@@ -46,10 +75,7 @@ helm upgrade --install \
   loki grafana/loki
 
 echo "      Wachten tot Loki pods Ready zijn..."
-kubectl wait --namespace loki \
-  --for=condition=ready pod \
-  --selector=app.kubernetes.io/instance=loki \
-  --timeout=300s
+wait_for_pods "loki" "app.kubernetes.io/instance=loki" 180 300s
 echo ""
 sleep 1
 
@@ -63,10 +89,7 @@ helm upgrade --install \
   alloy grafana/alloy
 
 echo "      Wachten tot Alloy pods Ready zijn..."
-kubectl wait --namespace alloy \
-  --for=condition=ready pod \
-  --selector=app.kubernetes.io/instance=alloy \
-  --timeout=300s
+wait_for_pods "alloy" "app.kubernetes.io/instance=alloy" 180 300s
 echo ""
 sleep 1
 
@@ -93,12 +116,14 @@ kubectl rollout status statefulset/prometheus-prometheus-kube-prometheus \
   --timeout=900s
 
 echo "      Controle op Grafana service endpoints..."
-GRAFANA_ENDPOINTS=$(kubectl -n prometheus get endpoints prometheus-grafana -o jsonpath='{.subsets[*].addresses[*].ip}')
+GRAFANA_ENDPOINTS="$(kubectl -n prometheus get endpoints prometheus-grafana -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"
 if [[ -z "${GRAFANA_ENDPOINTS}" ]]; then
   echo "FOUT: Grafana service heeft nog geen ready endpoints."
   echo "Diagnose:"
+  kubectl -n prometheus get svc prometheus-grafana || true
+  kubectl -n prometheus get endpoints prometheus-grafana -o yaml || true
   kubectl -n prometheus get pods -o wide
-  kubectl -n prometheus describe pod -l app.kubernetes.io/name=grafana
+  kubectl -n prometheus describe pod -l app.kubernetes.io/name=grafana || true
   exit 1
 fi
 echo ""
