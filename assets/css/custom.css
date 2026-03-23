@@ -1,3 +1,10 @@
+/* Afbeeldingen beperken in breedte zodat ze niet te groot worden */
+article img {
+  max-width: 720px;
+  width: 100%;
+  height: auto;
+}
+
 /* Language/theme controls live in the navbar — hide sidebar and footer duplicates */
 .hextra-sidebar-container > [data-toggle-animation="show"] {
   display: none !important;
