@@ -3,6 +3,8 @@ title: "Opdracht"
 weight: 1
 ---
 
+<a href="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week2.yml" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week2.yml/badge.svg" alt="CI Week 2" style="display:inline;vertical-align:middle;" /></a>
+
 ## 2.1 Google Kubernetes Engine (GKE) en DORA
 
 Deze week verdiep je je kennis van GKE en analyseer je DORA.
@@ -12,7 +14,7 @@ Deze week verdiep je je kennis van GKE en analyseer je DORA.
   Lever bewijs via screenshots.
 - Analyseer hoe alle technische DORA-capabilities kunnen leiden tot betere Organizational Performance (processen) en Well-being (mensen).
 
-## 2.2 Kubernetes Uitdaging (deel 2)
+## 2.2 Kubernetes
 
 In week 1 is een pod gestart met daarin een container (webserver). De pod is echter alleen bereikbaar via het IP van de pod. Dit is kwetsbaar, omdat als de pod uitvalt (of verwijderd wordt) er een nieuwe wordt aangemaakt (mits de deployment actief is) met een ander IP-adres.
 

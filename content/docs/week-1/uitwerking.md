@@ -7,7 +7,7 @@ weight: 2
 
 ## 1.1 Google Cloud & GKE - Voltooide Badges
 
-Voltooide badges via [Google Cloud Skills Boost](https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe):
+Voltooide badges via [Google Skills](https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe):
 
 <a href="https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe"><img src="https://cdn.qwiklabs.com/V%2FuXlPOWQoaDTrhNB3K%2Ba2p2wGiQZT7%2BODtWIPHmON4%3D" alt="Google Cloud Fundamentals: Core Infrastructure" width="120"></a>
 <a href="https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe"><img src="https://cdn.qwiklabs.com/sgKmjMjD%2BpyCGA4VRZkhXxeonasfqbo8j85m8b5gC%2Bg%3D" alt="Essential Google Cloud Infrastructure: Core Services" width="120"></a>
@@ -15,7 +15,7 @@ Voltooide badges via [Google Cloud Skills Boost](https://www.skills.google/publi
 
 ---
 
-## 1.2 Kubernetes Uitdaging
+## 1.2 Kubernetes
 
 ### Opdracht 1 - Cluster Installatie
 
@@ -97,47 +97,17 @@ master-amsterdam   Ready    control-plane   17m    v1.35.1
 
 ### Opdracht 2 - Gecontaineriseerde Applicatie
 
-**Dockerfile:**
+**Dockerfile:** ([bekijk op GitHub](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-1/bestanden/Dockerfile))
 
-```dockerfile
-FROM nginx:alpine
-COPY static-site/ /usr/share/nginx/html/
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
-- **`FROM nginx:alpine`**: Alpine-variant bewust gekozen: ~5 MB vs ~180 MB Debian, kleiner aanvalsoppervlak.
-- **`COPY static-site/`**: Kopieert de website naar de nginx-documentroot.
-- **`EXPOSE 80`**: Geeft aan dat de container luistert op poort 80.
-- **`CMD ["nginx", "-g", "daemon off;"]`**: Start nginx op de voorgrond zodat de container actief blijft.
+- Alpine-variant bewust gekozen: ~5 MB vs ~180 MB Debian, kleiner aanvalsoppervlak.
+- Kopieert de website naar de nginx-documentroot.
+- Start nginx op de voorgrond zodat de container actief blijft.
 
 **GitHub Actions workflow:**
 
 De workflow ([ci_week1.yml](https://github.com/Stensel8/public-cloud-concepts/blob/main/.github/workflows/ci_week1.yml)) bouwt en pusht het image als `stensel8/public-cloud-concepts:latest` bij elke push naar `main`.
 
-**deployment.yaml:**
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: first-deployment
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: my-container
-  template:
-    metadata:
-      labels:
-        app: my-container
-    spec:
-      containers:
-      - name: my-container
-        image: stensel8/public-cloud-concepts:latest
-        ports:
-        - containerPort: 80
-```
+**deployment.yaml:** ([bekijk op GitHub](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-1/bestanden/deployment.yml))
 
 **2b - Pod-IPs:**
 

@@ -4,8 +4,8 @@ linkTitle: "Week 2"
 weight: 2
 ---
 
-In week 2 breiden we de Week 1-setup uit met Kubernetes Services en Ingress. Een pod heeft een tijdelijk IP-adres dat verandert zodra de pod herstart. Services lossen dit op door een stabiel virtueel IP te bieden.
+In week 2 heb ik de week 1 setup gebruikt en uitgebreid met services en ingress. Een pod heeft een tijdelijk IP-adres wat niet vaststaat en verandert bij een herstart. Voor externe toegang en loadbalancing wil je een stabiel endpoint, want je gaat niet steeds die configs met de hand bijwerken.
 
-We testen de drie service-typen (ClusterIP, NodePort, LoadBalancer) op zowel het zelfgebouwde kubeadm-cluster als op GKE. Tot slot zetten we een Ingress op waarmee meerdere applicaties via één extern IP-adres bereikbaar zijn.
+Ik heb de drie service-typen uitgewerkt (ClusterIP, NodePort, LoadBalancer) op zowel het kubeadm-cluster als op GKE. Verder heb ik Ingress opgezet zodat meerdere applicaties via één extern IP beschikbaar zijn.
 
 <a href="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week2.yml" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week2.yml/badge.svg" alt="CI Week 2" style="display:inline;vertical-align:middle;" /></a>

@@ -1,4 +1,4 @@
-name: Switch Blue-Green Slot
+name: Week 3 - Switch Blue-Green Slot
 
 on:
   workflow_dispatch:

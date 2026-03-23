@@ -20,7 +20,7 @@ You need to add the Proof of Completion (Course Badge) badges to your portfolio.
 
 ![](../media/opdracht/image-001.avif)
 
-## 1.2 Kubernetes Challenge
+## 1.2 Kubernetes
 
 To complete the first week's assignment, we want to apply the knowledge of Kubernetes and gain more in-depth knowledge of Kubernetes.
 

@@ -3,6 +3,8 @@ title: "Opdracht"
 weight: 1
 ---
 
+<a href="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml/badge.svg" alt="CI Week 1" style="display:inline;vertical-align:middle;" /></a>
+
 ## 1.1 Google Cloud & Google Kubernetes Engine (GKE)
 
 Deze week maak je kennis met het Google Cloud Platform. Je leert de basisconcepten van Google Cloud en de belangrijkste Google-services.
@@ -20,7 +22,7 @@ Voeg de Proof of Completion (Course Badge) toe aan je portfolio.
 
 ![](../media/opdracht/image-001.avif)
 
-## 1.2 Kubernetes Uitdaging
+## 1.2 Kubernetes
 
 Om de eerste weekopdracht te voltooien, gaan we de kennis van Kubernetes toepassen en verdiepen.
 
