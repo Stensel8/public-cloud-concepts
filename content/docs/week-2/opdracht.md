@@ -44,7 +44,7 @@ In week 1 is een pod gestart met daarin een container (webserver). De pod is ech
 
 7. Om de load balancer-functionaliteit te kunnen zien, schakelen we over naar Google Cloud en gebruiken we de GKE-service. Maak daar een Kubernetes-cluster aan en zorg dat dezelfde deployment en service worden aangemaakt als op de Google-instances (de container met de webserver moet draaien). Pas de service aan naar type `LoadBalancer` en controleer of er nu een extern IP-adres wordt aangemaakt. Test of de service via internet bereikbaar is in een browser op je pc.
 
-   ![](/docs/week-2/media/opdracht/image-001.avif)
+   ![GKE LoadBalancer service: extern IP-adres aangemaakt, applicatie bereikbaar via browser](/docs/week-2/media/opdracht/image-001.avif)
 
 8. Er is nu een load balancer voor een applicatie zodat die via internet bereikbaar is. Als er meerdere applicaties zijn, zou dat betekenen dat er meerdere load balancers nodig zijn (1 per service). We willen nu meerdere services ontsluiten via 1 zogenaamde Ingress.
 

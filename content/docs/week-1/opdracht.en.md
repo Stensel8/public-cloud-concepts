@@ -18,7 +18,7 @@ Now you've basic understanding of the Google Cloud, let's jump into Google Kuber
 
 You need to add the Proof of Completion (Course Badge) badges to your portfolio.
 
-![](/docs/week-1/media/opdracht/image-001.avif)
+![Course Badge: Getting Started with Google Kubernetes Engine](/docs/week-1/media/opdracht/image-001.avif)
 
 ## 1.2 Kubernetes
 
@@ -32,7 +32,7 @@ Of course, you can use all kinds of sources for this, such as chatgpt or manuals
 
 1. Create three Ubuntu 24.04 LTS minimal instances in Google (choose type e2-standard-2 as node) and choose Ubuntu 24.04 LTS minimal as OS. To see that a virtual network in Google directly connects multiple regions, you can place the master in the Netherlands, a node in Brussels and a node in London.
 
-![](/docs/week-1/media/opdracht/image-002.avif)
+![Creating VM instances in GCP: master in Amsterdam, workers in Brussels and London](/docs/week-1/media/opdracht/image-002.avif)
 
 Install a Kubernetes master and 2 Kubernetes workernodes.
 
@@ -70,7 +70,7 @@ First check that on the master with the command:
 kubectl get nodes
 ```
 
-![](/docs/week-1/media/opdracht/image-003.avif)
+![kubectl get nodes: three nodes in Ready status](/docs/week-1/media/opdracht/image-003.avif)
 
 Use the following command to check which pods are running in the namespace `kube-system`. It should look something like this:
 
@@ -78,11 +78,11 @@ Use the following command to check which pods are running in the namespace `kube
 kubectl get pods -n kube-system
 ```
 
-![](/docs/week-1/media/opdracht/image-004.avif)
+![kubectl get pods -n kube-system: overview of system pods](/docs/week-1/media/opdracht/image-004.avif)
 
 Explain these pods using the figure below from the book "Production Kubernetes":
 
-![](/docs/week-1/media/opdracht/image-005.avif)
+![Architecture diagram from Production Kubernetes: Kubernetes component model](/docs/week-1/media/opdracht/image-005.avif)
 
 2. We now want to run a containerized application in this cluster.
 
@@ -94,7 +94,7 @@ We use GitHub to automatically create an image when the code (`index.html`) is m
 
 After that, we can run the image in the Google Kubernetes cluster. It is shown schematically below:
 
-![](/docs/week-1/media/opdracht/image-006.avif)
+![Schematic of the CI/CD flow: GitHub Actions builds and pushes the image to DockerHub](/docs/week-1/media/opdracht/image-006.avif)
 
 Create a repository in GitHub (e.g. called "container"). Make sure git is installed on your PC and clone the GitHub repository to your own PC and place the Dockerfile and the `index.html` file there.
 

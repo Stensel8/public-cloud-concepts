@@ -1,14 +1,14 @@
 ---
-title: "Uitwerkingen"
+title: "Assignments"
 breadcrumbs: false
 weight: 1
 ---
 
-Uitwerkingen en documentatie per week voor de module Public Cloud Concepts bij Saxion.
+Assignments and documentation per week for the Public Cloud Concepts module at Saxion.
 
-| Week | Onderwerp |
-|------|-----------|
-| [Week 1](/docs/week-1/) | Containerisatie & Kubernetes |
+| Week | Topic |
+|------|-------|
+| [Week 1](/docs/week-1/) | Containerisation & Kubernetes |
 | [Week 2](/docs/week-2/) | Kubernetes Services & Ingress |
 | [Week 3](/docs/week-3/) | CI/CD & Blue-Green Deployments |
 | [Week 4](/docs/week-4/) | Helm & IAM |

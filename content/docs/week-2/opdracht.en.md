@@ -42,7 +42,7 @@ In week 1, a pod was started in which a container is running (web server). Howev
 
 7. In order to be able to see the load balancer functionality, we now switch to the Google Cloud and use the GKE (Google Kubernetes Engine) service. Create a Kubernetes Cluster there and make sure that the same deployment and service are created as in google instances (so the container with a web server must be running). Adjust the service to type `LoadBalancer` and check if an external IP address is now created. Test if the service is accessible via the internet in a browser on your PC (it should be).
 
-   ![](/docs/week-2/media/opdracht/image-001.avif)
+   ![GKE LoadBalancer service: external IP address assigned, application accessible via browser](/docs/week-2/media/opdracht/image-001.avif)
 
 8. There is now a load balancer for an application so that it can be reached from the internet. If there are multiple applications, that would mean that there would have to be multiple load balancers (1 per service). We now want to unlock multiple services via 1 so-called Ingress.
 
