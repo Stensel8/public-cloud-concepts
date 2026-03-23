@@ -9,9 +9,26 @@ weight: 2
 
 Voltooide badges via [Google Skills](https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe):
 
-<a href="https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe"><img src="https://cdn.qwiklabs.com/V%2FuXlPOWQoaDTrhNB3K%2Ba2p2wGiQZT7%2BODtWIPHmON4%3D" alt="Google Cloud Fundamentals: Core Infrastructure" width="120"></a>
-<a href="https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe"><img src="https://cdn.qwiklabs.com/sgKmjMjD%2BpyCGA4VRZkhXxeonasfqbo8j85m8b5gC%2Bg%3D" alt="Essential Google Cloud Infrastructure: Core Services" width="120"></a>
-<a href="https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe"><img src="https://cdn.qwiklabs.com/HPtjPjHuWp197QQiSmfshQL2uNxmxDCHjWps43o10Cg%3D" alt="Getting Started with Google Kubernetes Engine" width="120"></a>
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0;">
+  <div style="text-align: center;">
+    <a href="https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe">
+      <img src="https://cdn.qwiklabs.com/V%2FuXlPOWQoaDTrhNB3K%2Ba2p2wGiQZT7%2BODtWIPHmON4%3D" alt="Google Cloud Fundamentals: Core Infrastructure" style="width: 100%; max-width: 200px;">
+      <p style="margin-top: 0.5rem; font-size: 0.9rem;">Google Cloud Fundamentals: Core Infrastructure</p>
+    </a>
+  </div>
+  <div style="text-align: center;">
+    <a href="https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe">
+      <img src="https://cdn.qwiklabs.com/sgKmjMjD%2BpyCGA4VRZkhXxeonasfqbo8j85m8b5gC%2Bg%3D" alt="Essential Google Cloud Infrastructure: Core Services" style="width: 100%; max-width: 200px;">
+      <p style="margin-top: 0.5rem; font-size: 0.9rem;">Essential Google Cloud Infrastructure: Core Services</p>
+    </a>
+  </div>
+  <div style="text-align: center;">
+    <a href="https://www.skills.google/public_profiles/d92d9d25-7174-4f3a-8f70-fab880429afe">
+      <img src="https://cdn.qwiklabs.com/HPtjPjHuWp197QQiSmfshQL2uNxmxDCHjWps43o10Cg%3D" alt="Getting Started with Google Kubernetes Engine" style="width: 100%; max-width: 200px;">
+      <p style="margin-top: 0.5rem; font-size: 0.9rem;">Getting Started with Google Kubernetes Engine</p>
+    </a>
+  </div>
+</div>
 
 ---
 

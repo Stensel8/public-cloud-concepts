@@ -44,6 +44,12 @@ helm upgrade --install \
   --create-namespace \
   --values loki-values.yaml \
   loki grafana/loki
+
+echo "      Wachten tot Loki pods Ready zijn..."
+kubectl wait --namespace loki \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/instance=loki \
+  --timeout=300s
 echo ""
 sleep 1
 
@@ -55,6 +61,12 @@ helm upgrade --install \
   --create-namespace \
   --values alloy-values.yaml \
   alloy grafana/alloy
+
+echo "      Wachten tot Alloy pods Ready zijn..."
+kubectl wait --namespace alloy \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/instance=alloy \
+  --timeout=300s
 echo ""
 sleep 1
 
@@ -66,6 +78,29 @@ helm upgrade --install \
   --create-namespace \
   --values prometheus-values.yaml \
   prometheus prometheus-community/kube-prometheus-stack
+
+echo "      Wachten tot Prometheus Operator en Grafana uitgerold zijn..."
+kubectl rollout status deployment/prometheus-kube-prometheus-operator \
+  --namespace prometheus \
+  --timeout=600s
+kubectl rollout status deployment/prometheus-grafana \
+  --namespace prometheus \
+  --timeout=900s
+
+echo "      Wachten tot Prometheus StatefulSet klaar is..."
+kubectl rollout status statefulset/prometheus-prometheus-kube-prometheus \
+  --namespace prometheus \
+  --timeout=900s
+
+echo "      Controle op Grafana service endpoints..."
+GRAFANA_ENDPOINTS=$(kubectl -n prometheus get endpoints prometheus-grafana -o jsonpath='{.subsets[*].addresses[*].ip}')
+if [[ -z "${GRAFANA_ENDPOINTS}" ]]; then
+  echo "FOUT: Grafana service heeft nog geen ready endpoints."
+  echo "Diagnose:"
+  kubectl -n prometheus get pods -o wide
+  kubectl -n prometheus describe pod -l app.kubernetes.io/name=grafana
+  exit 1
+fi
 echo ""
 
 # ------------------------------------------------------------------------------

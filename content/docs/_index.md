@@ -1,7 +1,8 @@
 ---
-title: "Uitwerkingen"
 weight: 1
 ---
+
+# Uitwerkingen
 
 Uitwerkingen en documentatie per week voor de cursus Public Cloud Concepts bij Saxion.
 
