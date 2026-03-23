@@ -107,13 +107,13 @@ Ik bleef een `GCE_STOCKOUT` fout krijgen in zone `europe-west4-c` - de zone had 
 
 De oplossing was om zone-c uit te sluiten met `--node-locations=europe-west4-a,europe-west4-b`. Zones a en b hadden geen problemen, zone-c bleef hangen. Voor een monitoring stack zijn twee zones meer dan genoeg.
 
-![Quota overzicht - ruim binnen de limieten](/docs/week-5/media/week5-quota-overzicht.avif)
+![Quota overzicht - ruim binnen de limieten](/docs/week-5/media/quota-overzicht.avif)
 
-![GCE_STOCKOUT fout zichtbaar in de GKE console](/docs/week-5/media/week5-gce-stockout-console.avif)
+![GCE_STOCKOUT fout zichtbaar in de GKE console](/docs/week-5/media/gce-stockout-console.avif)
 
-![GCE_STOCKOUT fout in de terminal tijdens cluster aanmaken](/docs/week-5/media/week5-gce-stockout-terminal.avif)
+![GCE_STOCKOUT fout in de terminal tijdens cluster aanmaken](/docs/week-5/media/gce-stockout-terminal.avif)
 
-![Instance groups: zone-c blijft hangen op Updating terwijl a en b gewoon draaien](/docs/week-5/media/week5-instance-groups.avif)
+![Instance groups: zone-c blijft hangen op Updating terwijl a en b gewoon draaien](/docs/week-5/media/instance-groups.avif)
 {{< /callout >}}
 
 {{< callout type="info" >}}
@@ -130,13 +130,13 @@ gcloud components install gke-gcloud-auth-plugin
   <source src="/docs/week-5/media/Cluster-create-week5.webm" type="video/webm">
 </video>
 
-![Cluster aanmaken via gcloud CLI](/docs/week-5/media/stap1-cluster-aanmaken.avif)
+![Cluster aanmaken via gcloud CLI](/docs/week-5/media/cluster-aanmaken.avif)
 
-![GKE cluster wordt aangemaakt in de GCP Console](/docs/week-5/media/stap1-cluster-provisioning.avif)
+![GKE cluster wordt aangemaakt in de GCP Console](/docs/week-5/media/cluster-provisioning.avif)
 
-![Cluster succesvol aangemaakt met status RUNNING](/docs/week-5/media/stap1-cluster-gereed.avif)
+![Cluster succesvol aangemaakt met status RUNNING](/docs/week-5/media/cluster-gereed.avif)
 
-![GKE console: Standard modus, 6 nodes, versie 1.35.1-gke.1396001, Regular release channel](/docs/week-5/media/stap1-cluster-details.avif)
+![GKE console: Standard modus, 6 nodes, versie 1.35.1-gke.1396001, Regular release channel](/docs/week-5/media/cluster-details.avif)
 
 ---
 
@@ -150,7 +150,7 @@ gcloud container clusters get-credentials week5-cluster \
   --project=project-5b8c5498-4fe2-42b9-bc3
 ```
 
-![get-credentials en kubectl get nodes tonen 6 Ready nodes](/docs/week-5/media/stap3-cluster-verbinding.avif)
+![get-credentials en kubectl get nodes tonen 6 Ready nodes](/docs/week-5/media/cluster-verbinding.avif)
 
 ---
 
@@ -178,7 +178,7 @@ bash setup-loki-prometheus-grafana.sh
   <source src="/docs/week-5/media/Grafana-create-week5.webm" type="video/webm">
 </video>
 
-![Uitvoer van setup-loki-prometheus-grafana.sh in Cloud Shell](/docs/week-5/media/stap3-stack-installatie-uitvoer.avif)
+![Uitvoer van setup-loki-prometheus-grafana.sh in Cloud Shell](/docs/week-5/media/stack-installatie-uitvoer.avif)
 
 Het script installeert de stack in vijf stappen: Helm repos toevoegen, ingress-nginx (met `kubectl wait`), Loki, Alloy, Prometheus + Grafana.
 
@@ -250,9 +250,9 @@ Grafana is ingebouwd in `kube-prometheus-stack` (`grafana.enabled: true`), dus i
 kubectl get ingress -n prometheus
 ```
 
-![kubectl get ingress toont het externe IP-adres voor grafana.stijhuis.nl](/docs/week-5/media/stap4-ingress-ip.avif)
+![kubectl get ingress toont het externe IP-adres voor grafana.stijhuis.nl](/docs/week-5/media/ingress-ip.avif)
 
-![Ingress status met adres en hostnaam](/docs/week-5/media/stap4-ingress-status.avif)
+![Ingress status met adres en hostnaam](/docs/week-5/media/ingress-status.avif)
 
 ---
 
@@ -260,11 +260,11 @@ kubectl get ingress -n prometheus
 
 Het externe IP is als A-record ingesteld bij Bunny DNS voor `grafana.stijhuis.nl`, in plaats van het `hosts`-bestand handmatig aan te passen. Een DNS-record werkt direct op alle apparaten wereldwijd, zonder lokale configuratie.
 
-![Grafana values aangepast met de hostnaam](/docs/week-5/media/stap5-grafana-values-aangepast.avif)
+![Grafana values aangepast met de hostnaam](/docs/week-5/media/grafana-values-aangepast.avif)
 
-![DNS record aanmaken in Bunny DNS](/docs/week-5/media/stap5-dns-record-aanmaken.avif)
+![DNS record aanmaken in Bunny DNS](/docs/week-5/media/dns-record-aanmaken.avif)
 
-![Overzicht DNS records in Bunny DNS](/docs/week-5/media/stap5-dns-overzicht.avif)
+![Overzicht DNS records in Bunny DNS](/docs/week-5/media/dns-overzicht.avif)
 
 ---
 
@@ -272,9 +272,9 @@ Het externe IP is als A-record ingesteld bij Bunny DNS voor `grafana.stijhuis.nl
 
 Via `https://grafana.stijhuis.nl` in de browser:
 
-![Grafana 404 bij eerste bezoek, DNS nog niet gepropageerd](/docs/week-5/media/stap6-grafana-404.avif)
+![Grafana 404 bij eerste bezoek, DNS nog niet gepropageerd](/docs/week-5/media/grafana-404.avif)
 
-![Grafana login pagina bereikbaar](/docs/week-5/media/stap6-grafana-login.avif)
+![Grafana login pagina bereikbaar](/docs/week-5/media/grafana-login.avif)
 
 Na het inloggen zijn de twee databronnen actief: **Loki** en **Prometheus**. Via **Connections > Data sources** heb ik beide bronnen getest.
 
@@ -286,11 +286,11 @@ Als basis voor Kubernetes monitoring is het community dashboard [k8s-custom-metr
 
 Dashboard geïmporteerd via **Dashboards > Import** met ID `20960`, Prometheus als datasource:
 
-![Dashboard template selecteren bij importeren](/docs/week-5/media/stap10-dashboard-template.avif)
+![Dashboard template selecteren bij importeren](/docs/week-5/media/dashboard-template.avif)
 
-![Dashboard importeren in Grafana met Prometheus als datasource](/docs/week-5/media/stap10-dashboard-import.avif)
+![Dashboard importeren in Grafana met Prometheus als datasource](/docs/week-5/media/dashboard-import.avif)
 
-![Kubernetes application insights dashboard actief, cluster CPU 70%, RAM 63%](/docs/week-5/media/stap10-dashboard-resultaat.avif)
+![Kubernetes application insights dashboard actief, cluster CPU 70%, RAM 63%](/docs/week-5/media/dashboard-resultaat.avif)
 
 ---
 
