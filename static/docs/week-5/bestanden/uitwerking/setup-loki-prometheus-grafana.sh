@@ -110,10 +110,8 @@ kubectl rollout status deployment/prometheus-grafana \
   --namespace prometheus \
   --timeout=900s
 
-echo "      Wachten tot Prometheus StatefulSet klaar is..."
-kubectl rollout status statefulset/prometheus-prometheus-kube-prometheus \
-  --namespace prometheus \
-  --timeout=900s
+echo "      Wachten tot Prometheus pods Ready zijn..."
+wait_for_pods "prometheus" "app.kubernetes.io/name=prometheus,app.kubernetes.io/instance=prometheus" 180 900s
 
 echo "      Controle op Grafana service endpoints..."
 GRAFANA_ENDPOINTS="$(kubectl -n prometheus get endpoints prometheus-grafana -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"

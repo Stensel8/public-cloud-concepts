@@ -29,6 +29,7 @@ on:
     paths:
       - '.github/workflows/ci_week3.yml'
       - 'static/docs/week-3/**'
+      - 'static/docs/week-1/bestanden/**'
   workflow_dispatch:
 
 permissions:
