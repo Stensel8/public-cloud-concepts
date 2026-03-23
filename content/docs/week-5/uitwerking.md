@@ -97,7 +97,7 @@ PowerShell gebruikt de backtick (`` ` ``) als regelvervolg in plaats van `\`.
 {{< callout type="warning" >}}
 **Studentquota (disk):** De standaard GKE-instellingen (100GB per node) zouden 4 × 100GB = **400GB SSD** vereisen. Met `--disk-size=50` komt het uit op 4 × 50GB = 200GB SSD, ruim binnen het quota van 500GB.
 
-**Studentquota (RAM):** e2-medium (4GB RAM per node) verdubbelt het RAM t.o.v. e2-small. GCP telt RAM niet als separate quota; de begrenzing zit in VM instances (limiet: 24, gebruik: 4) en CPUs (limiet: 32 regionaal, gebruik: 8). Beide zijn ruim binnen de limieten.
+**Studentquota (RAM):** e2-medium (4GB RAM per node) verdubbelt het RAM t.o.v. e2-small. GCP telt RAM niet als separate quota; de begrenzing zit in VM instances en CPUs, beide ruim binnen de studentlimieten.
 {{< /callout >}}
 
 {{< callout type="error" >}}
