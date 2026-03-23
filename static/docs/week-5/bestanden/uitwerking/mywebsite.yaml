@@ -1,33 +1,33 @@
 # =============================================================================
 # Kubernetes manifests voor de week 1 applicatie (statische website)
-# Namespace: week1-app
-# Ingress: week1.stijhuis.nl (pas aan naar jouw domein)
+# Namespace: mywebsite
+# Ingress: mywebsite.stijhuis.nl
 # =============================================================================
 
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: week1-app
+  name: mywebsite
 
 ---
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: week1-app
-  namespace: week1-app
+  name: mywebsite
+  namespace: mywebsite
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: week1-app
+      app: mywebsite
   template:
     metadata:
       labels:
-        app: week1-app
+        app: mywebsite
     spec:
       containers:
-        - name: week1-app
+        - name: mywebsite
           image: stensel8/public-cloud-concepts:latest
           ports:
             - containerPort: 80
@@ -36,6 +36,7 @@ spec:
               cpu: 50m
               memory: 64Mi
             limits:
+              cpu: 100m
               memory: 128Mi
 
 ---
@@ -43,11 +44,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: week1-app
-  namespace: week1-app
+  name: mywebsite
+  namespace: mywebsite
 spec:
   selector:
-    app: week1-app
+    app: mywebsite
   ports:
     - port: 80
       targetPort: 80
@@ -57,18 +58,18 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: week1-app
-  namespace: week1-app
+  name: mywebsite
+  namespace: mywebsite
 spec:
   ingressClassName: nginx
   rules:
-    - host: week1.stijhuis.nl
+    - host: mywebsite.stijhuis.nl
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: week1-app
+                name: mywebsite
                 port:
                   number: 80

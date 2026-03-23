@@ -279,11 +279,11 @@ Dashboard geïmporteerd via **Dashboards > Import** met ID `20960`, Prometheus a
 De week 1 applicatie (`stensel8/public-cloud-concepts:latest`) is een statische website geserveerd via nginx. Het installatiescript deployt deze automatisch als stap 6. Omdat ingress-nginx al actief is, gebruikt de app een ClusterIP service met een Ingress.
 
 ```bash
-kubectl get pods -n week1-app
-kubectl get ingress -n week1-app
+kubectl get pods -n mywebsite
+kubectl get ingress -n mywebsite
 ```
 
-Stel een DNS A-record in voor `week1.stijhuis.nl` naar hetzelfde Ingress IP-adres als Grafana.
+Stel een DNS A-record in voor `mywebsite.stijhuis.nl` naar hetzelfde Ingress IP-adres als Grafana.
 
 {{< callout type="info" >}}
 **Wat valt er te monitoren aan een static site?**

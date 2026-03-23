@@ -3,13 +3,13 @@ set -euo pipefail
 
 # =============================================================================
 # Week 5 - Monitoring stack setup
-# Installeert: ingress-nginx · Loki · Alloy · Prometheus + Grafana · week1-app
+# Installeert: ingress-nginx · Loki · Alloy · Prometheus + Grafana · mywebsite
 # =============================================================================
 
 echo ""
 echo "=================================================="
 echo " Week 5 - Monitoring stack installatie"
-echo " Loki · Alloy · Prometheus · Grafana · ingress-nginx · week1-app"
+echo " Loki · Alloy · Prometheus · Grafana · ingress-nginx · mywebsite"
 echo "=================================================="
 echo ""
 
@@ -70,8 +70,8 @@ echo ""
 # ------------------------------------------------------------------------------
 echo "[6/6] Week 1 applicatie deployen..."
 # ------------------------------------------------------------------------------
-kubectl apply -f week1-app.yaml
-kubectl rollout status deployment/week1-app --namespace week1-app --timeout=120s
+kubectl apply -f mywebsite.yaml
+kubectl rollout status deployment/mywebsite --namespace mywebsite --timeout=120s
 echo ""
 
 # ------------------------------------------------------------------------------
