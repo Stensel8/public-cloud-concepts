@@ -1,9 +1,10 @@
 ---
 title: "Uitwerkingen"
+breadcrumbs: false
 weight: 1
 ---
 
-Uitwerkingen en documentatie per week voor de cursus Public Cloud Concepts bij Saxion.
+Uitwerkingen en documentatie per week voor de module Public Cloud Concepts bij Saxion.
 
 | Week | Onderwerp |
 |------|-----------|

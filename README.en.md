@@ -37,7 +37,7 @@ This repository is maintained by [Sten Tijhuis](https://github.com/Stensel8) and
 | 2 | Ingress, Services & Apps | [Week 2/Bestanden](static/docs/week-2/bestanden/) |
 | 3 | Blue-Green Deployments & Artifact Registry | [Week 3/Bestanden](static/docs/week-3/bestanden/) |
 | 4 | Helm & Identity and Access Management | [Week 4/Bestanden](static/docs/week-4/bestanden/) |
-| 5 | Monitoring & Observability | [Week 5](static/docs/week-5/) |
+| 5 | Monitoring & Observability | [Week 5/Bestanden](static/docs/week-5/bestanden/) |
 
 ## Installing Google Cloud SDK
 

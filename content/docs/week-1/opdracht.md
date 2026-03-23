@@ -11,12 +11,12 @@ Deze week maak je kennis met het Google Cloud Platform. Je leert de basisconcept
 
 Als je al basiskennis hebt van Public Cloud Concepts, kun je de eerste twee basiscursussen overslaan.
 
-- Voltooi de cursus Essential Google Cloud Infrastructure: Core Infrastructure: <https://www.cloudskillsboost.google/course_templates/60>
-- Voltooi de cursus Essential Google Cloud Infrastructure: Core Services: <https://www.cloudskillsboost.google/course_templates/49>
+- Voltooi de cursus Essential Google Cloud Infrastructure: Core Infrastructure via [Google Skills](https://www.cloudskillsboost.google/course_templates/60).
+- Voltooi de cursus Essential Google Cloud Infrastructure: Core Services via [Google Skills](https://www.cloudskillsboost.google/course_templates/49).
 
 Nu je de basiskennis van Google Cloud hebt, duiken we in Google Kubernetes Engine (GKE).
 
-- Voltooi de cursus Getting Started with Google Kubernetes Engine, inclusief labs (12 credits): <https://www.cloudskillsboost.google/paths/11/course_templates/2>
+- Voltooi de cursus Getting Started with Google Kubernetes Engine, inclusief labs (12 credits), via [Google Skills](https://www.cloudskillsboost.google/paths/11/course_templates/2).
 
 Voeg de Proof of Completion (Course Badge) toe aan je portfolio.
 

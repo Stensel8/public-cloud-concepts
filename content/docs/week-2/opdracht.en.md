@@ -7,8 +7,8 @@ weight: 1
 
 This week you will extend your knowledge of GKE and analyse about DORA.
 
-- Complete the Kubernetes Engine: Qwik Start (GSP100, 1 credit): <https://www.cloudskillsboost.google/focuses/878?parent=catalog> and submit proof by connecting to the container using `kubectl exec` and show the last 15 lines of the webserver logfile.
-- Complete the lab "Managing Deployments Using Kubernetes Engine" (5 credits) of the course "Set Up and Configure a Cloud Environment in Google Cloud". You can find this course at: <https://www.cloudskillsboost.google/paths/11/course_templates/625>
+- Complete the Kubernetes Engine: Qwik Start (GSP100, 1 credit) via [Google Skills](https://www.cloudskillsboost.google/focuses/878?parent=catalog) and submit proof by connecting to the container using `kubectl exec` and show the last 15 lines of the webserver logfile.
+- Complete the lab "Managing Deployments Using Kubernetes Engine" (5 credits) of the course "Set Up and Configure a Cloud Environment in Google Cloud" via [Google Skills](https://www.cloudskillsboost.google/paths/11/course_templates/625).
   Submit proof using screenshots.
 - Analyse how all DORA's technical capabilities could yield better Organizational Performance (processes) and Well-being (people).
 

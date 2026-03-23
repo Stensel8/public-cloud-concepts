@@ -9,12 +9,12 @@ This week you will be introduced to the Google Cloud Platform. We will learn the
 
 If you've already a basic understanding of Public Cloud Concepts than you may skip the first two basic courses.
 
-- Complete the course Essential Google Cloud Infrastructure: Core Infrastructure: <https://www.cloudskillsboost.google/course_templates/60>
-- Complete the course Essential Google Cloud Infrastructure: Core Services: <https://www.cloudskillsboost.google/course_templates/49>
+- Complete the course Essential Google Cloud Infrastructure: Core Infrastructure via [Google Skills](https://www.cloudskillsboost.google/course_templates/60).
+- Complete the course Essential Google Cloud Infrastructure: Core Services via [Google Skills](https://www.cloudskillsboost.google/course_templates/49).
 
 Now you've basic understanding of the Google Cloud, let's jump into Google Kubernetes Engine (GKE).
 
-- Complete the course Getting Started with Google Kubernetes Engine, incl. labs (12 credits): <https://www.cloudskillsboost.google/paths/11/course_templates/2>
+- Complete the course Getting Started with Google Kubernetes Engine, incl. labs (12 credits), via [Google Skills](https://www.cloudskillsboost.google/paths/11/course_templates/2).
 
 You need to add the Proof of Completion (Course Badge) badges to your portfolio.
 

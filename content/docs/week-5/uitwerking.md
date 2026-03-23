@@ -176,6 +176,8 @@ bash setup-loki-prometheus-grafana.sh
   <source src="../media/Grafana-create-week5.webm" type="video/webm">
 </video>
 
+![Uitvoer van setup-loki-prometheus-grafana.sh in Cloud Shell](../media/stap3-stack-installatie-uitvoer.avif)
+
 Het script installeert de stack in vijf stappen: Helm repos toevoegen, ingress-nginx (met `kubectl wait`), Loki, Alloy, Prometheus + Grafana.
 
 **Waarom ingress-nginx als eerste?**

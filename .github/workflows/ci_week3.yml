@@ -26,7 +26,15 @@ name: CI Week 3 - Blue-Green Deploy
 on:
   push:
     branches: [main, development]
+    paths:
+      - '.github/workflows/ci_week3.yml'
+      - 'static/docs/week-3/**'
+      - 'static/docs/week-1/bestanden/**'
   workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -59,18 +67,52 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      - name: Check Week 3 cluster availability
+        id: cluster_check
+        run: |
+          if gcloud container clusters describe "${{ env.GKE_CLUSTER }}" \
+            --location "${{ env.GKE_ZONE }}" \
+            --project "${{ env.PROJECT_ID }}" >/dev/null 2>&1; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            echo "Week 3 cluster gevonden; deployment wordt uitgevoerd." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Week 3 omgeving mogelijk niet beschikbaar. Dit kan normaal zijn (studentquota, 1 cluster tegelijk), of tijdelijk door GKE/Google Cloud/GitHub API bereikbaarheid."
+            {
+              echo "### Week 3 deployment overgeslagen"
+              echo "Week 3 omgeving mogelijk niet beschikbaar."
+              echo "Dit kan normaal zijn door studentquota (vaak maar 1 cluster tegelijk), of tijdelijk door GKE/Google Cloud/GitHub API bereikbaarheid."
+              echo "De workflow is daarom bewust overgeslagen in plaats van hard gefaald."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Mark run as cancelled when environment is unavailable
+        if: steps.cluster_check.outputs.available != 'true'
+        continue-on-error: true
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
+
       - name: Configure Docker for Artifact Registry
+        if: steps.cluster_check.outputs.available == 'true'
         run: |
           gcloud auth print-access-token | docker login -u oauth2accesstoken \
             --password-stdin https://${{ env.GAR_ZONE }}-docker.pkg.dev
 
       - name: Get GKE credentials
+        if: steps.cluster_check.outputs.available == 'true'
         uses: google-github-actions/get-gke-credentials@v3
         with:
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GKE_ZONE }}
 
       - name: Build Docker image
+        if: steps.cluster_check.outputs.available == 'true'
         run: |
           SLOT="${{ steps.slot.outputs.slot }}"
           docker build \
@@ -78,10 +120,12 @@ jobs:
             "./static/docs/week-1/bestanden/"
 
       - name: Push to Artifact Registry
+        if: steps.cluster_check.outputs.available == 'true'
         run: |
           docker push "${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${{ steps.slot.outputs.slot }}"
 
       - name: Deploy to GKE
+        if: steps.cluster_check.outputs.available == 'true'
         run: |
           SLOT="${{ steps.slot.outputs.slot }}"
 
