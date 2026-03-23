@@ -27,9 +27,18 @@ Een Autopilot GKE-cluster aangemaakt: `week4-cluster`.
 
 ![Overzicht van het actieve week4-cluster](../media/week4-cluster-overzicht.avif)
 
+{{< tabs >}}
+{{< tab name="Linux" >}}
 ```bash
 gcloud container clusters get-credentials week4-cluster --region=europe-west4
 ```
+{{< /tab >}}
+{{< tab name="Windows (PowerShell)" >}}
+```powershell
+gcloud container clusters get-credentials week4-cluster --region=europe-west4
+```
+{{< /tab >}}
+{{< /tabs >}}
 
 ![Verbinding maken met het cluster via gcloud](../media/week4-cluster-credentials.avif)
 
@@ -65,8 +74,15 @@ helm install public-cloud-concepts-v1 public-cloud-concepts
 **Aanpassen naar v2:**
 
 Twee waarden aangepast in `values.yaml`:
-- `replicaCount`: `1` naar `2`
-- `ingress.enabled`: `false` naar `true`
+
+```diff
+-replicaCount: 1
++replicaCount: 2
+
+ ingress:
+-  enabled: false
++  enabled: true
+```
 
 ![Diff van values.yaml - v1 naar v2 wijzigingen](../media/week4-helm-values-v2-diff.avif)
 
@@ -104,12 +120,13 @@ helm uninstall public-cloud-concepts-v1
 
 ### b) Eigen applicatie
 
-De `static-site` chart gebruikt het Docker-image uit Week 1 en 2:
+De `static-site` chart gebruikt het Docker-image uit Week 1 en 2. In `values.yaml` is het standaard nginx-image vervangen:
 
-```yaml
-image:
-  repository: stensel8/public-cloud-concepts
-  tag: "latest"
+```diff
+ image:
+-  repository: nginx
++  repository: stensel8/public-cloud-concepts
++  tag: "latest"
 ```
 
 ```bash
@@ -183,62 +200,52 @@ gcloud container clusters delete week4-cluster --region=europe-west4
 
 ## 4.2 IAM & Casestudy: EHR Healthcare
 
-EHR Healthcare is een bedrijf met een on-premise infrastructuur dat wil migreren naar de cloud. Ze zijn met name geïnteresseerd in beveiliging en IAM. In de cloud biedt IAM meer functionaliteit dan een on-premise Active Directory.
-
-Hieronder worden de gevraagde Azure IAM-concepten uitgelegd met een advies voor EHR Healthcare.
+EHR Healthcare is een bedrijf met een on-premise infrastructuur dat wil migreren naar de cloud. Ze zijn geïnteresseerd in beveiliging en IAM. Per gevraagd concept heb ik uitgelegd wat het is en waarom ik het zou aanbevelen voor dit bedrijf.
 
 ---
 
 ### 1. Single Sign-On (SSO)
 
-**Wat is het?**
-Met SSO log je één keer in en heb je daarna toegang tot meerdere applicaties - zonder elke keer opnieuw in te loggen. In Azure wordt dit gerealiseerd via Microsoft Entra ID (voorheen Azure AD).
+SSO betekent dat je één keer inlogt en daarna toegang hebt tot meerdere applicaties zonder elke keer opnieuw te authenticeren. In Azure gaat dit via Microsoft Entra ID. Via Azure AD Application Proxy of SAML-integratie werkt dit ook voor on-premise applicaties.
 
-**On-premise?** Ja. Via Azure AD Application Proxy of SAML-integratie zijn ook on-premise applicaties te koppelen aan SSO.
-
-**Advies voor EHR Healthcare:** Zeker inzetten. Minder wachtwoorden betekent minder risico op phishing. Medewerkers hoeven niet voor elke applicatie een apart account te onthouden.
+Voor EHR zou ik dit zeker inzetten. Minder losse wachtwoorden betekent minder phishing-risico, en medewerkers hoeven niet voor elke applicatie een apart account bij te houden.
 
 ---
 
 ### 2. Conditional Access
 
-**Wat is het?**
-Beleid dat bepaalt onder welke omstandigheden toegang wordt verleend. Bijvoorbeeld: alleen toegang vanaf beheerde apparaten, of MFA vereisen als iemand inlogt vanuit een onbekend land.
+Conditional Access is beleid dat bepaalt onder welke omstandigheden toegang wordt verleend, zoals alleen vanaf beheerde apparaten of MFA vereisen bij inloggen vanuit een onbekend land.
 
-**Advies voor EHR Healthcare:** Absoluut inzetten. EHR werkt met gevoelige patiëntgegevens. Conditional Access zorgt dat toegang niet alleen afhankelijk is van een wachtwoord, maar ook van locatie, apparaat en risiconiveau.
+Voor EHR is dit essentieel. Ze werken met gevoelige patiëntgegevens, dus toegang mag niet puur afhangen van een wachtwoord. Locatie, apparaat en risiconiveau moeten ook meewegen.
 
 ---
 
 ### 3. RBAC (Role-Based Access Control)
 
-**Wat is het?**
-Rechten worden toegewezen op basis van rollen, niet op individuele gebruikers. In Azure kun je rollen toewijzen op abonnementsniveau, resource group-niveau of resource-niveau.
+Met RBAC wijs je rechten toe op basis van rollen in plaats van individuele gebruikers. In Azure werkt dit op abonnementsniveau, resource group-niveau of resource-niveau.
 
-**Advies voor EHR Healthcare:** Essentieel voor een gecontroleerde migratie. Door rollen vooraf te definiëren (bijv. "Database-beheerder", "Applicatiebeheerder") blijft het beheer overzichtelijk en worden de rechten automatisch mee-gemigreerd bij personeelswisselingen.
+Voor een gecontroleerde migratie is dit essentieel. Door rollen vooraf te definiëren (bijv. "Database-beheerder", "Applicatiebeheerder") blijft het beheer overzichtelijk en gaan rechten automatisch mee bij personeelswisselingen.
 
 ---
 
 ### 4. Identity Protection
 
-**Wat is het?**
-Microsoft Entra Identity Protection detecteert riskante inlogpogingen automatisch. Denk aan aanmeldingen vanuit anonieme IP-adressen, unmogelijke reizen (inloggen vanuit Amsterdam en Tokyo binnen een uur), of gelekte wachtwoorden.
+Microsoft Entra Identity Protection detecteert riskante inlogpogingen automatisch, zoals aanmeldingen vanuit anonieme IP-adressen, onmogelijke reizen (inloggen vanuit Amsterdam en Tokyo binnen een uur), of gelekte wachtwoorden.
 
-**Advies voor EHR Healthcare:** Inzetten. De meeste aanvallen beginnen met gecompromitteerde inloggegevens. Identity Protection detecteert dit en kan automatisch MFA afdwingen of accounts blokkeren.
+De meeste aanvallen beginnen met gecompromitteerde inloggegevens. Identity Protection detecteert dit en kan automatisch MFA afdwingen of accounts blokkeren. Voor EHR zou ik dit zeker inzetten.
 
 ---
 
 ### 5. Multi-Factor Authentication (MFA)
 
-**Wat is het?**
-Een tweede verificatiestap naast het wachtwoord, zoals een authenticator-app, sms of hardware token.
+MFA is een tweede verificatiestap naast het wachtwoord, zoals een authenticator-app, sms of hardware token.
 
-**Advies voor EHR Healthcare:** Verplicht inzetten voor alle medewerkers. Zeker voor healthcare-omgevingen is dit een basismaatregel. MFA blokkeert het overgrote deel van account-aanvallen, ook als een wachtwoord uitgelekt is.
+Voor EHR zou ik dit verplicht stellen voor alle medewerkers. MFA blokkeert het overgrote deel van account-aanvallen, ook als een wachtwoord uitgelekt is. Voor healthcare is dit gewoon een basismaatregel.
 
 ---
 
 ### 6. Managed Identities en Service Principals
 
-**Wat is het?**
-Managed Identities zijn Azure-beheerde identiteiten voor applicaties en services - geen wachtwoord nodig, Azure regelt de credentials automatisch. Service Principals zijn de handmatige variant waarbij je zelf credentials beheert.
+Managed Identities zijn Azure-beheerde identiteiten voor applicaties en services. Geen wachtwoord nodig; Azure regelt de credentials automatisch. Service Principals zijn de handmatige variant waarbij je zelf credentials beheert.
 
-**Advies voor EHR Healthcare:** Managed Identities zijn de voorkeur voor cloud-native applicaties. Geen opgeslagen wachtwoorden in configuratiebestanden, automatische rotatie en directe integratie met Azure RBAC. Service Principals zijn alleen nodig voor applicaties die buiten Azure draaien en Azure-resources moeten benaderen.
+Voor cloud-native applicaties is Managed Identity de betere keuze. Geen opgeslagen wachtwoorden in configuratiebestanden, automatische rotatie en directe integratie met Azure RBAC. Service Principals gebruik je alleen als een applicatie buiten Azure draait en Azure-resources moet benaderen.

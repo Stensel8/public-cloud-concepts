@@ -4,6 +4,8 @@ linkTitle: "Week 1"
 weight: 1
 ---
 
-In week 1 maken we kennis met Google Cloud Platform en Google Kubernetes Engine (GKE). We starten met de GCP-fundamentals en duiken daarna in Kubernetes door zelf een cluster op te zetten met kubeadm op losse Ubuntu-instances.
+In week 1 ben ik begonnen met Google Cloud Platform en Kubernetes. Ik heb een cluster opgezet met kubeadm op losse Ubuntu-instances, met een masternode in Nederland en workernodes in Brussel en Londen.
 
-Het doel: een werkend cluster met een masternode in Nederland, en workernodes in Brussel en Londen, waarop een gecontaineriseerde webapplicatie draait. De container wordt automatisch gebouwd en gepusht via een GitHub Actions pipeline.
+Daarna heb ik de applicatie gecontaineriseerd met Docker en een GitHub Actions pipeline ingericht die het image automatisch bouwt en pusht bij elke push naar `main`.
+
+<a href="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml/badge.svg" alt="CI Week 1" style="display:inline;vertical-align:middle;" /></a>

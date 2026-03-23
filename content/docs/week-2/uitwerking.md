@@ -18,7 +18,7 @@ De GitHub Actions workflow bouwt twee images en pusht ze naar `stensel8/public-c
 
 ---
 
-## 2.2 Kubernetes Uitdaging (deel 2)
+## 2.2 Kubernetes
 
 ### Opdracht 2.2a - Deployment draait
 
@@ -53,24 +53,26 @@ first-deployment-5ffbd9444c-5hkzs   IP: 10.244.2.3   worker-london
 first-deployment-5ffbd9444c-pdrw0   IP: 10.244.2.4   worker-london
 ```
 
-Dit is precies waarom je een Service nodig hebt: pods zijn wegwerpbaar en hun IPs veranderen.
+Dit is precies waarom een Service nodig is: pods zijn wegwerpbaar en hun IPs veranderen.
 
 ---
 
 ### Opdracht 2.2c - ClusterIP Service
 
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: first-service
-spec:
-  type: ClusterIP
-  selector:
-    app: my-container
-  ports:
-    - port: 80
-      targetPort: 80
+**[service.yml](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-1/bestanden/service.yml)** - Een Service koppelt via `selector` aan pods met het label `app: my-container`. De eerste versie was `ClusterIP`: alleen bereikbaar binnen het cluster, geen extern IP:
+
+```diff
++apiVersion: v1
++kind: Service
++metadata:
++  name: first-service
++spec:
++  type: ClusterIP        # stabiel virtueel IP, alleen intern
++  selector:
++    app: my-container    # koppelt aan pods met dit label
++  ports:
++    - port: 80
++      targetPort: 80
 ```
 
 ![ClusterIP service aangemaakt met stabiel virtueel IP](../media/2-2c-clusterip-service.avif)
@@ -98,13 +100,16 @@ Alle drie nodes gaven de HTML-respons terug via `curl 10.110.23.98`.
 
 ### Opdracht 2.2e - NodePort Service
 
-```yaml
-spec:
-  type: NodePort
-  ports:
-    - port: 80
-      targetPort: 80
-      nodePort: 32490
+Voor externe toegang is het type gewijzigd naar `NodePort` en een vaste poort toegevoegd:
+
+```diff
+ spec:
+-  type: ClusterIP
++  type: NodePort
+   ports:
+     - port: 80
+       targetPort: 80
++      nodePort: 32490   # vaste poort op alle nodes (bereik: 30000–32767)
 ```
 
 ![NodePort service - poort 80:32490/TCP](../media/2-2e-nodeport-service.avif)
@@ -163,7 +168,7 @@ Een `LoadBalancer` service vraagt de **cloud controller manager** om een externe
 
 | Aanpak | Hoe | Wanneer |
 |---|---|---|
-| **Juiste manier** | Gebruik GKE - cloud controller manager regelt automatisch een Load Balancer | Productie |
+| **Juiste manier** | GKE: cloud controller manager regelt automatisch een Load Balancer | Productie |
 | **NodePort + firewallregel** | Open handmatig een GCP-firewallregel voor de NodePort-poort | Workaround op kubeadm |
 | **Ingress controller** | nginx Ingress Controller routeert meerdere services via één extern IP | Meerdere apps (opdracht 2.2h) |
 
@@ -181,9 +186,18 @@ Een GKE-cluster `week2-cluster` aangemaakt: `e2-medium`, 2 nodes, `europe-west4-
 
 ![GKE week2-cluster provisioning op 33%](../media/2-2g-gke-cluster-provisioning.avif)
 
+{{< tabs >}}
+{{< tab name="Linux" >}}
 ```bash
 gcloud container clusters get-credentials week2-cluster --zone europe-west4-a
 ```
+{{< /tab >}}
+{{< tab name="Windows (PowerShell)" >}}
+```powershell
+gcloud container clusters get-credentials week2-cluster --zone europe-west4-a
+```
+{{< /tab >}}
+{{< /tabs >}}
 
 ![GKE cluster verbonden - twee nodes Ready](../media/2-2g-gke-kubectl-connected.avif)
 
@@ -204,14 +218,14 @@ Na ~44 seconden had GKE een Google Cloud Load Balancer geprovisioneert en het ex
 
 ### Opdracht 2.2h - Ingress: meerdere services via één load balancer
 
-Doel: twee apps beschikbaar stellen via een enkele Ingress:
+Twee apps beschikbaar via één Ingress, elk op een eigen hostnaam:
 
 | Hostnaam | Backend service |
 |---|---|
 | `bison.mysaxion.nl` | `bison-service` (poort 80) |
 | `brightspace.mysaxion.nl` | `brightspace-service` (poort 80) |
 
-**Stap 1 - nginx Ingress Controller installeren:**
+**nginx Ingress Controller installeren:**
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.0/deploy/static/provider/cloud/deploy.yaml
@@ -219,15 +233,17 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 
 ![nginx Ingress Controller - extern IP 34.91.190.135 toegewezen](../media/2-2h-nginx-ingress-controller-external-ip.avif)
 
-**Stap 2 - Ingress deployen:**
+**Manifesten deployen:**
 
-```bash
-kubectl apply -f "Week 2/Bestanden/bison/deployment.yml"
-kubectl apply -f "Week 2/Bestanden/bison/service.yml"
-kubectl apply -f "Week 2/Bestanden/brightspace/deployment.yml"
-kubectl apply -f "Week 2/Bestanden/brightspace/service.yml"
-kubectl apply -f "Week 2/Bestanden/ingress.yml"
-```
+Toegepaste bestanden (zie [GitHub](https://github.com/Stensel8/public-cloud-concepts/tree/main/static/docs/week-2/bestanden)):
+
+| Bestand | Beschrijving |
+|---|---|
+| [bison/deployment.yml](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-2/bestanden/bison/deployment.yml) | 2 replicas, image-tag `bison` |
+| [bison/service.yml](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-2/bestanden/bison/service.yml) | ClusterIP op poort 80 |
+| [brightspace/deployment.yml](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-2/bestanden/brightspace/deployment.yml) | 2 replicas, image-tag `brightspace` |
+| [brightspace/service.yml](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-2/bestanden/brightspace/service.yml) | ClusterIP op poort 80 |
+| [ingress.yml](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-2/bestanden/ingress.yml) | Ingress op basis van `Host` HTTP-header |
 
 ![nginx Ingress Controller geïnstalleerd - pods Running](../media/2-2h-nginx-ingress-controller-installed.avif)
 
@@ -250,6 +266,4 @@ ingress-saxion   nginx   bison.mysaxion.nl,brightspace.mysaxion.nl   34.91.190.1
 
 **Waarom Ingress?**
 
-Zonder Ingress heeft elke applicatie een aparte `LoadBalancer` service nodig (eigen IP, eigen kosten). Met Ingress gebruikt één load balancer (`34.91.190.135`) op basis van de `Host` HTTP-header om verkeer naar de juiste service te sturen.
-
-Flow: browser → `34.91.190.135` (Google Cloud LB) → nginx Ingress Controller → `bison-service` of `brightspace-service` → pods.
+Zonder Ingress heeft elke applicatie een aparte `LoadBalancer` service nodig (eigen IP, eigen kosten). Met Ingress stuurt één load balancer op basis van de `Host` HTTP-header verkeer naar de juiste service.

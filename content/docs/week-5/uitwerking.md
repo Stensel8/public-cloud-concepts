@@ -8,16 +8,16 @@ GKE **Standard** cluster opgezet met een moderne monitoring stack: Loki (SingleB
 {{< callout type="warning" >}}
 **Afwijkingen t.o.v. het aangeleverde schoolmateriaal**
 
-Het originele script van de docent gebruikt drie deprecated Helm charts. Deze zijn vervangen:
+Het script vanuit school bevatte een aantal foutjes en verouderde onderdelen. Bij het uitvoeren kreeg ik deprecation warnings in mijn terminal, dus ik heb gekeken of ik dat zelf kon oplossen. Dat lukte.
 
-| Schoolscript | Verbeterd | Reden |
+| Schoolscript | Mijn versie | Reden |
 |---|---|---|
 | `grafana/loki-distributed` | `grafana/loki` (SingleBinary) | `loki-distributed` is deprecated |
 | `grafana/promtail` | `grafana/alloy` | `promtail` is deprecated |
 | losse `grafana/grafana` release | gebundeld in `kube-prometheus-stack` | standalone chart is deprecated |
 | `storageClass: managed-csi` | `standard-rwo` | Azure-specifiek, werkt niet op GKE |
 
-De originele bestanden staan in [`Week 5/Opdracht/Bestanden/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/Week%205/Opdracht/Bestanden). De verbeterde versie staat in [`Week 5/Uitwerking/Bestanden/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/Week%205/Uitwerking/Bestanden).
+Het originele script staat in [`Week 5/Opdracht/Bestanden/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/Week%205/Opdracht/Bestanden), mijn versie in [`Week 5/Uitwerking/Bestanden/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/Week%205/Uitwerking/Bestanden).
 {{< /callout >}}
 
 **Gebruikte charts:**
@@ -55,30 +55,30 @@ Met Standard heb je gewoon volledige controle over node-configuratie, DaemonSets
 {{< /callout >}}
 
 {{< tabs >}}
-{{< tab name="Linux / macOS" >}}
+{{< tab name="Linux" >}}
 ```bash
 gcloud container clusters create week5-cluster \
   --region=europe-west4 \
+  --node-locations=europe-west4-a,europe-west4-b \
   --project=project-5b8c5498-4fe2-42b9-bc3 \
   --machine-type=e2-small \
   --num-nodes=2 \
   --disk-size=50 \
   --disk-type=pd-balanced \
-  --release-channel=regular \
-  --cluster-version=1.35.1-gke.1396001
+  --release-channel=regular
 ```
 {{< /tab >}}
 {{< tab name="Windows (PowerShell)" >}}
 ```powershell
 gcloud container clusters create "week5-cluster" `
   --region "europe-west4" `
+  --node-locations "europe-west4-a,europe-west4-b" `
   --project "project-5b8c5498-4fe2-42b9-bc3" `
   --machine-type "e2-small" `
   --num-nodes "2" `
   --disk-size "50" `
   --disk-type "pd-balanced" `
-  --release-channel "regular" `
-  --cluster-version "1.35.1-gke.1396001"
+  --release-channel "regular"
 ```
 PowerShell gebruikt de backtick (`` ` ``) als regelvervolg in plaats van `\`.
 {{< /tab >}}
@@ -87,18 +87,38 @@ PowerShell gebruikt de backtick (`` ` ``) als regelvervolg in plaats van `\`.
 | Vlag | Waarde | Toelichting |
 |------|--------|-------------|
 | `--region` | `europe-west4` | Regio dichtstbij Nederland |
+| `--node-locations` | `europe-west4-a,europe-west4-b` | Alleen zones a en b; zone-c had continu `GCE_STOCKOUT` fouten |
 | `--machine-type` | `e2-small` | 2 vCPU, 2GB RAM |
-| `--num-nodes` | `2` | 2 nodes per zone × 3 zones = 6 nodes totaal |
-| `--disk-size` | `50` | 6 × 50GB = 300GB SSD, past binnen het quota van 500GB |
+| `--num-nodes` | `2` | 2 nodes per zone × 2 zones = 4 nodes totaal |
+| `--disk-size` | `50` | 4 × 50GB = 200GB SSD, ruim binnen het quota van 500GB |
 | `--disk-type` | `pd-balanced` | SSD (balanced), betere I/O voor Prometheus TSDB writes |
 | `--release-channel` | `regular` | Stabiele GKE-versies met automatische upgrades |
-| `--cluster-version` | `1.35.1-gke.1396001` | Gepinde initiële versie voor reproduceerbaarheid |
 
 {{< callout type="warning" >}}
-**Studentquota:** De standaard GKE-instellingen (`pd-balanced`, 100GB per node) zouden 6 × 100GB = **600GB SSD** vereisen, wat boven het quota van 500GB uitkomt. Met `--disk-size=50` past alles: 6 × 50GB = 300GB SSD.
+**Studentquota:** De standaard GKE-instellingen (`pd-balanced`, 100GB per node) zouden 4 × 100GB = **400GB SSD** vereisen. Met `--disk-size=50` komt het uit op 4 × 50GB = 200GB SSD.
 {{< /callout >}}
 
-Na het installeren van de auth plugin:
+{{< callout type="error" >}}
+**Dit cluster heeft me bijna twee weken gekost.**
+
+Ik bleef een `GCE_STOCKOUT` fout krijgen in zone `europe-west4-c` - de zone had simpelweg geen capaciteit beschikbaar. Mijn quota's zagen er prima uit, dus ik had geen idee waar het aan lag. Ik heb er samen met een paar klasgenoten naar gekeken, maar niemand kon het direct verklaren.
+
+De oplossing was om zone-c uit te sluiten met `--node-locations=europe-west4-a,europe-west4-b`. Zones a en b hadden geen problemen, zone-c bleef hangen. Voor een monitoring stack zijn twee zones meer dan genoeg.
+
+![Quota overzicht - ruim binnen de limieten](../media/week5-quota-overzicht.avif)
+
+![GCE_STOCKOUT fout zichtbaar in de GKE console](../media/week5-gce-stockout-console.avif)
+
+![GCE_STOCKOUT fout in de terminal tijdens cluster aanmaken](../media/week5-gce-stockout-terminal.avif)
+
+![Instance groups: zone-c blijft hangen op Updating terwijl a en b gewoon draaien](../media/week5-instance-groups.avif)
+{{< /callout >}}
+
+{{< callout type="info" >}}
+**Stap 1 t/m 3 voer je uit vanuit [Google Cloud Shell](https://shell.cloud.google.com).** `helm`, `kubectl` en `gcloud` zijn daar standaard beschikbaar — je hoeft niets lokaal te installeren.
+{{< /callout >}}
+
+Na het installeren van de auth plugin in Cloud Shell:
 
 ```bash
 gcloud components install gke-gcloud-auth-plugin
@@ -120,6 +140,8 @@ gcloud components install gke-gcloud-auth-plugin
 
 ## Stap 2: Verbinding maken met het cluster
 
+Verbinden in **Google Cloud Shell**:
+
 ```bash
 gcloud container clusters get-credentials week5-cluster \
   --region=europe-west4 \
@@ -132,8 +154,21 @@ gcloud container clusters get-credentials week5-cluster \
 
 ## Stap 3: Stack deployen
 
+De repository klonen in Cloud Shell (of updaten als die al bestaat):
+
 ```bash
-cd "Week 5/Uitwerking/Bestanden"
+# Eerste keer
+git clone https://github.com/Stensel8/public-cloud-concepts.git
+cd public-cloud-concepts
+
+# Al eerder gecloned
+cd public-cloud-concepts && git pull
+```
+
+Daarna het script uitvoeren:
+
+```bash
+cd static/docs/week-5/bestanden/uitwerking
 bash setup-loki-prometheus-grafana.sh
 ```
 
@@ -141,12 +176,10 @@ bash setup-loki-prometheus-grafana.sh
   <source src="../media/Grafana-create-week5.webm" type="video/webm">
 </video>
 
-![Script uitvoeren: Helm repos toevoegen en stack installeren](../media/stap3-script-uitvoeren.avif)
-
 Het script installeert de stack in vijf stappen: Helm repos toevoegen, ingress-nginx (met `kubectl wait`), Loki, Alloy, Prometheus + Grafana.
 
 **Waarom ingress-nginx als eerste?**
-De `kube-prometheus-stack` maakt bij installatie direct een Grafana Ingress-object aan. De ingress-nginx controller valideert dat object via een webhook; als ingress-nginx nog niet draait, mislukt de Helm-installatie met een webhook-fout. Door ingress-nginx eerst te installeren en te wachten tot de controller `Ready` is, voorkom je dat.
+De `kube-prometheus-stack` maakt bij installatie direct een Grafana Ingress-object aan. De ingress-nginx controller valideert dat object via een webhook; als ingress-nginx nog niet draait, mislukt de Helm-installatie met een webhook-fout. Door ingress-nginx eerst te installeren en te wachten tot de controller `Ready` is, voorkom ik dat.
 
 ### `loki-values.yaml`
 
@@ -156,45 +189,11 @@ De `grafana/loki` chart vereist een expliciete `schemaConfig`, anders geeft Helm
 Error: You must provide a schema_config for Loki.
 ```
 
-Op basis van de [officiële Loki schema docs](https://grafana.com/docs/loki/latest/operations/storage/schema/):
-
-```yaml
-deploymentMode: SingleBinary
-loki:
-  auth_enabled: false
-  commonConfig:
-    replication_factor: 1
-  storage:
-    type: filesystem
-  schemaConfig:
-    configs:
-      - from: "2024-04-01"
-        store: tsdb
-        object_store: filesystem
-        schema: v13
-        index:
-          prefix: loki_index_
-          period: 24h
-  pattern_ingester:
-    enabled: true
-  limits_config:
-    allow_structured_metadata: true
-    volume_enabled: true
-    retention_period: 336h
-  ruler:
-    enable_api: true
-singleBinary:
-  replicas: 1
-  persistence:
-    storageClass: standard-rwo
-    size: 5Gi
-minio:
-  enabled: false
-```
+Het volledige bestand staat op [GitHub](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-5/bestanden/uitwerking/loki-values.yaml). Belangrijkste keuzes:
 
 - `storageClass: standard-rwo`: GKE-compatibel; het schoolscript gebruikte `managed-csi`, wat Azure-specifiek is
 - Alle gedistribueerde componenten staan expliciet op `replicas: 0`, dat is vereist door de chart
-- `minio.enabled: false`, want we gebruiken filesystem storage
+- `minio.enabled: false`, filesystem storage is voldoende voor deze setup
 
 ### `alloy-values.yaml`
 
@@ -215,11 +214,11 @@ http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push
 http://loki-gateway.loki.svc.cluster.local
 ```
 
-> **Twee geldige aanpakken:** De officiële Grafana tutorial gebruikt de `grafana/k8s-monitoring` chart (kant-en-klare bundel). Voor meer inzicht in wat er onder de motorkap gebeurt is gekozen voor de standalone `grafana/alloy` chart.
+> **Twee geldige aanpakken:** De officiële Grafana tutorial gebruikt de `grafana/k8s-monitoring` chart (kant-en-klare bundel). Voor meer inzicht in wat er onder de motorkap gebeurt heb ik gekozen voor de standalone `grafana/alloy` chart.
 
 ### `prometheus-values.yaml`
 
-Grafana is ingebouwd in `kube-prometheus-stack` (`grafana.enabled: true`), dus je hebt geen aparte `grafana/grafana` chart nodig. Prometheus staat op 1 replica, want de monitoring stack is RAM-intensief en de `e2-small` nodes (2GB) kunnen anders niet mee.
+Grafana is ingebouwd in `kube-prometheus-stack` (`grafana.enabled: true`), dus is er geen aparte `grafana/grafana` chart nodig. Prometheus staat op 1 replica, want de monitoring stack is RAM-intensief en de `e2-small` nodes (2GB) kunnen anders niet mee.
 
 ---
 
@@ -255,7 +254,7 @@ Via `https://grafana.stijhuis.nl` in de browser:
 
 ![Grafana login pagina bereikbaar](../media/stap6-grafana-login.avif)
 
-Na het inloggen zijn de twee databronnen actief: **Loki** en **Prometheus**. Via **Connections > Data sources** en dan **Test** op elke bron is de verbinding te controleren.
+Na het inloggen zijn de twee databronnen actief: **Loki** en **Prometheus**. Via **Connections > Data sources** heb ik beide bronnen getest.
 
 ---
 

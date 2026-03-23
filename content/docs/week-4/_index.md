@@ -4,6 +4,6 @@ linkTitle: "Week 4"
 weight: 4
 ---
 
-In week 4 leren we werken met Helm, de pakketbeheerder voor Kubernetes. In plaats van losse YAML-bestanden handmatig toe te passen, bundelt Helm alles in een chart. We maken een eigen chart, installeren hem, upgraden naar een nieuwe versie en rollen terug.
+In week 4 heb ik Helm gebruikt, de pakketbeheerder voor Kubernetes. In plaats van losse YAML-bestanden handmatig toe te passen, bundel je alles in een chart. Ik heb een eigen chart gemaakt, geïnstalleerd, geupgraded naar een nieuwe versie en teruggerold.
 
-Naast Helm behandelen we IAM (Identity and Access Management) aan de hand van de EHR Healthcare-casestudy: wat zijn de mogelijkheden van Azure IAM en wat zou een bedrijf in de praktijk moeten inzetten?
+Naast Helm heb ik IAM uitgewerkt aan de hand van de EHR Healthcare-casestudy: wat zijn de mogelijkheden van Azure IAM en wat zou zo'n bedrijf in de praktijk moeten inzetten?

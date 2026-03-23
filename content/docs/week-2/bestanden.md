@@ -13,86 +13,26 @@ Alle Kubernetes-configuratiebestanden die gebruikt zijn voor Week 2. De broncode
 
 De Bison-applicatie simuleert een schoolwebsite, bereikbaar via `bison.mysaxion.nl`.
 
-**deployment.yml**
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: bison-deployment
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: bison
-  template:
-    metadata:
-      labels:
-        app: bison
-    spec:
-      containers:
-      - name: bison
-        image: stensel8/public-cloud-concepts:bison
-        ports:
-        - containerPort: 80
-```
-
-**service.yml**
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: bison-service
-spec:
-  type: ClusterIP
-  selector:
-    app: bison
-  ports:
-    - port: 80
-      targetPort: 80
-```
-
----
+| Bestand | Beschrijving |
+|---------|-------------|
+| [deployment.yml](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-2/bestanden/bison/deployment.yml) | Kubernetes Deployment met 2 replicas, image-tag `bison`. |
+| [service.yml](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-2/bestanden/bison/service.yml) | ClusterIP Service op poort 80. |
+| [dockerfile](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-2/bestanden/bison/dockerfile) | Dockerfile voor de Bison-container. |
+| [index.html](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-2/bestanden/bison/index.html) | Broncode van de Bison-pagina. |
 
 ## brightspace/
 
-De Brightspace-applicatie, bereikbaar via `brightspace.mysaxion.nl`. Identieke structuur aan Bison, met tag `brightspace`.
+De Brightspace-applicatie, bereikbaar via `brightspace.mysaxion.nl`. Identieke structuur aan Bison, met image-tag `brightspace`.
 
----
+| Bestand | Beschrijving |
+|---------|-------------|
+| [deployment.yml](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-2/bestanden/brightspace/deployment.yml) | Kubernetes Deployment met 2 replicas, image-tag `brightspace`. |
+| [service.yml](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-2/bestanden/brightspace/service.yml) | ClusterIP Service op poort 80. |
+| [dockerfile](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-2/bestanden/brightspace/dockerfile) | Dockerfile voor de Brightspace-container. |
+| [index.html](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-2/bestanden/brightspace/index.html) | Broncode van de Brightspace-pagina. |
 
 ## ingress.yml
 
-De Ingress stuurt binnenkomend verkeer op basis van de `Host` HTTP-header naar de juiste service. Zo zijn beide applicaties via één extern IP-adres bereikbaar.
-
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: ingress-saxion
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: "bison.mysaxion.nl"
-    http:
-      paths:
-      - pathType: Prefix
-        path: /
-        backend:
-          service:
-            name: bison-service
-            port:
-              number: 80
-  - host: "brightspace.mysaxion.nl"
-    http:
-      paths:
-      - pathType: Prefix
-        path: /
-        backend:
-          service:
-            name: brightspace-service
-            port:
-              number: 80
-```
+| Bestand | Beschrijving |
+|---------|-------------|
+| [ingress.yml](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-2/bestanden/ingress.yml) | Kubernetes Ingress die binnenkomend verkeer op basis van de `Host` HTTP-header naar de juiste service stuurt. Beide applicaties zijn zo via één extern IP-adres bereikbaar. |

@@ -12,7 +12,7 @@ This week you will extend your knowledge of GKE and analyse about DORA.
   Submit proof using screenshots.
 - Analyse how all DORA's technical capabilities could yield better Organizational Performance (processes) and Well-being (people).
 
-## 2.2 Kubernetes Challenge (part 2)
+## 2.2 Kubernetes
 
 In week 1, a pod was started in which a container is running (web server). However, the pod can only be accessed via the IP of the pod. This is vulnerable because if the pod fails (or is thrown away) a new one is created (provided the deployment is active) and it has a different IP address.
 
