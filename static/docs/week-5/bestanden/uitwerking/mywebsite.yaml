@@ -1,0 +1,75 @@
+# =============================================================================
+# Kubernetes manifests voor de week 1 applicatie (statische website)
+# Namespace: mywebsite
+# Ingress: mywebsite.stijhuis.nl
+# =============================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mywebsite
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mywebsite
+  namespace: mywebsite
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mywebsite
+  template:
+    metadata:
+      labels:
+        app: mywebsite
+    spec:
+      containers:
+        - name: mywebsite
+          image: stensel8/public-cloud-concepts:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mywebsite
+  namespace: mywebsite
+spec:
+  selector:
+    app: mywebsite
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mywebsite
+  namespace: mywebsite
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: mywebsite.stijhuis.nl
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mywebsite
+                port:
+                  number: 80
