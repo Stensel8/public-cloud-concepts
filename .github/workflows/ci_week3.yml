@@ -34,6 +34,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -84,6 +85,17 @@ jobs:
               echo "De workflow is daarom bewust overgeslagen in plaats van hard gefaald."
             } >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Mark run as cancelled when environment is unavailable
+        if: steps.cluster_check.outputs.available != 'true'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            })
 
       - name: Configure Docker for Artifact Registry
         if: steps.cluster_check.outputs.available == 'true'

@@ -26,7 +26,7 @@ wait_for_pods() {
   echo "      Wachten tot pods bestaan voor selector: ${selector}"
   while true; do
     set +e
-    pods_output="$(kubectl -n "${namespace}" get pods -l "${selector}" --no-headers 2>&1)"
+    pods_output="$(kubectl -n "${namespace}" get pods -l "${selector}" -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' 2>&1)"
     pods_status=$?
     set -e
 
@@ -37,7 +37,7 @@ wait_for_pods() {
       exit 1
     fi
 
-    if echo "${pods_output}" | grep -q .; then
+    if [ -n "${pods_output//[[:space:]]/}" ]; then
       break
     fi
 
