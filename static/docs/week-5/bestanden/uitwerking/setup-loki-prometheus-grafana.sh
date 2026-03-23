@@ -121,7 +121,14 @@ echo ""
 echo "[6/6] Week 1 applicatie deployen..."
 # ------------------------------------------------------------------------------
 kubectl apply -f mywebsite.yaml
-kubectl rollout status deployment/mywebsite --namespace mywebsite --timeout=120s
+if ! kubectl rollout status deployment/mywebsite --namespace mywebsite --timeout=300s; then
+  echo ""
+  echo "WAARSCHUWING: mywebsite timeout. Huidige pod-status:"
+  kubectl get pods -n mywebsite
+  kubectl get events -n mywebsite --sort-by='.lastTimestamp' | tail -10
+  echo ""
+  echo "De monitoring stack is wel geïnstalleerd. Controleer bovenstaande output."
+fi
 echo ""
 
 # ------------------------------------------------------------------------------
