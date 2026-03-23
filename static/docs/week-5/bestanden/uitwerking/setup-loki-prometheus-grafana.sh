@@ -14,6 +14,49 @@ echo "=================================================="
 echo ""
 
 # ------------------------------------------------------------------------------
+echo "[0/6] Prerequisites controleren..."
+# ------------------------------------------------------------------------------
+PREREQ_OK=true
+
+for tool in kubectl helm gcloud; do
+  if ! command -v "${tool}" &>/dev/null; then
+    echo "FOUT: '${tool}' is niet geïnstalleerd of niet gevonden in PATH."
+    PREREQ_OK=false
+  fi
+done
+
+# Controleer of gcloud een actief account heeft
+if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" 2>/dev/null | grep -q .; then
+  echo "FOUT: Geen actief gcloud account gevonden."
+  echo "      Voer eerst uit: gcloud auth login"
+  PREREQ_OK=false
+fi
+
+# Controleer of kubectl verbinding kan maken met het cluster
+if ! kubectl cluster-info &>/dev/null; then
+  echo "FOUT: kubectl kan het cluster niet bereiken."
+  echo "      Voer eerst uit: gcloud container clusters get-credentials <cluster> --region <region>"
+  PREREQ_OK=false
+fi
+
+# Controleer of de benodigde values-bestanden aanwezig zijn
+for f in loki-values.yaml alloy-values.yaml prometheus-values.yaml mywebsite.yaml; do
+  if [ ! -f "${f}" ]; then
+    echo "FOUT: Bestand '${f}' niet gevonden. Voer dit script uit vanuit de juiste map."
+    PREREQ_OK=false
+  fi
+done
+
+if [ "${PREREQ_OK}" = false ]; then
+  echo ""
+  echo "Los bovenstaande problemen op en probeer opnieuw."
+  exit 1
+fi
+
+echo "      Alle prerequisites OK."
+echo ""
+
+# ------------------------------------------------------------------------------
 echo "[1/6] Helm repositories toevoegen en updaten..."
 # ------------------------------------------------------------------------------
 helm repo add grafana              https://grafana.github.io/helm-charts
