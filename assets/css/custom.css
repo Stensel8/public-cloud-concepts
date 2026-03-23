@@ -1,7 +1,6 @@
 /* Afbeeldingen beperken in breedte zodat ze niet te groot worden */
 article img {
-  max-width: 720px;
-  width: 100%;
+  max-width: min(720px, 100%);
   height: auto;
 }
 
