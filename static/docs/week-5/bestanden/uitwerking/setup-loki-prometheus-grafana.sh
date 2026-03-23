@@ -35,9 +35,14 @@ if command -v gcloud &>/dev/null; then
 fi
 
 # Controleer of kubectl verbinding kan maken met het cluster
-if ! kubectl cluster-info &>/dev/null; then
-  echo "FOUT: kubectl kan het cluster niet bereiken."
-  echo "      Voer eerst uit: gcloud container clusters get-credentials <cluster> --region <region>"
+if command -v kubectl &>/dev/null; then
+  if ! kubectl cluster-info &>/dev/null; then
+    echo "FOUT: kubectl kan het cluster niet bereiken."
+    echo "      Voer eerst uit: gcloud container clusters get-credentials <cluster> --region <region>"
+    PREREQ_OK=false
+  fi
+else
+  echo "FOUT: 'kubectl' ontbreekt, kan clusterinformatie niet ophalen."
   PREREQ_OK=false
 fi
 
