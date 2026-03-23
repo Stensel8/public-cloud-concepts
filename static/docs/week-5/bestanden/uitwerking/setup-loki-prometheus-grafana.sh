@@ -64,7 +64,7 @@ helm upgrade --install \
 kubectl rollout status deployment/prometheus-kube-prometheus-operator \
   --namespace prometheus --timeout=300s
 kubectl rollout status deployment/prometheus-grafana \
-  --namespace prometheus --timeout=300s
+  --namespace prometheus --timeout=600s
 echo ""
 
 # ------------------------------------------------------------------------------
