@@ -25,11 +25,13 @@ for tool in kubectl helm gcloud; do
   fi
 done
 
-# Controleer of gcloud een actief account heeft
-if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" 2>/dev/null | grep -q .; then
-  echo "FOUT: Geen actief gcloud account gevonden."
-  echo "      Voer eerst uit: gcloud auth login"
-  PREREQ_OK=false
+# Controleer of gcloud een actief account heeft (alleen als gcloud aanwezig is)
+if command -v gcloud &>/dev/null; then
+  if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" 2>/dev/null | grep -q .; then
+    echo "FOUT: Geen actief gcloud account gevonden."
+    echo "      Voer eerst uit: gcloud auth login"
+    PREREQ_OK=false
+  fi
 fi
 
 # Controleer of kubectl verbinding kan maken met het cluster
