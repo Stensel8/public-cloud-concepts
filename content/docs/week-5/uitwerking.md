@@ -274,9 +274,9 @@ Dashboard geïmporteerd via **Dashboards > Import** met ID `20960`, Prometheus a
 
 ---
 
-## Stap 8: Week 1 applicatie deployen
+## Stap 8: Week 1 en 2 applicatie deployen
 
-De week 1 applicatie (`stensel8/public-cloud-concepts:latest`) is een statische website geserveerd via nginx. Het installatiescript deployt deze automatisch als stap 6. Omdat ingress-nginx al actief is, gebruikt de app een ClusterIP service met een Ingress.
+De week 1 applicatie (`stensel8/public-cloud-concepts:latest`) is een statische website geserveerd via nginx. Week 2 gebruikt hetzelfde Docker image — een aparte deployment is daarvoor niet nodig. Het installatiescript deployt de app automatisch als stap 6. Omdat ingress-nginx al actief is, gebruikt de app een ClusterIP service met een Ingress.
 
 ```bash
 kubectl get pods -n mywebsite

@@ -81,6 +81,9 @@ for i in $(seq 1 18); do
   GRAFANA_IP=$(kubectl -n prometheus get ingress prometheus-grafana \
     -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
   [ -n "${GRAFANA_IP}" ] && break
+  GRAFANA_IP=$(kubectl -n prometheus get ingress prometheus-grafana \
+    -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || true)
+  [ -n "${GRAFANA_IP}" ] && break
   sleep 10
 done
 
