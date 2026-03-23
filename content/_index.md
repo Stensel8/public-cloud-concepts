@@ -3,11 +3,9 @@ title: ""
 toc: false
 ---
 
-<div class="hx-mt-16 hx-mb-16">
-{{< hextra/hero-headline >}}
+{{< hextra/hero-headline style="margin-top:4rem;margin-bottom:4rem;" >}}
   Public Cloud Concepts
 {{< /hextra/hero-headline >}}
-</div>
 
 {{< cards >}}
   {{< card link="/docs/week-1/" title="Week 1" subtitle="Containerisatie & Kubernetes" >}}

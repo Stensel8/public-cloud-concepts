@@ -5,7 +5,7 @@ weight: 3
 
 Alle Kubernetes-configuratiebestanden die gebruikt zijn voor Week 2. De broncode staat op [GitHub](https://github.com/Stensel8/public-cloud-concepts/tree/main/static/docs/week-2/bestanden).
 
-<a href="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week2.yml" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week2.yml/badge.svg" alt="CI Week 2" style="display:inline;vertical-align:middle;" /></a>
+[![CI Week 2](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week2.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week2.yml)
 
 ---
 

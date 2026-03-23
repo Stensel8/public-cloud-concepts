@@ -126,9 +126,7 @@ Na het installeren van de auth plugin in Cloud Shell:
 gcloud components install gke-gcloud-auth-plugin
 ```
 
-<video controls width="100%" style="max-width:800px">
-  <source src="/docs/week-5/media/Cluster-create-week5.webm" type="video/webm">
-</video>
+{{< video src="/docs/week-5/media/Cluster-create-week5.webm" >}}
 
 ![Cluster aanmaken via gcloud CLI](/docs/week-5/media/cluster-aanmaken.avif)
 
@@ -174,9 +172,7 @@ cd static/docs/week-5/bestanden/uitwerking
 bash setup-loki-prometheus-grafana.sh
 ```
 
-<video controls width="100%" style="max-width:800px">
-  <source src="/docs/week-5/media/Grafana-create-week5.webm" type="video/webm">
-</video>
+{{< video src="/docs/week-5/media/Grafana-create-week5.webm" >}}
 
 ![Uitvoer van setup-loki-prometheus-grafana.sh in Cloud Shell](/docs/week-5/media/stack-installatie-uitvoer.avif)
 

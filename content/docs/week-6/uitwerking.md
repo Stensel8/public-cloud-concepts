@@ -11,14 +11,12 @@ weight: 2
 
 <!-- Vul in: stappen en bevindingen van het lab -->
 
----
-
-## 6.2 API Gateway toevoegen
+### API Gateway toevoegen
 
 <!-- Vul in: uitleg over hoe de API Gateway past in de opgebouwde microservices-oplossing -->
 
 ---
 
-## 6.3 The Twelve-Factor App
+## 6.2 The Twelve-Factor App
 
 <!-- Vul in: beschrijf de twaalf factoren en koppel ze aan het lab -->

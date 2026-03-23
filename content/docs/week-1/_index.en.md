@@ -8,4 +8,4 @@ In week 1 I started working with Google Cloud Platform and Kubernetes. I set up 
 
 I then containerised the application using Docker and set up a GitHub Actions pipeline that automatically builds and pushes the image on every push to `main`.
 
-<a href="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml/badge.svg" alt="CI Week 1" style="display:inline;vertical-align:middle;" /></a>
+[![CI Week 1](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml)

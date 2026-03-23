@@ -1,7 +1,10 @@
-
+# Could contain sensitive information, so we ignore it
 *.pdf
 *.docx
 /.claude
 
 # Hugo build output
 /public/
+
+# Hugo build lock file
+.hugo_build.lock
