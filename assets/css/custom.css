@@ -1,7 +1,12 @@
-/* Afbeeldingen beperken in breedte zodat ze niet te groot worden */
-article img {
+/* Afbeeldingen beperken zodat ze niet te groot worden */
+/* .content is de directe wrapper van de markdown output in Hextra */
+.content img,
+.content figure img {
   max-width: min(720px, 100%);
+  max-height: 500px;
+  width: auto;
   height: auto;
+  display: block;
 }
 
 /* Language/theme controls live in the navbar — hide sidebar and footer duplicates */
