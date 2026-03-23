@@ -3,8 +3,8 @@ title: "Opdracht"
 weight: 1
 ---
 
-<a href="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week3.yml" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week3.yml/badge.svg" alt="CI Week 3 - Blue-Green Deploy" style="display:inline;vertical-align:middle;" /></a>
-<a href="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml/badge.svg" alt="Week 3 - Switch Blue-Green Slot" style="display:inline;vertical-align:middle;" /></a>
+[![CI Week 3 - Blue-Green Deploy](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week3.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week3.yml)
+[![Week 3 - Switch Blue-Green Slot](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml)
 
 ## 3.1 Blue-Green Deployment & Artifact Registry
 
@@ -16,7 +16,7 @@ Om de Docker-images op te slaan, gebruiken we nu de Google Artifact Registry - e
 
 Er wordt een pipeline aangemaakt zodat wanneer de code verandert, het Docker-image wordt gebouwd en het image gestart wordt in een pod op het Kubernetes-cluster in Google.
 
-![](../media/opdracht/image-001.avif)
+![Schema van de Blue-Green deployment met Artifact Registry en CI/CD-pipeline](/docs/week-3/media/opdracht/image-001.avif)
 
 Voer de volgende stappen uit:
 

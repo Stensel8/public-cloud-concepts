@@ -1,0 +1,28 @@
+{{- $alt := .PlainText -}}
+{{- $dest := .Destination -}}
+{{- $url := urls.Parse $dest -}}
+{{- $isLocal := and (not $url.Scheme) (not $url.Host) -}}
+{{- $widthAttr := "" -}}
+
+{{- if and $dest $isLocal (hasPrefix $dest "/") -}}
+  {{- $resourcePath := strings.TrimPrefix "/" $url.Path -}}
+  {{- with resources.Get $resourcePath -}}
+    {{- $dest = .RelPermalink -}}
+    {{- if gt .Width 600 -}}
+      {{- $widthAttr = `width="600"` -}}
+    {{- end -}}
+  {{- else -}}
+    {{- $dest = relURL (strings.TrimPrefix "/" $dest) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- .Page.Store.Set "hasImageZoom" true -}}
+
+{{- with .Title -}}
+  <figure>
+    <img src="{{ $dest | safeURL }}" title="{{ . }}" alt="{{ $alt }}" {{ $widthAttr | safeHTMLAttr }} data-zoomable loading="lazy" />
+    <figcaption>{{ . }}</figcaption>
+  </figure>
+{{- else -}}
+  <img src="{{ $dest | safeURL }}" alt="{{ $alt }}" {{ $widthAttr | safeHTMLAttr }} data-zoomable loading="lazy" />
+{{- end -}}

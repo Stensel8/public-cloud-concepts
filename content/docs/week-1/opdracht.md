@@ -3,7 +3,7 @@ title: "Opdracht"
 weight: 1
 ---
 
-<a href="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml/badge.svg" alt="CI Week 1" style="display:inline;vertical-align:middle;" /></a>
+[![CI Week 1](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml)
 
 ## 1.1 Google Cloud & Google Kubernetes Engine (GKE)
 
@@ -20,7 +20,7 @@ Nu je de basiskennis van Google Cloud hebt, duiken we in Google Kubernetes Engin
 
 Voeg de Proof of Completion (Course Badge) toe aan je portfolio.
 
-![](../media/opdracht/image-001.avif)
+![Course Badge: Getting Started with Google Kubernetes Engine](/docs/week-1/media/opdracht/image-001.avif)
 
 ## 1.2 Kubernetes
 
@@ -34,7 +34,7 @@ Je mag hiervoor uiteraard allerlei bronnen gebruiken, zoals ChatGPT of handleidi
 
 1. Maak drie Ubuntu 24.04 LTS minimal-instances aan in Google (kies type e2-standard-2 als node) en kies Ubuntu 24.04 LTS minimal als besturingssysteem. Om te zien dat een virtueel netwerk in Google meerdere regio's direct verbindt, kun je de master in Nederland plaatsen, een node in Brussel en een node in Londen.
 
-![](../media/opdracht/image-002.avif)
+![VM-instances aanmaken in GCP: master in amsterdam, workers in brussel en londen](/docs/week-1/media/opdracht/image-002.avif)
 
 Installeer een Kubernetes master en 2 Kubernetes workernodes.
 
@@ -72,7 +72,7 @@ Controleer dit op de master met:
 kubectl get nodes
 ```
 
-![](../media/opdracht/image-003.avif)
+![kubectl get nodes: drie nodes in Ready-status](/docs/week-1/media/opdracht/image-003.avif)
 
 Gebruik het volgende commando om te controleren welke pods draaien in de namespace `kube-system`. Het ziet er ongeveer zo uit:
 
@@ -80,11 +80,11 @@ Gebruik het volgende commando om te controleren welke pods draaien in de namespa
 kubectl get pods -n kube-system
 ```
 
-![](../media/opdracht/image-004.avif)
+![kubectl get pods -n kube-system: overzicht van systeempods](/docs/week-1/media/opdracht/image-004.avif)
 
 Leg deze pods uit aan de hand van de onderstaande figuur uit het boek "Production Kubernetes":
 
-![](../media/opdracht/image-005.avif)
+![Architectuurdiagram uit Production Kubernetes: Kubernetes-componentenmodel](/docs/week-1/media/opdracht/image-005.avif)
 
 2. We willen nu een gecontaineriseerde applicatie in dit cluster draaien.
 
@@ -96,7 +96,7 @@ We gebruiken GitHub om automatisch een image te maken als de code (`index.html`)
 
 Daarna kunnen we het image draaien in het Google Kubernetes-cluster. Dit is schematisch weergegeven hieronder:
 
-![](../media/opdracht/image-006.avif)
+![Schema van de CI/CD-flow: GitHub Actions bouwt het image en pusht naar DockerHub](/docs/week-1/media/opdracht/image-006.avif)
 
 Maak een repository aan in GitHub (bijv. "container"). Zorg dat git is geïnstalleerd op je pc en clone de GitHub-repository naar je eigen pc. Plaats de Dockerfile en het `index.html`-bestand daar.
 

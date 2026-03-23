@@ -23,11 +23,11 @@ Het bedrijf TerramEarth (zie de casebeschrijving) wil monitoring en observabilit
    kubectl get pods --namespace ingress-nginx
    ```
 
-   ![kubectl get pods --namespace ingress-nginx toont de ingress-nginx-controller als Running](../media/opdracht/image-001.avif)
+   ![kubectl get pods --namespace ingress-nginx toont de ingress-nginx-controller als Running](/docs/week-5/media/opdracht/image-001.avif)
 
 5. Maak een Ingress aan voor de Grafana-service (poort 443) in de `grafana`-namespace. Het begin van het `grafana-ingress.yaml`-bestand ziet er als volgt uit:
 
-   ![Begin van grafana-ingress.yaml met apiVersion, kind, metadata en host grafana.project.intern](../media/opdracht/image-002.avif)
+   ![Begin van grafana-ingress.yaml met apiVersion, kind, metadata en host grafana.project.intern](/docs/week-5/media/opdracht/image-002.avif)
 
 6. Zoek het IP-adres van de Ingress op. Pas het `hosts`-bestand op je pc aan zodat de naam `grafana.project.intern` verwijst naar het bijbehorende IP-adres.
 
@@ -35,7 +35,7 @@ Het bedrijf TerramEarth (zie de casebeschrijving) wil monitoring en observabilit
 
    Selecteer een databron, scroll naar beneden en klik op **Test** om te controleren of de verbinding werkt.
 
-   ![Grafana Data sources: Loki en Prometheus verbonden](../media/opdracht/image-003.avif)
+   ![Grafana Data sources: Loki en Prometheus verbonden](/docs/week-5/media/opdracht/image-003.avif)
 
 ### Monitoring instellen
 

@@ -3,8 +3,8 @@ title: "Uitwerking"
 weight: 2
 ---
 
-<a href="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week3.yml" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week3.yml/badge.svg" alt="CI Week 3 - Blue-Green Deploy" style="display:inline;vertical-align:middle;" /></a>
-<a href="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml/badge.svg" alt="Week 3 - Switch Blue-Green Slot" style="display:inline;vertical-align:middle;" /></a>
+[![CI Week 3 - Blue-Green Deploy](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week3.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week3.yml)
+[![Week 3 - Switch Blue-Green Slot](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml)
 
 In week 3 heb ik een Blue-Green deployment opgezet voor de applicatie uit week 1 en 2, met Google Artifact Registry als container registry in plaats van Docker Hub. Daarnaast heb ik een CI/CD pipeline ingericht met GitHub Actions.
 
@@ -62,9 +62,9 @@ gcloud container clusters get-credentials week3-cluster `
 {{< /tab >}}
 {{< /tabs >}}
 
-![gcloud connect cluster commando](../media/gcloud-connect-cluster.avif)
+![gcloud connect cluster commando](/docs/week-3/media/gcloud-connect-cluster.avif)
 
-![GKE cluster nodes actief](../media/gke-cluster-nodes.avif)
+![GKE cluster nodes actief](/docs/week-3/media/gke-cluster-nodes.avif)
 
 ---
 
@@ -72,18 +72,18 @@ gcloud container clusters get-credentials week3-cluster `
 
 Een Service Account voor GitHub Actions om met GCP te communiceren:
 
-![Het formulier voor het aanmaken van een service account](../media/service-account-form.avif)
+![Het formulier voor het aanmaken van een service account](/docs/week-3/media/service-account-form.avif)
 
-![Service account aanmaken](../media/service-account-create.avif)
+![Service account aanmaken](/docs/week-3/media/service-account-create.avif)
 
 Naam: **Github Pipeline Account**. Rollen:
 - Artifact Registry Reader
 - Artifact Registry Writer
 - Kubernetes Engine Developer
 
-![Rollen toegewezen aan het service account](../media/service-account-permissions.avif)
+![Rollen toegewezen aan het service account](/docs/week-3/media/service-account-permissions.avif)
 
-![Service account principals overzicht](../media/service-account-principals.avif)
+![Service account principals overzicht](/docs/week-3/media/service-account-principals.avif)
 
 ---
 
@@ -91,13 +91,13 @@ Naam: **Github Pipeline Account**. Rollen:
 
 Bij het aanmaken van de key verschijnt een foutmelding:
 
-![Foutmelding: service account key creation is disabled](../media/service-account-key-disabled.avif)
+![Foutmelding: service account key creation is disabled](/docs/week-3/media/service-account-key-disabled.avif)
 
 Een Organization Policy (`iam.disableServiceAccountKeyCreation`) blokkeert dit.
 
-![Organization Policy overzicht](../media/org-policy-overview.avif)
+![Organization Policy overzicht](/docs/week-3/media/org-policy-overview.avif)
 
-![Organization Policy geblokkeerd](../media/org-policy-blocked.avif)
+![Organization Policy geblokkeerd](/docs/week-3/media/org-policy-blocked.avif)
 
 Opgelost via Cloud Shell:
 
@@ -105,7 +105,7 @@ Opgelost via Cloud Shell:
 gcloud organizations list
 ```
 
-![Lijst van organizations](../media/org-list.avif)
+![Lijst van organizations](/docs/week-3/media/org-list.avif)
 
 ```bash
 gcloud organizations add-iam-policy-binding 774668784967 \
@@ -113,20 +113,20 @@ gcloud organizations add-iam-policy-binding 774668784967 \
   --role="roles/orgpolicy.policyAdmin"
 ```
 
-![IAM policy binding toevoegen](../media/org-policy-add-binding.avif)
+![IAM policy binding toevoegen](/docs/week-3/media/org-policy-add-binding.avif)
 
 ```bash
 gcloud resource-manager org-policies disable-enforce iam.disableServiceAccountKeyCreation \
   --project=project-5b8c5498-4fe2-42b9-bc3
 ```
 
-![Policy succesvol uitgeschakeld op projectniveau](../media/org-policy-disable-enforce.avif)
+![Policy succesvol uitgeschakeld op projectniveau](/docs/week-3/media/org-policy-disable-enforce.avif)
 
-![JSON key downloaden](../media/json-key-download.avif)
+![JSON key downloaden](/docs/week-3/media/json-key-download.avif)
 
-![JSON key opgeslagen](../media/json-key-saved.avif)
+![JSON key opgeslagen](/docs/week-3/media/json-key-saved.avif)
 
-![Service account keys overzicht](../media/service-account-keys.avif)
+![Service account keys overzicht](/docs/week-3/media/service-account-keys.avif)
 
 ---
 
@@ -134,7 +134,7 @@ gcloud resource-manager org-policies disable-enforce iam.disableServiceAccountKe
 
 De JSON key en projectgegevens als repository secrets via **Settings → Secrets and variables → Actions**:
 
-![GitHub Secrets volledig ingesteld (GCP_PROJECT_ID, GCP_SA_KEY, GKE_CLUSTER, GKE_ZONE)](../media/github-secrets-complete.avif)
+![GitHub Secrets volledig ingesteld (GCP_PROJECT_ID, GCP_SA_KEY, GKE_CLUSTER, GKE_ZONE)](/docs/week-3/media/github-secrets-complete.avif)
 
 ---
 
@@ -142,13 +142,13 @@ De JSON key en projectgegevens als repository secrets via **Settings → Secrets
 
 Artifact Registry repository aangemaakt: `public-cloud-concepts`, Docker-formaat, `europe-west4`. Container Scanning API ingeschakeld voor kwetsbaarheidsscans.
 
-![Artifact Registry aanmaken](../media/artifact-registry-create.avif)
+![Artifact Registry aanmaken](/docs/week-3/media/artifact-registry-create.avif)
 
-![Lege Artifact Registry na aanmaken](../media/artifact-registry-empty.avif)
+![Lege Artifact Registry na aanmaken](/docs/week-3/media/artifact-registry-empty.avif)
 
-![Container Scanning API ingeschakeld](../media/container-scanning-api.avif)
+![Container Scanning API ingeschakeld](/docs/week-3/media/container-scanning-api.avif)
 
-![Artifact Registry met het gepushte green image](../media/artifact-registry-result.avif)
+![Artifact Registry met het gepushte green image](/docs/week-3/media/artifact-registry-result.avif)
 
 ---
 
@@ -160,19 +160,19 @@ Er zijn twee identiteiten betrokken:
 
 **Compute Engine default service account** - wordt door de GKE-nodes gebruikt om images te pullen bij het starten van pods. Zonder `Artifact Registry Reader` op dit account krijg je een `ImagePullBackOff` fout, ook als het pipeline account wel de juiste rechten heeft.
 
-![IAM-rechten van het GitHub pipeline service account](../media/iam-pipeline-account.avif)
+![IAM-rechten van het GitHub pipeline service account](/docs/week-3/media/iam-pipeline-account.avif)
 
-![IAM-rechten van het Compute Engine default service account](../media/iam-gke-node-account.avif)
+![IAM-rechten van het Compute Engine default service account](/docs/week-3/media/iam-gke-node-account.avif)
 
 ---
 
 ## Resultaat
 
-![GitHub Actions workflow: Build, push & deploy geslaagd](../media/github-actions-run.avif)
+![GitHub Actions workflow: Build, push & deploy geslaagd](/docs/week-3/media/github-actions-run.avif)
 
-![Website draaiend in het cluster](../media/website-draaiend.avif)
+![Website draaiend in het cluster](/docs/week-3/media/website-draaiend.avif)
 
-![GKE observability overzicht](../media/gke-observability.avif)
+![GKE observability overzicht](/docs/week-3/media/gke-observability.avif)
 
 ### Beide deployments parallel testen
 
@@ -207,7 +207,7 @@ kubectl get service public-cloud-concepts \
 
 Voor wie niet via de commandline wil switchen, is er de `switch-slot` workflow: een handmatige workflow (`workflow_dispatch`) die je vanuit de GitHub Actions UI kunt starten. Je kiest `blue` of `green`, en de pipeline doet de rest.
 
-![Blue-Green slot switch via GitHub Actions workflow UI](../media/blue-green-switch-workflow.avif)
+![Blue-Green slot switch via GitHub Actions workflow UI](/docs/week-3/media/blue-green-switch-workflow.avif)
 
 De workflow toont na de switch de actieve slot en de draaiende pods:
 
@@ -220,13 +220,13 @@ deployment-green-7fbf59cf77-q2nxj   1/1     Running   0          7m32s
 
 Je hebt dus zowel een commandline-optie als een kleine GUI; beide leiden tot hetzelfde resultaat.
 
-![De website met actieve blue slot - blauwe balk bovenaan](../media/website-slot-blue.avif)
+![De website met actieve blue slot - blauwe balk bovenaan](/docs/week-3/media/website-slot-blue.avif)
 
-![De website met actieve green slot - groene balk bovenaan](../media/website-slot-green.avif)
+![De website met actieve green slot - groene balk bovenaan](/docs/week-3/media/website-slot-green.avif)
 
-![Service handmatig aangemaakt na switch](../media/service-handmatig-aangemaakt.avif)
+![Service handmatig aangemaakt na switch](/docs/week-3/media/service-handmatig-aangemaakt.avif)
 
-![Overzicht van de draaiende pods met slot-labels](../media/gke-pods-overzicht.avif)
+![Overzicht van de draaiende pods met slot-labels](/docs/week-3/media/gke-pods-overzicht.avif)
 
 ---
 
@@ -303,7 +303,7 @@ kubectl get pods -l app=public-cloud-concepts --show-labels
 
 Dit is ook zichtbaar in de Google Cloud Console. In de Cloud Shell terminal zijn de `kubectl patch`-opdrachten en het IP-adres te zien:
 
-![GKE cluster details en kubectl-commando's in Cloud Shell](../media/gke-cloudshell-kubectl.avif)
+![GKE cluster details en kubectl-commando's in Cloud Shell](/docs/week-3/media/gke-cloudshell-kubectl.avif)
 
 ---
 
