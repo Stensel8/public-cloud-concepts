@@ -9,8 +9,8 @@ weight: 1
 
 Deze week verdiep je je kennis van GKE en analyseer je DORA.
 
-- Voltooi Kubernetes Engine: Qwik Start (GSP100, 1 credit): <https://www.cloudskillsboost.google/focuses/878?parent=catalog> en lever bewijs aan door verbinding te maken met de container via `kubectl exec` en de laatste 15 regels van het webserver-logbestand te tonen.
-- Voltooi het lab "Managing Deployments Using Kubernetes Engine" (5 credits) van de cursus "Set Up and Configure a Cloud Environment in Google Cloud". Deze cursus is te vinden op: <https://www.cloudskillsboost.google/paths/11/course_templates/625>
+- Voltooi Kubernetes Engine: Qwik Start (GSP100, 1 credit) via [Google Skills](https://www.cloudskillsboost.google/focuses/878?parent=catalog) en lever bewijs aan door verbinding te maken met de container via `kubectl exec` en de laatste 15 regels van het webserver-logbestand te tonen.
+- Voltooi het lab "Managing Deployments Using Kubernetes Engine" (5 credits) van de cursus "Set Up and Configure a Cloud Environment in Google Cloud" via [Google Skills](https://www.cloudskillsboost.google/paths/11/course_templates/625).
   Lever bewijs via screenshots.
 - Analyseer hoe alle technische DORA-capabilities kunnen leiden tot betere Organizational Performance (processen) en Well-being (mensen).
 

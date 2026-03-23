@@ -44,7 +44,7 @@ enableGitInfo = true
       type = 'theme-toggle'
 
 [params]
-  description = 'Uitwerkingen en documentatie voor de cursus Public Cloud Concepts — GKE, monitoring, CI/CD en meer.'
+  description = 'Uitwerkingen en documentatie voor de module Public Cloud Concepts — GKE, monitoring, CI/CD en meer.'
 
   [params.navbar]
     displayTitle = true

@@ -20,10 +20,24 @@ wait_for_pods() {
   local appear_timeout="$3"
   local ready_timeout="$4"
   local waited=0
+  local pods_output
+  local pods_status
 
   echo "      Wachten tot pods bestaan voor selector: ${selector}"
   while true; do
-    if kubectl -n "${namespace}" get pods -l "${selector}" --no-headers 2>/dev/null | grep -q .; then
+    set +e
+    pods_output="$(kubectl -n "${namespace}" get pods -l "${selector}" --no-headers 2>&1)"
+    pods_status=$?
+    set -e
+
+    if [ "${pods_status}" -ne 0 ]; then
+      echo "FOUT: Kon pods niet ophalen in namespace '${namespace}' met selector '${selector}'."
+      echo "Kubectl foutmelding:"
+      echo "${pods_output}"
+      exit 1
+    fi
+
+    if echo "${pods_output}" | grep -q .; then
       break
     fi
 

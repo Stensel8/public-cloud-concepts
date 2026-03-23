@@ -16,6 +16,7 @@ permissions:
   contents: read
 
 env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
   GKE_ZONE: ${{ secrets.GKE_ZONE }}
 
@@ -30,13 +31,34 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      - name: Check Week 3 cluster availability
+        id: cluster_check
+        run: |
+          if gcloud container clusters describe "${{ env.GKE_CLUSTER }}" \
+            --location "${{ env.GKE_ZONE }}" \
+            --project "${{ env.PROJECT_ID }}" >/dev/null 2>&1; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            echo "Week 3 cluster gevonden; slot-switch wordt uitgevoerd." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Week 3 omgeving mogelijk niet beschikbaar. Dit kan normaal zijn (studentquota, 1 cluster tegelijk), of tijdelijk door GKE/Google Cloud/GitHub API bereikbaarheid."
+            {
+              echo "### Week 3 slot-switch overgeslagen"
+              echo "Week 3 omgeving mogelijk niet beschikbaar."
+              echo "Dit kan normaal zijn door studentquota (vaak maar 1 cluster tegelijk), of tijdelijk door GKE/Google Cloud/GitHub API bereikbaarheid."
+              echo "De workflow is daarom bewust overgeslagen in plaats van hard gefaald."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Get GKE credentials
+        if: steps.cluster_check.outputs.available == 'true'
         uses: google-github-actions/get-gke-credentials@v3
         with:
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GKE_ZONE }}
 
       - name: Switch service naar ${{ inputs.slot }}
+        if: steps.cluster_check.outputs.available == 'true'
         run: |
           kubectl apply -f - <<EOF
           apiVersion: v1
@@ -55,6 +77,7 @@ jobs:
           EOF
 
       - name: Controleer actieve slot
+        if: steps.cluster_check.outputs.available == 'true'
         run: |
           kubectl get service public-cloud-concepts \
             -o jsonpath='Actieve slot: {.spec.selector.slot}{"\n"}'
