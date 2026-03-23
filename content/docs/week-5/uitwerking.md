@@ -296,6 +296,8 @@ Dashboard geïmporteerd via **Dashboards > Import** met ID `20960`, Prometheus a
 
 ![Kubernetes application insights dashboard actief, cluster CPU 70%, RAM 63%](/docs/week-5/media/dashboard-resultaat.avif)
 
+{{< video src="/docs/week-5/media/monitoring-demo-week5.webm" >}}
+
 ---
 
 ## Stap 8: Week 1 en 2 applicatie deployen
