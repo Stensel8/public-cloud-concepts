@@ -3,7 +3,7 @@
 # Jobs:
 #   pr-title        - Controleert of de PR-titel voldoet aan Conventional Commits
 #                     (feat, fix, docs, chore, refactor, style, revert, ci).
-#   image-format    - Weigert PNG/JPG-afbeeldingen in de docs-map en plaatst
+#   image-format    - Weigert PNG/JPG-afbeeldingen in static/docs/ en plaatst
 #                     een PR-comment met conversieinstructies als ze worden gevonden.
 #   dockerfile-lint - Lint de Dockerfile met hadolint.
 name: PR Checks
