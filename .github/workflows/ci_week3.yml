@@ -50,9 +50,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Haal de broncode op uit de repository.
       - name: Checkout
         uses: actions/checkout@v6
 
+      # Bepaal op basis van de branch welke slot gebruikt wordt:
+      #   main        -> blue  (productie)
+      #   development -> green (test)
       - name: Determine deployment slot
         id: slot
         run: |
@@ -62,6 +66,7 @@ jobs:
             echo "slot=green" >> $GITHUB_OUTPUT
           fi
 
+      # Authenticeer bij Google Cloud met het service account.
       - name: Authenticate with GCP
         uses: google-github-actions/auth@v3
         with:
@@ -98,12 +103,14 @@ jobs:
               run_id: context.runId
             })
 
+      # Configureer Docker zodat het kan pushen naar Google Artifact Registry.
       - name: Configure Docker for Artifact Registry
         if: steps.cluster_check.outputs.available == 'true'
         run: |
           gcloud auth print-access-token | docker login -u oauth2accesstoken \
             --password-stdin https://${{ env.GAR_ZONE }}-docker.pkg.dev
 
+      # Haal de kubectl-configuratie op zodat we commando's naar het cluster kunnen sturen.
       - name: Get GKE credentials
         if: steps.cluster_check.outputs.available == 'true'
         uses: google-github-actions/get-gke-credentials@v3
@@ -111,6 +118,7 @@ jobs:
           cluster_name: ${{ env.GKE_CLUSTER }}
           location: ${{ env.GKE_ZONE }}
 
+      # Bouw het Docker image met de juiste slot-tag (blue of green).
       - name: Build Docker image
         if: steps.cluster_check.outputs.available == 'true'
         run: |
@@ -119,6 +127,7 @@ jobs:
             --tag "${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${SLOT}" \
             "./static/docs/week-1/bestanden/"
 
+      # Push het gebouwde image naar Artifact Registry, zodat GKE het kan ophalen.
       - name: Push to Artifact Registry
         if: steps.cluster_check.outputs.available == 'true'
         run: |

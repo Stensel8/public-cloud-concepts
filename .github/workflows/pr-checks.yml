@@ -3,7 +3,7 @@
 # Jobs:
 #   pr-title        - Controleert of de PR-titel voldoet aan Conventional Commits
 #                     (feat, fix, docs, chore, refactor, style, revert, ci).
-#   image-format    - Weigert PNG/JPG-afbeeldingen in Uitwerking-mappen en plaatst
+#   image-format    - Weigert PNG/JPG-afbeeldingen in de docs-map en plaatst
 #                     een PR-comment met conversieinstructies als ze worden gevonden.
 #   dockerfile-lint - Lint de Dockerfile met hadolint.
 name: PR Checks
@@ -23,6 +23,9 @@ jobs:
       statuses: write
       pull-requests: read
     steps:
+      # Controleer of de PR-titel het Conventional Commits-formaat volgt.
+      # Toegestane types: feat, fix, docs, chore, refactor, style, revert, ci.
+      # Een PR die begint met "WIP" wordt ook goedgekeurd (wip: true).
       - uses: amannn/action-semantic-pull-request@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -45,8 +48,11 @@ jobs:
       contents: read
       pull-requests: write
     steps:
+      # Haal de broncode op zodat we de bestanden kunnen controleren.
       - uses: actions/checkout@v6
 
+      # Zoek alle PNG/JPG/JPEG-bestanden in de docs-map.
+      # Sla het resultaat op als step-output: een lijst van bestanden en een boolean (found).
       - name: Find non-AVIF images
         id: check
         run: |
@@ -66,6 +72,8 @@ jobs:
             echo "All images are AVIF."
           fi
 
+      # Als er niet-AVIF afbeeldingen gevonden zijn: plaats een PR-comment
+      # met de lijst van bestanden en instructies om ze te converteren naar AVIF.
       - name: Post PR comment
         if: steps.check.outputs.found == 'true'
         uses: actions/github-script@v8
@@ -102,6 +110,8 @@ jobs:
               body,
             });
 
+      # Markeer elk gevonden bestand als fout in GitHub (annotatie) en laat de check falen.
+      # Zo ziet de ontwikkelaar direct in de PR welke bestanden het probleem veroorzaken.
       - name: Annotate and fail
         if: steps.check.outputs.found == 'true'
         env:
@@ -116,10 +126,15 @@ jobs:
     name: Dockerfile lint
     runs-on: ubuntu-latest
     steps:
+      # Haal de broncode op.
       - uses: actions/checkout@v6
+
+      # Download en installeer hadolint (Dockerfile linter).
       - name: Install hadolint
         run: |
           wget -qO /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
           chmod +x /usr/local/bin/hadolint
+
+      # Voer de lint-controle uit op de Dockerfile.
       - name: Lint Dockerfile
         run: hadolint "static/docs/week-1/bestanden/Dockerfile"

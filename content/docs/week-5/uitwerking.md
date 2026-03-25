@@ -17,7 +17,7 @@ Het script vanuit school bevatte een aantal foutjes en verouderde onderdelen. Bi
 | losse `grafana/grafana` release | gebundeld in `kube-prometheus-stack` | standalone chart is deprecated |
 | `storageClass: managed-csi` | `standard-rwo` | Azure-specifiek, werkt niet op GKE |
 
-Het originele script staat in [`Week 5/Opdracht/Bestanden/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/Week%205/Opdracht/Bestanden), mijn versie in [`Week 5/Uitwerking/Bestanden/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/Week%205/Uitwerking/Bestanden).
+Het originele script staat in [`static/docs/week-5/bestanden/opdracht/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/static/docs/week-5/bestanden/opdracht), mijn versie in [`static/docs/week-5/bestanden/uitwerking/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/static/docs/week-5/bestanden/uitwerking).
 {{< /callout >}}
 
 **Gebruikte charts:**
@@ -129,6 +129,8 @@ gcloud components install gke-gcloud-auth-plugin
 {{< video src="/docs/week-5/media/Cluster-create-week5.webm" >}}
 
 ![Cluster aanmaken via gcloud CLI](/docs/week-5/media/cluster-aanmaken.avif)
+
+![Clusterdetails tijdens aanmaken in de GCP Console](/docs/week-5/media/cluster-aanmaken-details.avif)
 
 ![GKE cluster wordt aangemaakt in de GCP Console](/docs/week-5/media/cluster-provisioning.avif)
 
@@ -328,56 +330,44 @@ In Grafana zijn deze logs en metrics direct zichtbaar via de Loki- en Prometheus
 
 De monitoring stack bestaat uit vier lagen: **log-verzameling** (Alloy), **log-opslag** (Loki), **metrics** (Prometheus + exporters) en **visualisatie** (Grafana). Ingress-nginx verzorgt de externe toegang.
 
-{{< tabs >}}
-{{< tab name="Mermaid" >}}
 ```mermaid
-flowchart TB
+flowchart LR
     browser(["Browser\ngrafana.stijhuis.nl"])
 
-    subgraph cluster["GKE Standard Cluster — europe-west4 (4× e2-medium)"]
-        direction TB
-
-        subgraph ingress_ns["ingress-nginx"]
-            nginx["ingress-nginx\nLoadBalancer"]
-        end
-
-        subgraph app_ns["mywebsite"]
-            app["nginx static site\nstensel8/public-cloud-concepts"]
-        end
-
-        subgraph alloy_ns["alloy"]
-            alloy["Grafana Alloy\nDaemonSet — log collector"]
-        end
-
-        subgraph loki_ns["loki"]
-            loki_gw["Loki Gateway\nnginx reverse proxy"]
-            loki_pod[("Loki SingleBinary\nfilesystem storage")]
-            loki_gw --> loki_pod
-        end
-
-        subgraph prom_ns["prometheus — kube-prometheus-stack"]
-            node_exp["node-exporter\nDaemonSet"]
-            ksm["kube-state-metrics"]
-            prom[("Prometheus\nTSDB")]
-            grafana["Grafana"]
-            node_exp -->|"scrape /metrics"| prom
-            ksm -->|"scrape /metrics"| prom
-        end
-
-        app -->|"stdout / stderr"| alloy
-        alloy -->|"HTTP push — Loki API"| loki_gw
-        prom -->|"PromQL query"| grafana
-        loki_pod -->|"LogQL query"| grafana
-        nginx --> grafana
+    subgraph ingress_ns["ingress-nginx"]
+        nginx["ingress-nginx\nLoadBalancer"]
     end
 
-    browser -->|"HTTPS — Bunny DNS A-record"| nginx
+    subgraph app_ns["mywebsite"]
+        app["nginx static site\nstensel8/public-cloud-concepts"]
+    end
+
+    subgraph alloy_ns["alloy"]
+        alloy["Grafana Alloy\nDaemonSet"]
+    end
+
+    subgraph loki_ns["loki"]
+        loki_gw["Loki Gateway"]
+        loki_pod[("Loki SingleBinary\nfilesystem storage")]
+        loki_gw --> loki_pod
+    end
+
+    subgraph prom_ns["prometheus — kube-prometheus-stack"]
+        node_exp["node-exporter\nDaemonSet"]
+        ksm["kube-state-metrics"]
+        prom[("Prometheus TSDB")]
+        grafana["Grafana"]
+        node_exp -->|"scrape /metrics"| prom
+        ksm -->|"scrape /metrics"| prom
+    end
+
+    browser -->|"HTTPS — Bunny DNS"| nginx
+    nginx --> grafana
+    app -->|"stdout/stderr"| alloy
+    alloy -->|"HTTP push"| loki_gw
+    prom -->|"PromQL"| grafana
+    loki_pod -->|"LogQL"| grafana
 ```
-{{< /tab >}}
-{{< tab name="ArchiMate" >}}
-<!-- ArchiMate exportafbeelding hier plaatsen -->
-{{< /tab >}}
-{{< /tabs >}}
 
 | Component | Namespace | Rol |
 |-----------|-----------|-----|

@@ -24,24 +24,35 @@ jobs:
     name: Dockerfile lint
     runs-on: ubuntu-latest
     steps:
+      # Haal de broncode op uit de repository.
       - uses: actions/checkout@v6
+
+      # Download hadolint (een Dockerfile linter) en maak het uitvoerbaar.
       - name: Install hadolint
         run: |
           wget -qO /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
           chmod +x /usr/local/bin/hadolint
+
+      # Voer de lint-controle uit op de Dockerfile.
+      # Als er fouten zijn, stopt de pipeline hier zodat build nooit start.
       - name: Lint Dockerfile
         run: hadolint "static/docs/week-1/bestanden/Dockerfile"
 
   build:
     name: Build & scan
     runs-on: ubuntu-latest
+    # Dit job start pas als het lint-job succesvol is afgerond.
     needs: lint
     steps:
+      # Haal de broncode op.
       - uses: actions/checkout@v6
 
+      # Bouw het Docker image op basis van de Dockerfile in week-1.
       - name: Build Docker image
         run: docker build -t stensel8/public-cloud-concepts:latest "./static/docs/week-1/bestanden/"
 
+      # Scan het gebouwde image op beveiligingsproblemen met Trivy.
+      # Bij CRITICAL kwetsbaarheden faalt de pipeline (exit-code: 1).
       - name: Scan image with Trivy
         uses: aquasecurity/trivy-action@0.35.0
         with:
@@ -50,6 +61,8 @@ jobs:
           exit-code: "1"
           severity: CRITICAL
 
+      # Log in bij Docker Hub. Dit gebeurt alleen bij een push naar main,
+      # zodat pull requests het image nooit automatisch publiceren.
       - name: Login to Docker Hub
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: docker/login-action@v4
@@ -57,6 +70,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PAT }}
 
+      # Push het image naar Docker Hub. Zelfde voorwaarde als de login hierboven.
       - name: Push to Docker Hub
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: docker push stensel8/public-cloud-concepts:latest
