@@ -48,22 +48,20 @@ jobs:
           cache: true
           cache-dependency-path: go.sum
 
-      # Bouw de site met localhost als baseURL zodat interne links werken.
-      # Minificatie staat aan voor een schone output.
-      - name: Build Hugo site
+      # Start de Hugo-server op poort 1313. Hugo's eigen server handelt routing
+      # en index.html-doorverwijzing correct af — python http.server doet dat niet.
+      - name: Start Hugo server
         env:
-          HUGO_ENVIRONMENT: production
           TZ: Europe/Amsterdam
-        run: hugo --gc --minify --baseURL "http://localhost:1313/"
+        run: hugo server --port 1313 --bind 0.0.0.0 --baseURL "http://localhost:1313/" &
 
-      # Start een lokale webserver op poort 1313 zodat Chrome de pagina's kan laden.
-      # Het ampersand (&) zorgt dat de server op de achtergrond blijft draaien.
-      - name: Start lokale webserver
-        run: python3 -m http.server 1313 --directory public &
-
-      # Geef de webserver even tijd om op te starten voordat Chrome verbinding maakt.
-      - name: Wacht op webserver
-        run: sleep 3
+      # Wacht tot de Hugo-server daadwerkelijk reageert (max 30 seconden).
+      - name: Wacht op Hugo server
+        run: |
+          for i in $(seq 1 30); do
+            curl -s -o /dev/null -w "%{http_code}" http://localhost:1313/nl/ | grep -q "200" && break
+            sleep 1
+          done
 
       # Installeer pdfunite (onderdeel van poppler-utils) voor het samenvoegen van PDFs.
       - name: Install pdfunite
@@ -84,10 +82,10 @@ jobs:
 
             for pagina in "" opdracht uitwerking bestanden; do
               if [ -z "$pagina" ]; then
-                url="http://localhost:1313/docs/week-${week}/"
+                url="http://localhost:1313/nl/docs/week-${week}/"
                 bestand="pdfs/w${week}-00-index.pdf"
               else
-                url="http://localhost:1313/docs/week-${week}/${pagina}/"
+                url="http://localhost:1313/nl/docs/week-${week}/${pagina}/"
                 bestand="pdfs/w${week}-${pagina}.pdf"
               fi
 
