@@ -17,7 +17,7 @@ Het script vanuit school bevatte een aantal foutjes en verouderde onderdelen. Bi
 | losse `grafana/grafana` release | gebundeld in `kube-prometheus-stack` | standalone chart is deprecated |
 | `storageClass: managed-csi` | `standard-rwo` | Azure-specifiek, werkt niet op GKE |
 
-Het originele script staat in [`Week 5/Opdracht/Bestanden/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/Week%205/Opdracht/Bestanden), mijn versie in [`Week 5/Uitwerking/Bestanden/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/Week%205/Uitwerking/Bestanden).
+Het originele script staat in [`static/docs/week-5/bestanden/opdracht/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/static/docs/week-5/bestanden/opdracht), mijn versie in [`static/docs/week-5/bestanden/uitwerking/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/static/docs/week-5/bestanden/uitwerking).
 {{< /callout >}}
 
 **Gebruikte charts:**
@@ -129,6 +129,8 @@ gcloud components install gke-gcloud-auth-plugin
 {{< video src="/docs/week-5/media/Cluster-create-week5.webm" >}}
 
 ![Cluster aanmaken via gcloud CLI](/docs/week-5/media/cluster-aanmaken.avif)
+
+![Clusterdetails tijdens aanmaken in de GCP Console](/docs/week-5/media/cluster-aanmaken-details.avif)
 
 ![GKE cluster wordt aangemaakt in de GCP Console](/docs/week-5/media/cluster-provisioning.avif)
 
@@ -326,7 +328,57 @@ In Grafana zijn deze logs en metrics direct zichtbaar via de Loki- en Prometheus
 
 ## Stap 9: Architectuurdiagram
 
-<!-- ArchiMate diagram volgt -->
+De monitoring stack bestaat uit vier lagen: **log-verzameling** (Alloy), **log-opslag** (Loki), **metrics** (Prometheus + exporters) en **visualisatie** (Grafana). Ingress-nginx verzorgt de externe toegang.
+
+```mermaid
+flowchart LR
+    browser(["Browser\ngrafana.stijhuis.nl"])
+
+    subgraph ingress_ns["ingress-nginx"]
+        nginx["ingress-nginx\nLoadBalancer"]
+    end
+
+    subgraph app_ns["mywebsite"]
+        app["nginx static site\nstensel8/public-cloud-concepts"]
+    end
+
+    subgraph alloy_ns["alloy"]
+        alloy["Grafana Alloy\nDaemonSet"]
+    end
+
+    subgraph loki_ns["loki"]
+        loki_gw["Loki Gateway"]
+        loki_pod[("Loki SingleBinary\nfilesystem storage")]
+        loki_gw --> loki_pod
+    end
+
+    subgraph prom_ns["prometheus — kube-prometheus-stack"]
+        node_exp["node-exporter\nDaemonSet"]
+        ksm["kube-state-metrics"]
+        prom[("Prometheus TSDB")]
+        grafana["Grafana"]
+        node_exp -->|"scrape /metrics"| prom
+        ksm -->|"scrape /metrics"| prom
+    end
+
+    browser -->|"HTTPS — Bunny DNS"| nginx
+    nginx --> grafana
+    app -->|"stdout/stderr"| alloy
+    alloy -->|"HTTP push"| loki_gw
+    prom -->|"PromQL"| grafana
+    loki_pod -->|"LogQL"| grafana
+```
+
+| Component | Namespace | Rol |
+|-----------|-----------|-----|
+| **ingress-nginx** | `ingress-nginx` | Externe toegang; exposeert Grafana via HTTP Ingress |
+| **Grafana Alloy** | `alloy` | DaemonSet; leest pod-logs via `loki.source.kubernetes` en stuurt ze naar Loki |
+| **Loki Gateway** | `loki` | nginx reverse proxy voor de Loki API |
+| **Loki SingleBinary** | `loki` | Log-aggregatie; slaat logs op als chunks op filesystem |
+| **node-exporter** | `prometheus` | DaemonSet; exporteert host-level metrics (CPU, RAM, disk, netwerk) |
+| **kube-state-metrics** | `prometheus` | Exporteert Kubernetes object-status (pods, deployments, replicas) |
+| **Prometheus** | `prometheus` | Scrapet metrics van node-exporter en kube-state-metrics; slaat op als TSDB |
+| **Grafana** | `prometheus` | Visualiseert metrics (PromQL) en logs (LogQL) via datasources |
 
 ---
 

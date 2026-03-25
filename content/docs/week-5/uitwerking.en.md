@@ -17,7 +17,7 @@ The script from school contained some mistakes and outdated components. When run
 | standalone `grafana/grafana` release | bundled in `kube-prometheus-stack` | standalone chart is deprecated |
 | `storageClass: managed-csi` | `standard-rwo` | Azure-specific, does not work on GKE |
 
-The original script is in [`Week 5/Opdracht/Bestanden/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/Week%205/Opdracht/Bestanden), my version in [`Week 5/Uitwerking/Bestanden/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/Week%205/Uitwerking/Bestanden).
+The original script is in [`static/docs/week-5/bestanden/opdracht/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/static/docs/week-5/bestanden/opdracht), my version in [`static/docs/week-5/bestanden/uitwerking/`](https://github.com/Stensel8/public-cloud-concepts/tree/main/static/docs/week-5/bestanden/uitwerking).
 {{< /callout >}}
 
 **Charts used:**
@@ -129,6 +129,8 @@ gcloud components install gke-gcloud-auth-plugin
 {{< video src="/docs/week-5/media/Cluster-create-week5.webm" >}}
 
 ![Creating the cluster via gcloud CLI](/docs/week-5/media/cluster-aanmaken.avif)
+
+![Cluster details during creation in the GCP Console](/docs/week-5/media/cluster-aanmaken-details.avif)
 
 ![GKE cluster being created in the GCP Console](/docs/week-5/media/cluster-provisioning.avif)
 
@@ -326,7 +328,46 @@ In Grafana these logs and metrics are directly visible via the Loki and Promethe
 
 ## Step 9: Architecture diagram
 
-<!-- Architecture diagram to follow -->
+The monitoring stack consists of four layers: **log collection** (Alloy), **log storage** (Loki), **metrics** (Prometheus + exporters) and **visualisation** (Grafana). Ingress-nginx handles external access.
+
+```mermaid
+flowchart LR
+    browser(["Browser\ngrafana.stijhuis.nl"])
+
+    subgraph ingress_ns["ingress-nginx"]
+        nginx["ingress-nginx\nLoadBalancer"]
+    end
+
+    subgraph app_ns["mywebsite"]
+        app["nginx static site\nstensel8/public-cloud-concepts"]
+    end
+
+    subgraph alloy_ns["alloy"]
+        alloy["Grafana Alloy\nDaemonSet"]
+    end
+
+    subgraph loki_ns["loki"]
+        loki_gw["Loki Gateway"]
+        loki_pod[("Loki SingleBinary\nfilesystem storage")]
+        loki_gw --> loki_pod
+    end
+
+    subgraph prom_ns["prometheus — kube-prometheus-stack"]
+        node_exp["node-exporter\nDaemonSet"]
+        ksm["kube-state-metrics"]
+        prom[("Prometheus TSDB")]
+        grafana["Grafana"]
+        node_exp -->|"scrape /metrics"| prom
+        ksm -->|"scrape /metrics"| prom
+    end
+
+    browser -->|"HTTPS — Bunny DNS"| nginx
+    nginx --> grafana
+    app -->|"stdout/stderr"| alloy
+    alloy -->|"HTTP push"| loki_gw
+    prom -->|"PromQL"| grafana
+    loki_pod -->|"LogQL"| grafana
+```
 
 ---
 

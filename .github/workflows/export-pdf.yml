@@ -1,0 +1,129 @@
+# PDF Export - Exporteer alle weken als PDF voor archivering (bijv. Saxion-richtlijnen).
+#
+# Per week worden de volgende pagina's gecombineerd tot één PDF-bestand:
+#   - Weekoverzicht  (/docs/week-N/)
+#   - Opdracht       (/docs/week-N/opdracht/)
+#   - Uitwerking     (/docs/week-N/uitwerking/)
+#   - Bestanden      (/docs/week-N/bestanden/)
+#
+# Pagina's die niet bestaan (bijv. een week zonder 'bestanden') worden automatisch
+# overgeslagen zodat de workflow nooit faalt door missende content.
+#
+# Resultaat: 7 PDF-bestanden, beschikbaar als workflow artifact (30 dagen).
+# Starten via: GitHub Actions > "Export naar PDF" > Run workflow
+name: Export naar PDF
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    name: Genereer PDF per week
+    runs-on: ubuntu-latest
+    env:
+      HUGO_VERSION: 0.158.0
+
+    steps:
+      # Haal de volledige git-geschiedenis op zodat Hugo datums correct weergeeft.
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # Installeer Hugo (zelfde versie als de live-site workflow).
+      - name: Install Hugo CLI
+        run: |
+          wget -O ${{ runner.temp }}/hugo.deb \
+            https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb
+          sudo dpkg -i ${{ runner.temp }}/hugo.deb
+
+      # Installeer Go voor Hugo-modules (thema Hextra).
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.26'
+          cache: true
+          cache-dependency-path: go.sum
+
+      # Bouw de site met localhost als baseURL zodat interne links werken.
+      # Minificatie staat aan voor een schone output.
+      - name: Build Hugo site
+        env:
+          HUGO_ENVIRONMENT: production
+          TZ: Europe/Amsterdam
+        run: hugo --gc --minify --baseURL "http://localhost:1313/"
+
+      # Start een lokale webserver op poort 1313 zodat Chrome de pagina's kan laden.
+      # Het ampersand (&) zorgt dat de server op de achtergrond blijft draaien.
+      - name: Start lokale webserver
+        run: python3 -m http.server 1313 --directory public &
+
+      # Geef de webserver even tijd om op te starten voordat Chrome verbinding maakt.
+      - name: Wacht op webserver
+        run: sleep 3
+
+      # Installeer pdfunite (onderdeel van poppler-utils) voor het samenvoegen van PDFs.
+      - name: Install pdfunite
+        run: sudo apt-get install -y --no-install-recommends poppler-utils
+
+      # Genereer per week een PDF door alle subpagina's samen te voegen:
+      #   1. Controleer per pagina of de URL bestaat (HTTP 200) — sla missende pagina's over.
+      #   2. Print elke pagina naar een tijdelijke PDF via Chrome headless.
+      #   3. Voeg alle losse PDFs samen tot één weekbestand met pdfunite.
+      #   4. Verwijder de tijdelijke bestanden.
+      - name: Genereer PDFs
+        run: |
+          mkdir -p pdfs
+
+          for week in 1 2 3 4 5 6 7; do
+            echo "=== Week ${week} ==="
+            paginas=()
+
+            for pagina in "" opdracht uitwerking bestanden; do
+              if [ -z "$pagina" ]; then
+                url="http://localhost:1313/docs/week-${week}/"
+                bestand="pdfs/w${week}-00-index.pdf"
+              else
+                url="http://localhost:1313/docs/week-${week}/${pagina}/"
+                bestand="pdfs/w${week}-${pagina}.pdf"
+              fi
+
+              # Controleer of de pagina bestaat voordat Chrome probeert te printen.
+              status=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+              if [ "$status" = "200" ]; then
+                google-chrome \
+                  --headless \
+                  --disable-gpu \
+                  --no-sandbox \
+                  --disable-dev-shm-usage \
+                  --print-to-pdf="$bestand" \
+                  --print-to-pdf-no-header \
+                  "$url" 2>/dev/null
+                paginas+=("$bestand")
+                echo "  OK:          $url"
+              else
+                echo "  Overgeslagen: $url (HTTP ${status})"
+              fi
+            done
+
+            # Voeg de losse pagina-PDFs samen tot één weekbestand.
+            if [ ${#paginas[@]} -gt 0 ]; then
+              pdfunite "${paginas[@]}" "pdfs/Week-${week}-Public-Cloud-Concepts.pdf"
+              rm -f "${paginas[@]}"
+              echo "  Aangemaakt:  Week-${week}-Public-Cloud-Concepts.pdf"
+            else
+              echo "  Geen paginas gevonden voor week ${week}, overgeslagen."
+            fi
+          done
+
+      # Upload alle week-PDFs als één artifact.
+      # Beschikbaar via: Actions > deze run > Artifacts > public-cloud-concepts-pdfs
+      - name: Upload PDFs als artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-cloud-concepts-pdfs
+          path: pdfs/Week-*.pdf
+          retention-days: 30

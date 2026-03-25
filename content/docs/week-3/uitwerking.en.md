@@ -134,6 +134,8 @@ gcloud resource-manager org-policies disable-enforce iam.disableServiceAccountKe
 
 The JSON key and project details as repository secrets via **Settings → Secrets and variables → Actions**:
 
+![GitHub Secrets partially configured](/docs/week-3/media/github-secrets-partial.avif)
+
 ![GitHub Secrets fully configured (GCP_PROJECT_ID, GCP_SA_KEY, GKE_CLUSTER, GKE_ZONE)](/docs/week-3/media/github-secrets-complete.avif)
 
 ---
@@ -169,6 +171,8 @@ Two identities are involved:
 ## Result
 
 ![GitHub Actions workflow: Build, push & deploy succeeded](/docs/week-3/media/github-actions-run.avif)
+
+![GitHub Actions workflow fully green](/docs/week-3/media/github-actions-green-build.avif)
 
 ![Website running in the cluster](/docs/week-3/media/website-draaiend.avif)
 

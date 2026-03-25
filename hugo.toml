@@ -1,6 +1,7 @@
 baseURL = 'https://public-cloud-concepts.stensel.nl/'
 title = 'Public Cloud Concepts'
 defaultContentLanguage = 'nl'
+defaultContentLanguageInSubdir = true
 enableRobotsTXT = true
 disableKinds = ['taxonomy', 'term']
 enableGitInfo = true
