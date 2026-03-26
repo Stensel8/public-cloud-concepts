@@ -1,9 +1,12 @@
-# PDF Export - Exporteer alleen de uitwerkingen als PDF voor inlevering.
+# PDF Export - Exporteer alleen de uitwerkingen als PDF.
 #
 # Haalt elke uitwerking op van de live site, zodat links in de PDF
 # verwijzen naar https://public-cloud-concepts.stensel.nl/ en niet naar localhost.
 #
-# Resultaat: 7 PDF-bestanden + één gebundeld artifact (30 dagen).
+# Gebruikt Puppeteer (puppeteer-core + Chrome) zodat de pagina
+# volledig geladen is voordat de PDF wordt aangemaakt (networkidle2).
+#
+# Resultaat: 7 PDF-bestanden + één gebundeld artifact.
 # Starten via: GitHub Actions > "Export naar PDF" > Run workflow
 
 name: Export naar PDF
@@ -23,33 +26,80 @@ jobs:
     strategy:
       matrix:
         week: [1, 2, 3, 4, 5, 6, 7]
+      # fail-fast: false zorgt ervoor dat als één week faalt, de rest gewoon doorgaat.
+      # Zonder dit zou een falende week alle andere weken cancelen.
+      fail-fast: false
 
     steps:
 
+      # Installeer puppeteer-core — dit downloadt geen extra Chromium,
+      # maar gebruikt de Chrome die al aanwezig is op de ubuntu-latest runner.
+      - name: Installeer Puppeteer
+        run: npm install puppeteer-core
+
+      # Schrijf het Puppeteer-script naar een tijdelijk bestand.
+      # Het script opent de pagina, wacht tot het netwerk stil is (networkidle2),
+      # en exporteert dan de volledige pagina als A4-PDF met achtergrondkleuren.
+      - name: Schrijf Puppeteer-script
+        run: |
+          cat > /tmp/pdf.js << 'EOF'
+          const puppeteer = require('puppeteer-core');
+
+          (async () => {
+            const browser = await puppeteer.launch({
+              // Gebruik de voorgeïnstalleerde Chrome op de runner.
+              executablePath: '/usr/bin/google-chrome',
+              args: ['--no-sandbox', '--disable-dev-shm-usage'],
+            });
+
+            const page = await browser.newPage();
+
+            // networkidle2: wacht tot er max. 2 netwerkverzoeken actief zijn
+            // gedurende 500ms — betrouwbaarder dan een vaste wachttijd.
+            await page.goto(process.env.PDF_URL, {
+              waitUntil: 'networkidle2',
+              timeout: 30000,
+            });
+
+            await page.pdf({
+              path: process.env.PDF_FILE,
+              format: 'A4',
+              // printBackground: true behoudt achtergrondkleuren en -afbeeldingen
+              // van het Hextra-thema in de PDF.
+              printBackground: true,
+            });
+
+            await browser.close();
+            console.log('Aangemaakt:', process.env.PDF_FILE);
+          })();
+          EOF
+
+      # Controleer eerst of de uitwerkingspagina bestaat (HTTP 200).
+      # Als de pagina er niet is (bijv. week nog niet uitgewerkt), sla dan over.
+      # Als de pagina wel bestaat, genereer de PDF via Puppeteer en
+      # controleer daarna of het bestand niet leeg is (Puppeteer kan stil falen).
       - name: Genereer PDF voor week ${{ matrix.week }}
+        env:
+          PDF_URL: "https://public-cloud-concepts.stensel.nl/nl/docs/week-${{ matrix.week }}/uitwerking/"
+          PDF_FILE: "pdfs/Week-${{ matrix.week }}-Uitwerking.pdf"
         run: |
           mkdir -p pdfs
-          week=${{ matrix.week }}
-          url="https://public-cloud-concepts.stensel.nl/nl/docs/week-${week}/uitwerking/"
-          file="pdfs/Week-${week}-Uitwerking.pdf"
 
-          status=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+          status=$(curl -s -o /dev/null -w "%{http_code}" "$PDF_URL")
 
-          if [ "$status" = "200" ]; then
-            google-chrome \
-              --headless \
-              --disable-gpu \
-              --no-sandbox \
-              --disable-dev-shm-usage \
-              --print-to-pdf="$file" \
-              --print-to-pdf-no-header \
-              "$url" 2>/dev/null
-
-            echo "Aangemaakt: $file"
-          else
-            echo "Geen uitwerking voor week ${week} (HTTP ${status}), overgeslagen."
+          if [ "$status" != "200" ]; then
+            echo "Geen uitwerking voor week ${{ matrix.week }} (HTTP ${status}), overgeslagen."
+            exit 0
           fi
 
+          node /tmp/pdf.js
+
+          if [ ! -s "$PDF_FILE" ]; then
+            echo "Fout: Puppeteer heeft geen geldig PDF-bestand aangemaakt."
+            exit 1
+          fi
+
+      # Sla de gegenereerde PDF op als artifact zodat hij downloadbaar is vanuit GitHub Actions.
       - name: Upload week PDF
         uses: actions/upload-artifact@v7
         with:
@@ -61,10 +111,13 @@ jobs:
   bundle:
     name: Bundel alle uitwerkingen
     runs-on: ubuntu-latest
+    # Wacht tot alle week-jobs klaar zijn voordat we gaan bundelen.
     needs: build-pdf
 
     steps:
 
+      # Download alle losse week-PDFs naar één map.
+      # merge-multiple: true zet alle bestanden plat in de opgegeven map (geen submappen per artifact).
       - name: Download alle week-PDFs
         uses: actions/download-artifact@v4
         with:
@@ -72,6 +125,7 @@ jobs:
           path: pdfs
           merge-multiple: true
 
+      # Upload alle PDFs samen als één artifact zodat je ze in één klik kunt downloaden.
       - name: Upload gebundeld artifact
         uses: actions/upload-artifact@v7
         with:
