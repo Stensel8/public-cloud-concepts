@@ -120,7 +120,7 @@ jobs:
       # Upload alle week-PDFs als één artifact.
       # Beschikbaar via: Actions > deze run > Artifacts > public-cloud-concepts-pdfs
       - name: Upload PDFs als artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: public-cloud-concepts-pdfs
           path: pdfs/Week-*.pdf
