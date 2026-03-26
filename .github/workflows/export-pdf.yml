@@ -32,12 +32,13 @@ jobs:
 
     steps:
 
-      # Installeer puppeteer-core — dit downloadt geen extra Chromium,
-      # maar gebruikt de Chrome die al aanwezig is op de ubuntu-latest runner.
+      # Installeer puppeteer-core in /tmp zodat het script (dat ook in /tmp staat)
+      # de module kan vinden. Node zoekt node_modules relatief aan het script.
+      # puppeteer-core downloadt geen extra Chromium — gebruikt de systeem-Chrome.
       - name: Installeer Puppeteer
-        run: npm install puppeteer-core
+        run: cd /tmp && npm install puppeteer-core
 
-      # Schrijf het Puppeteer-script naar een tijdelijk bestand.
+      # Schrijf het Puppeteer-script naar /tmp (zelfde map als node_modules).
       # Het script opent de pagina, wacht tot het netwerk stil is (networkidle2),
       # en exporteert dan de volledige pagina als A4-PDF met achtergrondkleuren.
       - name: Schrijf Puppeteer-script
