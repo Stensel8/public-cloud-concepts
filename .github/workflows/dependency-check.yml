@@ -1,0 +1,97 @@
+# Dependency Check - Controleert wekelijks op nieuwe versies van Hugo en Hextra.
+#
+# Stappen:
+#   1. Haal de huidige versies op uit de repository (hugo.yml en go.mod).
+#   2. Vraag de GitHub API voor de laatste releases van Hugo en Hextra.
+#   3. Vergelijk en rapporteer in de Job Summary welke updates beschikbaar zijn.
+#
+# Draait elke maandag om 08:00 (Europe/Amsterdam), of handmatig via workflow_dispatch.
+name: Dependency Check
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Elke maandag 08:00 Amsterdam-tijd (UTC+2 zomer / UTC+1 winter)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check Hugo and Hextra versions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # Lees de huidige Hugo-versie uit hugo.yml (de HUGO_VERSION env var).
+      - name: Get current Hugo version
+        id: current_hugo
+        run: |
+          VERSION=$(grep 'HUGO_VERSION:' .github/workflows/hugo.yml | head -1 | awk '{print $2}')
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Huidige Hugo-versie in gebruik: ${VERSION}"
+
+      # Lees de huidige Hextra-versie uit go.mod.
+      - name: Get current Hextra version
+        id: current_hextra
+        run: |
+          VERSION=$(grep 'github.com/imfing/hextra' go.mod | awk '{print $2}' | sed 's/^v//')
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Huidige Hextra-versie in gebruik: ${VERSION}"
+
+      # Vraag de GitHub API voor de nieuwste Hugo-release.
+      - name: Get latest Hugo version
+        id: latest_hugo
+        run: |
+          LATEST=$(curl -s https://api.github.com/repos/gohugoio/hugo/releases/latest | jq -r '.tag_name' | sed 's/^v//')
+          echo "version=${LATEST}" >> "$GITHUB_OUTPUT"
+          echo "Nieuwste Hugo-versie: ${LATEST}"
+
+      # Vraag de GitHub API voor de nieuwste Hextra-release.
+      - name: Get latest Hextra version
+        id: latest_hextra
+        run: |
+          LATEST=$(curl -s https://api.github.com/repos/imfing/hextra/releases/latest | jq -r '.tag_name' | sed 's/^v//')
+          echo "version=${LATEST}" >> "$GITHUB_OUTPUT"
+          echo "Nieuwste Hextra-versie: ${LATEST}"
+
+      # Vergelijk de versies en schrijf een overzicht naar de Job Summary.
+      - name: Report
+        run: |
+          CURRENT_HUGO="${{ steps.current_hugo.outputs.version }}"
+          LATEST_HUGO="${{ steps.latest_hugo.outputs.version }}"
+          CURRENT_HEXTRA="${{ steps.current_hextra.outputs.version }}"
+          LATEST_HEXTRA="${{ steps.latest_hextra.outputs.version }}"
+
+          HUGO_STATUS="ok"
+          HEXTRA_STATUS="ok"
+
+          [ "$CURRENT_HUGO" != "$LATEST_HUGO" ] && HUGO_STATUS="update beschikbaar"
+          [ "$CURRENT_HEXTRA" != "$LATEST_HEXTRA" ] && HEXTRA_STATUS="update beschikbaar"
+
+          {
+            echo "## Dependency Check"
+            echo ""
+            echo "| Package | Huidig | Nieuwste | Status |"
+            echo "|---------|--------|----------|--------|"
+            echo "| Hugo | \`${CURRENT_HUGO}\` | \`${LATEST_HUGO}\` | ${HUGO_STATUS} |"
+            echo "| Hextra | \`${CURRENT_HEXTRA}\` | \`${LATEST_HEXTRA}\` | ${HEXTRA_STATUS} |"
+            echo ""
+
+            if [ "$HUGO_STATUS" != "ok" ] || [ "$HEXTRA_STATUS" != "ok" ]; then
+              echo "### Updates beschikbaar"
+              echo ""
+
+              if [ "$HUGO_STATUS" != "ok" ]; then
+                echo "**Hugo:** update \`HUGO_VERSION\` in \`.github/workflows/hugo.yml\` van \`${CURRENT_HUGO}\` naar \`${LATEST_HUGO}\`."
+              fi
+
+              if [ "$HEXTRA_STATUS" != "ok" ]; then
+                echo "**Hextra:** voer \`hugo mod get github.com/imfing/hextra@v${LATEST_HEXTRA}\` uit en commit de gewijzigde \`go.mod\`, \`go.sum\` en \`_vendor/\`."
+              fi
+            else
+              echo "Alles up-to-date."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

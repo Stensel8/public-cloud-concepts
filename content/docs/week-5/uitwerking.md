@@ -384,16 +384,103 @@ flowchart LR
 
 ## Stap 10: Andere monitoring-tools voor Kubernetes
 
-<!-- Vul in -->
+De stack die ik gebruik (Loki, Alloy, Prometheus, Grafana) is open-source en zelf te hosten. Er zijn ook commerciele alternatieven die meer out-of-the-box bieden.
+
+### Datadog
+
+Datadog is een cloud-native observability platform. Je installeert een DaemonSet (de Datadog Agent) in je cluster, en daarna verzamelt het automatisch metrics, logs en traces. Geen losse Helm charts voor Prometheus, Loki en Grafana; alles zit in één platform.
+
+Voordeel: snelle setup, sterke integraties, goede APM (Application Performance Monitoring) voor distributed tracing. Nadeel: kostbaar op schaal en je bent volledig afhankelijk van Datadog als vendor.
+
+### New Relic
+
+Vergelijkbaar met Datadog. New Relic heeft ook een Kubernetes-integratie die automatisch cluster-health bijhoudt. Het heeft een genereuze gratis laag (100 GB/maand), wat het aantrekkelijk maakt voor kleinere omgevingen.
+
+### Dynatrace
+
+Dynatrace gaat een stap verder met AI-gedreven root cause analysis. In plaats van alleen dashboards te tonen, probeert het automatisch te bepalen wat de oorzaak is van een probleem. Nuttig in grote, complexe omgevingen waar handmatig door dashboards scrollen niet schaalbaar is.
+
+### Vergelijking met mijn stack
+
+| | Mijn stack | Datadog / New Relic / Dynatrace |
+|---|---|---|
+| Kosten | Gratis (open-source) | Betaald (op basis van hosts of data) |
+| Setup | Meer configuratie nodig | Snelle installatie |
+| Vendor lock-in | Geen | Hoog |
+| Flexibiliteit | Volledig aanpasbaar | Beperkt tot platform-mogelijkheden |
+| APM / tracing | Zelf opzetten (Tempo) | Ingebouwd |
+
+Voor een leeromgeving is de open-source stack de betere keuze: je begrijpt wat er onder de motorkap gebeurt. In een professionele omgeving met een groot cluster zou ik Datadog of Dynatrace overwegen vanwege de lage beheerslast.
 
 ---
 
 ## Stap 11: SIEM en SOAR
 
-<!-- Vul in: beschrijf SIEM en SOAR, koppel aan ITIL/DevOps en TerramEarth -->
+### Wat is SIEM?
+
+SIEM staat voor Security Information and Event Management. Een SIEM verzamelt logs en events uit allerlei bronnen (servers, netwerkapparaten, applicaties) en correleert die om verdacht gedrag te detecteren. Bekende voorbeelden zijn Microsoft Sentinel, Splunk en IBM QRadar.
+
+Het gaat niet alleen om opslaan van logs, maar om het vinden van patronen: meerdere mislukte inlogpogingen van hetzelfde IP, een account dat midden in de nacht data downloadt, of een nieuwe admin die opeens toegang heeft tot productie.
+
+### Wat is SOAR?
+
+SOAR staat voor Security Orchestration, Automation and Response. Waar een SIEM detecteert, regelt een SOAR de reactie. Als een SIEM een alert genereert, kan een SOAR automatisch een playbook uitvoeren: het account blokkeren, een ticket aanmaken, de beheerder notificeren.
+
+In combinatie werkt het zo: SIEM detecteert een incident, SOAR reageert er geautomatiseerd op.
+
+### Koppeling aan ITIL
+
+ITIL beschrijft processen voor IT-dienstverlening. Twee processen zijn hier direct relevant:
+
+**Incident Management** gaat over het zo snel mogelijk herstellen van een dienst. Een SIEM signaleert het incident, een SOAR-playbook schakelt de aanval automatisch in en maakt een ticket aan. Dat verkort de Mean Time to Detect (MTTD) en Mean Time to Respond (MTTR) direct.
+
+**Problem Management** gaat een stap verder: wat is de onderliggende oorzaak? Uit SIEM-data kun je patronen halen die wijzen op een structureel probleem, zoals een applicatie die structureel te veel rechten vraagt of een endpoint dat regelmatig het doelwit is van brute-force.
+
+### Koppeling aan DevOps
+
+In DevOps wil je security integreren in de hele pipeline (DevSecOps). Een SIEM/SOAR past daar goed in:
+
+- Alerts uit de SIEM kunnen automatisch een pipeline blokkeren als er verdachte activiteit is gedetecteerd.
+- SOAR-playbooks kunnen geautomatiseerd reageren zonder dat een beheerder handmatig hoeft in te grijpen, wat past bij de DevOps-filosofie van automatisering.
 
 ---
 
 ## Stap 12: TerramEarth casestudy
 
-<!-- Vul in: analyseer minimaal 2 producten voor Monitoring/Observability, geef concrete voorbeelden voor Problem Management en Monitoring & Event Management op tactisch en operationeel niveau -->
+TerramEarth maakt zware machines voor de mijnbouw en landbouw. Ze hebben 2 miljoen voertuigen in gebruik die sensortdata verzamelen: kritieke data gaat real-time, de rest wordt dagelijks geupload. Dat is per voertuig 200-500 MB per dag. Ze draaien op Google Cloud, maar hebben ook legacy-systemen on-premise.
+
+Een expliciete uitdaging uit hun executive statement: "improve and standardize tools necessary for application and network monitoring and troubleshooting." Dat is precies het speelveld van de twee producten hieronder.
+
+### Product 1: Google Cloud Monitoring (Operations Suite)
+
+Google Cloud Monitoring verzamelt metrics, logs en traces van alle Google Cloud-resources. Omdat TerramEarth al op Google Cloud draait, is integratie minimaal: Cloud Monitoring is out-of-the-box beschikbaar.
+
+**Problem Management:**
+
+*Tactisch niveau:* Cloud Monitoring kan trends analyseren over langere periodes. Als voertuigsensoren van een bepaald model structureel hogere CPU-load rapporteren op de verwerkingspipeline, is dat een signaal voor een structureel probleem in de dataverwerkingscode. Een dashboard met historische trends maakt dit zichtbaar voor het management.
+
+*Operationeel niveau:* Een beheerder ziet in real-time dat de ingest-pipeline vertraging oploopt. Via Cloud Monitoring Alerts krijgt hij een notificatie als de latency boven een drempelwaarde komt. Hij kan direct de oorzaak opsporen via de bijbehorende logs in Cloud Logging.
+
+**Monitoring and Event Management:**
+
+*Tactisch niveau:* SLO (Service Level Objectives) instellen voor de datapipeline. TerramEarth kan afspreken dat 99,9% van de real-time vehicledata binnen 5 seconden verwerkt moet zijn. Cloud Monitoring bewaakt deze SLO continu en rapporteert de error budget naar het management.
+
+*Operationeel niveau:* Automatische alerts bij afwijkingen. Als een zone opeens geen data meer ontvangt van voertuigen in een bepaalde regio, triggert een alert direct. Dat kan wijzen op een netwerkaanleg of een softwarefout in de on-board firmware.
+
+---
+
+### Product 2: Grafana + Prometheus (zelf te hosten of via Grafana Cloud)
+
+Dit is dezelfde stack als ik in Week 5 gebruik. Voor TerramEarth is dit interessant omdat ze naast hun Google Cloud omgeving ook on-premise legacy-systemen hebben. Grafana kan datasources van beide omgevingen combineren in één dashboard.
+
+**Problem Management:**
+
+*Tactisch niveau:* Grafana heeft annotaties: je kunt events (zoals software-releases of firmware-updates) markeren op grafieken. Als een nieuwe firmware-versie samenvalt met een stijging in foutmeldingen, is de correlatie direct zichtbaar. Dat helpt bij het identificeren van de root cause.
+
+*Operationeel niveau:* Via Prometheus-alerting kunnen beheerders automatisch gewaarschuwd worden als een specifiek voertuigtype buiten normale bandbreedtegrenzen valt. Dat kan wijzen op een defect sensor of een netwerkprobleem in het veld.
+
+**Monitoring and Event Management:**
+
+*Tactisch niveau:* Omdat TerramEarth zowel Google Cloud als on-premise heeft, is een gecentraliseerd Grafana-dashboard waardevol. Prometheus scrapt metrics van beide omgevingen, Grafana visualiseert alles in één plek. Het management heeft zo een compleet beeld van de infrastructuurstatus.
+
+*Operationeel niveau:* Grafana Alerting kan bij een alert automatisch een webhook sturen naar een ticketsysteem (zoals PagerDuty of Jira). Dat is vergelijkbaar met SOAR: detectie en de eerste stap van response zijn geautomatiseerd.
