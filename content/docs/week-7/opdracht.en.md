@@ -24,6 +24,8 @@ The week 7 assignment focuses on a Proof of Concept based on a Cloud reference a
    - If this does not work, show what happens and try to explain why.
    - Describe the relationship between a **method** and an **integration**.
 
+   ![AWS API Gateway: flow from Method request via Integration request to HTTP backend, and back](/docs/week-7/media/opdracht/image-001.avif)
+
    Add screenshots to your portfolio.
 
 2. Create a REST API with a Lambda function as the backend via the lab: [Build an API Gateway REST API with Lambda integration](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html).

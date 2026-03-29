@@ -85,7 +85,7 @@ EHR Healthcare (see the case description) is a company with on-premise infrastru
 
 Explain the following concepts as used in Azure, and advise EHR Healthcare whether they should use each concept. Justify your answer.
 
-1. **Single Sign-On (SSO)** — Can this also be configured for on-premise applications?
+1. **Single Sign-On (SSO):** Can this also be configured for on-premise applications?
 2. **Conditional Access**
 3. **RBAC** (Role-Based Access Control)
 4. **Identity Protection**
