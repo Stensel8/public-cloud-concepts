@@ -12,7 +12,7 @@ In deze opdracht maken we een Blue-Green deployment voor een applicatie. Blue is
 
 De applicatie is dezelfde als in week 1 en 2. De Blue-versie staat in de main-branch van de GitHub-repository, de Green-versie in een andere branch, bijvoorbeeld de test-branch.
 
-Om de Docker-images op te slaan, gebruiken we nu de Google Artifact Registry - een alternatief voor Docker Hub.
+Om de Docker-images op te slaan, gebruiken we nu de Google Artifact Registry, een alternatief voor Docker Hub.
 
 Er wordt een pipeline aangemaakt zodat wanneer de code verandert, het Docker-image wordt gebouwd en het image gestart wordt in een pod op het Kubernetes-cluster in Google.
 

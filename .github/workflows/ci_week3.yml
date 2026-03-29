@@ -133,24 +133,27 @@ jobs:
         run: |
           docker push "${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${{ steps.slot.outputs.slot }}"
 
-      - name: Deploy to GKE
+      # Vervang ${IMAGE_TAG} in het deployment-manifest en stuur het naar kubectl.
+      # envsubst leest van stdin, zodat er geen tijdelijk bestand nodig is.
+      - name: Apply deployment manifest
         if: steps.cluster_check.outputs.available == 'true'
         run: |
           SLOT="${{ steps.slot.outputs.slot }}"
-
-          # IMAGE_TAG samenstellen uit de workflow-variabelen, zodat het exact overeenkomt
-          # met het image dat hierboven gebouwd en gepusht is.
           export IMAGE_TAG="${{ env.GAR_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE }}:${SLOT}"
-
-          # envsubst vervangt ${IMAGE_TAG} in het YAML-bestand met de waarde hierboven.
-          # Het resultaat wordt direct via stdin naar kubectl gestuurd (geen tijdelijk bestand nodig).
           envsubst < "static/docs/week-3/bestanden/deployment-${SLOT}.yml" | kubectl apply -f -
 
-          # Forceer een herstart zodat Kubernetes het nieuw gepushte image ophaalt.
-          # Zonder dit herkent Kubernetes geen wijziging als de tag (bijv. :green) gelijk blijft.
-          kubectl rollout restart deployment/deployment-${SLOT}
+      # Forceer een herstart zodat Kubernetes het nieuw gepushte image ophaalt.
+      # Zonder dit herkent Kubernetes geen wijziging als de tag (bijv. :green) gelijk blijft.
+      - name: Rollout restart
+        if: steps.cluster_check.outputs.available == 'true'
+        run: kubectl rollout restart deployment/deployment-${{ steps.slot.outputs.slot }}
 
-          # Wacht op succesvolle rollout; toon pod-details als het mislukt (helpt bij debuggen).
+      # Wacht op een succesvolle rollout (timeout 120s).
+      # Bij mislukken worden pod-details getoond om debuggen te vergemakkelijken.
+      - name: Wait for rollout
+        if: steps.cluster_check.outputs.available == 'true'
+        run: |
+          SLOT="${{ steps.slot.outputs.slot }}"
           if ! kubectl rollout status deployment/deployment-${SLOT} --timeout=120s; then
             echo "--- Rollout mislukt. Pod-status: ---"
             kubectl get pods -l slot=${SLOT} -o wide
@@ -158,5 +161,4 @@ jobs:
             kubectl describe pods -l slot=${SLOT}
             exit 1
           fi
-
           kubectl get pods -l slot=${SLOT}

@@ -50,6 +50,6 @@ In week 1 is een pod gestart met daarin een container (webserver). De pod is ech
 
    Maak eerst twee containers aan zoals de huidige. Eén simuleert de website Bison, de ander de website Brightspace (toon bijvoorbeeld alleen een welkomstbericht). Zorg dat er voor elk van deze twee een deployment en service zijn zodat ze bereikbaar zijn. Het service-type is bijvoorbeeld `NodePort` of `ClusterIP`. Maak nu een Ingress aan zodat de "bison"-website bereikbaar is via `bison.mysaxion.nl` en de "brightspace"-website via `brightspace.mysaxion.nl`.
 
-   Maak ook een hosts-bestand aan waarin je beide namen resolved naar het IP-adres van de ingress-controller.
+   Maak ook een hosts-bestand aan waarin je beide namen koppelt aan het IP-adres van de ingress-controller.
 
    Bekijk ook de load balancer die automatisch wordt aangemaakt en de Ingress in Google's portal (zie bijv. de monitoring).

@@ -85,7 +85,7 @@ EHR Healthcare (zie de casebeschrijving) is een bedrijf met een on-premise infra
 
 Leg de volgende concepten uit zoals ze worden gebruikt in Azure, en geef EHR Healthcare een advies of ze elk concept zouden moeten gebruiken. Motiveer je antwoord.
 
-1. **Single Sign-On (SSO)** - Kan dit ook geconfigureerd worden voor on-premise applicaties?
+1. **Single Sign-On (SSO):** Kan dit ook geconfigureerd worden voor on-premise applicaties?
 2. **Conditional Access**
 3. **RBAC** (Role-Based Access Control)
 4. **Identity Protection**

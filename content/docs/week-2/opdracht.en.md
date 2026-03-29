@@ -3,6 +3,8 @@ title: "Assignment"
 weight: 1
 ---
 
+[![CI Week 2](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week2.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week2.yml)
+
 ## 2.1 Google Kubernetes Engine (GKE) and DORA
 
 This week you will extend your knowledge of GKE and analyse about DORA.

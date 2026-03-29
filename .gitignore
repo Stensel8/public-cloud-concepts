@@ -11,3 +11,4 @@
 
 # Hugo lokale build-cache (wordt automatisch opnieuw gegenereerd)
 /resources/
+*.zip

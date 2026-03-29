@@ -3,6 +3,9 @@ title: "Assignment"
 weight: 1
 ---
 
+[![CI Week 3 - Blue-Green Deploy](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week3.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week3.yml)
+[![Week 3 - Switch Blue-Green Slot](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/switch-slot.yml)
+
 ## 3.1 Blue-Green Deployment & Artifact Registry
 
 In this assignment we create a Blue-Green deployment for an application. Blue is the production version of the application, Green is a new (test-)version.

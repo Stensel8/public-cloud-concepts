@@ -3,6 +3,8 @@ title: "Assignment"
 weight: 1
 ---
 
+[![CI Week 1](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml/badge.svg)](https://github.com/Stensel8/public-cloud-concepts/actions/workflows/ci_week1.yml)
+
 ## 1.1 Google Cloud & Google Kubernetes Engine (GKE)
 
 This week you will be introduced to the Google Cloud Platform. We will learn the basic concepts of the Google Cloud and the most important Google services.
