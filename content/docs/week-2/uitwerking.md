@@ -279,7 +279,7 @@ DORA staat voor DevOps Research and Assessment. Het is een meerjarig onderzoeksp
 | Metric | Wat het meet |
 |--------|-------------|
 | **Deployment Frequency** | Hoe vaak deploy je succesvol naar productie? |
-| **Lead Time for Changes** | Hoe lang duurt het van een commit tot dat het live staat? |
+| **Lead Time for Changes** | Hoe lang duurt het van een commit totdat het live staat? |
 | **Change Failure Rate** | Hoeveel procent van je deploys gaat mis? |
 | **Time to Restore Service** | Hoe snel ben je weer up na een incident? |
 
