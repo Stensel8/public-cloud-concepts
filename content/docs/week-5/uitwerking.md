@@ -384,7 +384,7 @@ flowchart LR
 
 ## Stap 10: Andere monitoring-tools voor Kubernetes
 
-De stack die ik gebruik (Loki, Alloy, Prometheus, Grafana) is open-source en zelf te hosten. Er zijn ook commerciele alternatieven die meer out-of-the-box bieden.
+De stack die ik gebruik (Loki, Alloy, Prometheus, Grafana) is open-source en zelf te hosten. Er zijn ook commerciële alternatieven die meer out-of-the-box bieden.
 
 ### Datadog
 
