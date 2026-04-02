@@ -72,7 +72,7 @@ jobs:
       # Configureer GitHub Pages en sla de base-URL op voor gebruik tijdens het bouwen.
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       # Bouw de Hugo-site:
       #   --gc        verwijdert ongebruikte cache-bestanden na het bouwen
