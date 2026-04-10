@@ -120,7 +120,7 @@ jobs:
       # Download alle losse week-PDFs naar één map.
       # merge-multiple: true zet alle bestanden plat in de opgegeven map (geen submappen per artifact).
       - name: Download alle week-PDFs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           pattern: "Week-*-Uitwerking"
           path: pdfs

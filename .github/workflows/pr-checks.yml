@@ -17,16 +17,18 @@ permissions:
 
 jobs:
   pr-title:
-    name: Semantic PR title
+    name: PR-titel controleren
     runs-on: ubuntu-latest
     permissions:
       statuses: write
       pull-requests: read
+
     steps:
       # Controleer of de PR-titel het Conventional Commits-formaat volgt.
       # Toegestane types: feat, fix, docs, chore, refactor, style, revert, ci.
       # Een PR die begint met "WIP" wordt ook goedgekeurd (wip: true).
-      - uses: amannn/action-semantic-pull-request@v6
+      - name: Controleer Conventional Commits-formaat
+        uses: amannn/action-semantic-pull-request@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -42,18 +44,20 @@ jobs:
             ci
 
   image-format:
-    name: Do not use JPG or PNG
+    name: Controleer afbeeldingsformaat
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
+
     steps:
       # Haal de broncode op zodat we de bestanden kunnen controleren.
-      - uses: actions/checkout@v6
+      - name: Haal broncode op
+        uses: actions/checkout@v6
 
       # Zoek alle PNG/JPG/JPEG-bestanden in de docs-map.
       # Sla het resultaat op als step-output: een lijst van bestanden en een boolean (found).
-      - name: Find non-AVIF images
+      - name: Zoek niet-AVIF afbeeldingen
         id: check
         run: |
           {
@@ -69,12 +73,12 @@ jobs:
             echo "found=true" >> "$GITHUB_OUTPUT"
           else
             echo "found=false" >> "$GITHUB_OUTPUT"
-            echo "All images are AVIF."
+            echo "Alle afbeeldingen zijn AVIF."
           fi
 
       # Als er niet-AVIF afbeeldingen gevonden zijn: plaats een PR-comment
       # met de lijst van bestanden en instructies om ze te converteren naar AVIF.
-      - name: Post PR comment
+      - name: Plaats PR-comment
         if: steps.check.outputs.found == 'true'
         uses: actions/github-script@v8
         env:
@@ -112,7 +116,7 @@ jobs:
 
       # Markeer elk gevonden bestand als fout in GitHub (annotatie) en laat de check falen.
       # Zo ziet de ontwikkelaar direct in de PR welke bestanden het probleem veroorzaken.
-      - name: Annotate and fail
+      - name: Markeer bestanden en laat falen
         if: steps.check.outputs.found == 'true'
         env:
           FILES: ${{ steps.check.outputs.files }}
@@ -123,18 +127,20 @@ jobs:
           exit 1
 
   dockerfile-lint:
-    name: Dockerfile lint
+    name: Lint de Dockerfile
     runs-on: ubuntu-latest
+
     steps:
       # Haal de broncode op.
-      - uses: actions/checkout@v6
+      - name: Haal broncode op
+        uses: actions/checkout@v6
 
       # Download en installeer hadolint (Dockerfile linter).
-      - name: Install hadolint
+      - name: Installeer hadolint
         run: |
           wget -qO /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
           chmod +x /usr/local/bin/hadolint
 
       # Voer de lint-controle uit op de Dockerfile.
-      - name: Lint Dockerfile
+      - name: Lint de Dockerfile
         run: hadolint "static/docs/week-1/bestanden/Dockerfile"

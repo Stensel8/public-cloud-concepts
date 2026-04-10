@@ -18,15 +18,16 @@ permissions:
 
 jobs:
   check:
-    name: Check Hugo and Hextra versions
+    name: Controleer Hugo en Hextra versies
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      # Haal de broncode op uit de repository.
+      - name: Haal broncode op
         uses: actions/checkout@v6
 
       # Lees de huidige Hugo-versie uit hugo.yml (de HUGO_VERSION env var).
-      - name: Get current Hugo version
+      - name: Lees huidige Hugo-versie
         id: current_hugo
         run: |
           VERSION=$(grep 'HUGO_VERSION:' .github/workflows/hugo.yml | head -1 | awk '{print $2}')
@@ -34,7 +35,7 @@ jobs:
           echo "Huidige Hugo-versie in gebruik: ${VERSION}"
 
       # Lees de huidige Hextra-versie uit go.mod.
-      - name: Get current Hextra version
+      - name: Lees huidige Hextra-versie
         id: current_hextra
         run: |
           VERSION=$(grep 'github.com/imfing/hextra' go.mod | awk '{print $2}' | sed 's/^v//')
@@ -42,7 +43,7 @@ jobs:
           echo "Huidige Hextra-versie in gebruik: ${VERSION}"
 
       # Vraag de GitHub API voor de nieuwste Hugo-release.
-      - name: Get latest Hugo version
+      - name: Haal nieuwste Hugo-versie op
         id: latest_hugo
         run: |
           LATEST=$(curl -s https://api.github.com/repos/gohugoio/hugo/releases/latest | jq -r '.tag_name' | sed 's/^v//')
@@ -50,7 +51,7 @@ jobs:
           echo "Nieuwste Hugo-versie: ${LATEST}"
 
       # Vraag de GitHub API voor de nieuwste Hextra-release.
-      - name: Get latest Hextra version
+      - name: Haal nieuwste Hextra-versie op
         id: latest_hextra
         run: |
           LATEST=$(curl -s https://api.github.com/repos/imfing/hextra/releases/latest | jq -r '.tag_name' | sed 's/^v//')
@@ -58,7 +59,7 @@ jobs:
           echo "Nieuwste Hextra-versie: ${LATEST}"
 
       # Vergelijk de versies en schrijf een overzicht naar de Job Summary.
-      - name: Report
+      - name: Rapporteer versies
         run: |
           CURRENT_HUGO="${{ steps.current_hugo.outputs.version }}"
           LATEST_HUGO="${{ steps.latest_hugo.outputs.version }}"

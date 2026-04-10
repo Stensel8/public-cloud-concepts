@@ -33,26 +33,28 @@ defaults:
 
 jobs:
   build:
+    name: Bouw de site
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.159.0
+      HUGO_VERSION: 0.160.0
+
     steps:
       # Download en installeer de opgegeven versie van Hugo.
       # De "extended" variant is vereist voor SCSS/Sass-ondersteuning.
-      - name: Install Hugo CLI
+      - name: Installeer Hugo
         run: |
           wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
           && sudo dpkg -i ${{ runner.temp }}/hugo.deb
 
       # Haal de volledige git-geschiedenis op (fetch-depth: 0), zodat Hugo
       # de "last modified" datum per pagina correct kan bepalen.
-      - name: Checkout
+      - name: Haal broncode op
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       # Installeer Go, dat nodig is voor Hugo-modules (thema's en plugins).
-      - name: Setup Go
+      - name: Installeer Go
         uses: actions/setup-go@v6
         with:
           go-version: '1.26'
@@ -61,7 +63,7 @@ jobs:
 
       # Sla gedownloade Hugo-modules op in de cache, zodat volgende runs sneller zijn.
       # De cache-sleutel is gebaseerd op go.sum; als dat bestand verandert, wordt de cache vernieuwd.
-      - name: Cache Hugo modules
+      - name: Cache Hugo-modules
         uses: actions/cache@v5
         with:
           path: ${{ runner.temp }}/hugo_cache
@@ -70,15 +72,15 @@ jobs:
             ${{ runner.os }}-hugo-
 
       # Configureer GitHub Pages en sla de base-URL op voor gebruik tijdens het bouwen.
-      - name: Setup Pages
+      - name: Configureer GitHub Pages
         id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       # Bouw de Hugo-site:
       #   --gc        verwijdert ongebruikte cache-bestanden na het bouwen
       #   --minify    verkleint HTML/CSS/JS voor snellere laadtijden
       #   --baseURL   stelt de juiste URL in zodat interne links kloppen op GitHub Pages
-      - name: Build with Hugo
+      - name: Bouw de site met Hugo
         env:
           HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
           HUGO_ENVIRONMENT: production
@@ -91,21 +93,23 @@ jobs:
 
       # Upload de gebouwde site (map ./public) als artifact,
       # zodat het deploy-job het kan ophalen en publiceren.
-      - name: Upload artifact
+      - name: Upload build-artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: ./public
 
   deploy:
+    name: Publiceer naar GitHub Pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     # Wacht tot het build-job klaar is voordat er gedeployed wordt.
     needs: build
+
     steps:
       # Publiceer het artifact naar GitHub Pages.
       # De URL van de gepubliceerde site wordt als output beschikbaar gesteld.
-      - name: Deploy to GitHub Pages
+      - name: Publiceer naar GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5

@@ -40,7 +40,7 @@ jobs:
 
     steps:
       # Authenticeer bij Google Cloud met het service account.
-      - name: Authenticate with GCP
+      - name: Authenticeer bij GCP
         uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
@@ -48,7 +48,7 @@ jobs:
       # Controleer of het GKE-cluster beschikbaar is.
       # Als het cluster niet bestaat of niet bereikbaar is, slaat de workflow de
       # volgende stappen over en annuleert zichzelf (geen harde fout).
-      - name: Check Week 3 cluster availability
+      - name: Controleer beschikbaarheid GKE-cluster
         id: cluster_check
         run: |
           if gcloud container clusters describe "${{ env.GKE_CLUSTER }}" \
@@ -69,7 +69,7 @@ jobs:
 
       # Als het cluster niet beschikbaar is: annuleer de workflow via de GitHub API.
       # continue-on-error: true zorgt dat de annulering zelf geen extra fout geeft.
-      - name: Mark run as cancelled when environment is unavailable
+      - name: Annuleer workflow als omgeving niet beschikbaar is
         if: steps.cluster_check.outputs.available != 'true'
         continue-on-error: true
         uses: actions/github-script@v8
@@ -82,7 +82,7 @@ jobs:
             })
 
       # Haal de kubectl-configuratie op zodat we commando's naar het cluster kunnen sturen.
-      - name: Get GKE credentials
+      - name: Haal GKE-credentials op
         if: steps.cluster_check.outputs.available == 'true'
         uses: google-github-actions/get-gke-credentials@v3
         with:

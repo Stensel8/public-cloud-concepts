@@ -1,17 +1,18 @@
 # CI Week 2 - Bouw en push twee Docker images naar Docker Hub.
 #
 # Stappen:
-#   1. build - Bouwt en pusht de images voor de bison- en brightspace-applicaties.
-#              Beide images worden altijd gepusht, ongeacht de branch.
+#   1. build - Bouwt de images voor de bison- en brightspace-applicaties.
+#            - Pusht de images naar Docker Hub, maar alleen bij een push naar main
+#              (niet bij pull requests).
 #
 # Secrets benodigd: DOCKER_USERNAME, DOCKER_PAT
 name: CI Week 2
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -24,24 +25,28 @@ jobs:
 
     steps:
       # Haal de broncode op uit de repository.
-      - uses: actions/checkout@v6
+      - name: Haal broncode op
+        uses: actions/checkout@v6
 
-      # Log in bij Docker Hub met de opgeslagen secrets,
-      # zodat we images kunnen pushen.
-      - name: Login to Docker Hub
+      # Bouw beide Docker images zodat ze gecontroleerd kunnen worden.
+      - name: Bouw Docker images
+        run: |
+          docker build -t stensel8/public-cloud-concepts:bison "./static/docs/week-2/bestanden/bison"
+          docker build -t stensel8/public-cloud-concepts:brightspace "./static/docs/week-2/bestanden/brightspace"
+
+      # Log in bij Docker Hub met de opgeslagen secrets.
+      # Alleen bij een push naar main, niet bij pull requests.
+      - name: Log in bij Docker Hub
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PAT }}
 
-      # Bouw en push beide Docker images:
-      #   - bison:       de Bison-applicatie (week 2)
-      #   - brightspace: de Brightspace-applicatie (week 2)
-      # De twee images worden apart gebouwd zodat ze elk hun eigen tag krijgen.
-      - name: Build and push Docker images
+      # Push beide images naar Docker Hub.
+      # Zelfde voorwaarde als de login hierboven.
+      - name: Push Docker images naar Docker Hub
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: |
-          docker build -t stensel8/public-cloud-concepts:bison "./static/docs/week-2/bestanden/bison"
           docker push stensel8/public-cloud-concepts:bison
-
-          docker build -t stensel8/public-cloud-concepts:brightspace "./static/docs/week-2/bestanden/brightspace"
           docker push stensel8/public-cloud-concepts:brightspace
