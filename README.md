@@ -11,6 +11,9 @@ Nederlands | [English](README.en.md)
 
 ---
 
+> [!WARNING]
+> **Deprecated vanaf juni 2026.** Deze repository bevat de uitwerking van de Public Cloud Concepts module, onderdeel van de Cloud Engineering-specialisatie (jaar 3). De module is zelfstandig afgerond en deze repository wordt niet meer bijgehouden.
+
 # Public Cloud Concepts
 
 Deze repository wordt bijgehouden door [Sten Tijhuis](https://github.com/Stensel8) en bevat de individuele module van de Cloud Engineering-specialisatie.
