@@ -41,8 +41,8 @@ Deze repository wordt bijgehouden door [Sten Tijhuis](https://github.com/Stensel
 | 3 | Blue-Green Deployments & Artifact Registry | [Week 3/Bestanden](static/docs/week-3/bestanden/) |
 | 4 | Helm & Identity and Access Management | [Week 4/Bestanden](static/docs/week-4/bestanden/) |
 | 5 | Monitoring & Observability | [Week 5/Bestanden](static/docs/week-5/bestanden/) |
-| 6 | Microservices | Week 6/Bestanden (binnenkort beschikbaar) |
-| 7 | Serverless & API Gateway | Week 7/Bestanden (binnenkort beschikbaar) |
+| 6 | Microservices | [Week 6](content/docs/week-6/) |
+| 7 | Serverless & API Gateway | [Week 7](content/docs/week-7/) |
 
 ## Google Cloud SDK installeren
 
