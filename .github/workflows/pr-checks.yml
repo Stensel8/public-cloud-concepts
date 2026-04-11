@@ -80,7 +80,7 @@ jobs:
       # met de lijst van bestanden en instructies om ze te converteren naar AVIF.
       - name: Plaats PR-comment
         if: steps.check.outputs.found == 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           FILES: ${{ steps.check.outputs.files }}
           ACTOR: ${{ github.event.pull_request.user.login }}
