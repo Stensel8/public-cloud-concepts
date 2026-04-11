@@ -72,7 +72,7 @@ jobs:
       - name: Annuleer workflow als omgeving niet beschikbaar is
         if: steps.cluster_check.outputs.available != 'true'
         continue-on-error: true
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             await github.rest.actions.cancelWorkflowRun({
