@@ -5,7 +5,7 @@ weight: 2
 
 ## 4.1 Helm
 
-Helm is de pakketbeheerder voor Kubernetes. In plaats van handmatig losse YAML-bestanden toe te passen, bundelt Helm alles in een **chart**.
+Helm is de package manager voor Kubernetes. In plaats van handmatig losse YAML-bestanden toe te passen, bundelt Helm alles in een **chart**.
 
 Er zijn drie kernconcepten:
 

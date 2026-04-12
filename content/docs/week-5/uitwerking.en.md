@@ -45,13 +45,13 @@ The original script is in [`static/docs/week-5/bestanden/opdracht/`](https://git
 {{< callout type="info" >}}
 **Why Standard and not Autopilot?**
 
-Autopilot restricts DaemonSets, blocks privileged containers by default, and requires resource requests for every pod. That conflicts with the monitoring stack:
+Autopilot restricts DaemonSets, blocks containers that require elevated privileges by default, and requires resource requests for every pod. That conflicts with the monitoring stack:
 
 - **Alloy** runs as a DaemonSet with access to `/var/log/pods` on the host
-- **Prometheus node-exporter** needs privileged access to host metrics
+- **Prometheus node-exporter** requires elevated access to host metrics
 - **ingress-nginx** requires port configuration that Autopilot does not always allow
 
-With Standard you simply have full control over node configuration, DaemonSets, and privileged workloads.
+With Standard you simply have full control over node configuration, DaemonSets, and workloads requiring elevated privileges.
 {{< /callout >}}
 
 {{< tabs >}}

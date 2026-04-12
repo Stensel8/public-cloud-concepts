@@ -77,23 +77,84 @@ jobs:
 
       # Controleer eerst of de uitwerkingspagina bestaat (HTTP 200).
       # Als de pagina er niet is (bijv. week nog niet uitgewerkt), sla dan over.
-      # Als de pagina wel bestaat, genereer de PDF via Puppeteer en
-      # controleer daarna of het bestand niet leeg is (Puppeteer kan stil falen).
+      # Als de pagina wel bestaat, download de pagina en resources lokaal,
+      # converteer AVIF-afbeeldingen naar PNG (Ubuntu runner met ffmpeg/libavif),
+      # voeg een korte waarschuwing toe en genereer dan de PDF via Puppeteer.
       - name: Genereer PDF voor week ${{ matrix.week }}
         env:
-          PDF_URL: "https://public-cloud-concepts.stensel.nl/nl/docs/week-${{ matrix.week }}/uitwerking/"
+          REMOTE_URL: "https://public-cloud-concepts.stensel.nl/nl/docs/week-${{ matrix.week }}/uitwerking/"
           PDF_FILE: "pdfs/Week-${{ matrix.week }}-Uitwerking.pdf"
         run: |
+          set -euo pipefail
           mkdir -p pdfs
 
-          status=$(curl -s -o /dev/null -w "%{http_code}" "$PDF_URL")
+          status=$(curl -s -o /dev/null -w "%{http_code}" "$REMOTE_URL")
 
           if [ "$status" != "200" ]; then
             echo "Geen uitwerking voor week ${{ matrix.week }} (HTTP ${status}), overgeslagen."
             exit 0
           fi
 
+          # Installeer tools voor AVIF/beeldconversie en zip/unzip
+          sudo apt-get update -y
+          sudo apt-get install -y ffmpeg libavif-bin wget zip unzip
+
+          tmpdir=$(mktemp -d)
+          echo "Downloading page into $tmpdir"
+
+          # Download pagina en alle benodigde resources (CSS, JS, afbeeldingen)
+          wget --no-verbose --page-requisites --adjust-extension --convert-links --span-hosts --no-parent -P "$tmpdir" "$REMOTE_URL"
+
+          # Zoek het lokale index.html voor deze week
+          local_index=$(find "$tmpdir" -type f -iname 'index.html' -path "*/nl/docs/week-${{ matrix.week }}/*" -print -quit || true)
+          if [ -z "$local_index" ]; then
+            # fallback: eerste index.html
+            local_index=$(find "$tmpdir" -type f -iname 'index.html' -print -quit)
+          fi
+
+          if [ -z "$local_index" ]; then
+            echo "Kon lokale pagina niet vinden na download"
+            exit 1
+          fi
+
+          echo "Gevonden lokale pagina: $local_index"
+
+          # Converteer alle AVIF bestanden naar PNG
+          find "$tmpdir" -type f \( -iname '*.avif' -o -iname '*.AVIF' \) -print0 | while IFS= read -r -d '' f; do
+            png="${f%.*}.png"
+            echo "Converteer $f -> $png"
+            ffmpeg -y -loglevel error -i "$f" "$png" || echo "ffmpeg kon $f niet converteren"
+          done
+
+          # Wijzig verwijzingen .avif -> .png in alle gedownloade bestanden (HTML/CSS/JS)
+          find "$tmpdir" -type f -exec sed -i 's/\.avif/\.png/gI' {} + || true
+
+          # Voeg bovenaan de pagina een korte waarschuwing toe
+          warning='<div style="border:1px solid #f39c12;padding:10px;background:#fff8e1;color:#000;margin:8px 0;font-weight:600">Let op, dit is een export welke is gegenereerd uit Github. Deze export is gedraaid vanaf de github static pagina op; "https://public-cloud-concepts.stensel.nl/nl/". Het kan zijn dat er secties niet goed inladen of versprongen zijn. Dit is een limitatie van de github runner welke mijn markdown naar pdf heeft omgevormd.</div>'
+          # Gebruik perl om de warning direct na de <body> tag in te voegen
+          perl -0777 -pe "s/(<body[^>]*>)/\1
+          $warning/mi" -i "$local_index"
+
+          # Start een lokale webserver om de pagina te serveren
+          server_dir="$tmpdir"
+          (cd "$server_dir" && python3 -m http.server 8000 >/dev/null 2>&1 &) 
+          server_pid=$!
+          sleep 1
+
+          # Bepaal relatieve pad voor de lokale index en stel de lokale URL in
+          relpath="${local_index#$tmpdir/}"
+          LOCAL_URL="http://127.0.0.1:8000/$relpath"
+
+          echo "Gebruik lokale URL: $LOCAL_URL"
+
+          export PDF_URL="$LOCAL_URL"
+
+          # Genereer PDF via Puppeteer (script staat in /tmp/pdf.js)
           node /tmp/pdf.js
+
+          # Stop server en ruim op
+          kill "$server_pid" || true
+          rm -rf "$tmpdir"
 
           if [ ! -s "$PDF_FILE" ]; then
             echo "Fout: Puppeteer heeft geen geldig PDF-bestand aangemaakt."
@@ -108,6 +169,48 @@ jobs:
           path: "pdfs/Week-${{ matrix.week }}-Uitwerking.pdf"
           retention-days: 30
 
+      # Maak per-week een zip met code/config bestanden die bij deze week horen
+      - name: Maak week code/config zip
+        run: |
+          set -euo pipefail
+          mkdir -p archives
+          zipfile="archives/Week-${{ matrix.week }}-Code.zip"
+
+          echo "Zoek en verzamel bestanden voor week ${{ matrix.week }}"
+
+          made=0
+          # Voeg de 'bestanden' directory toe als die bestaat
+          if [ -d "static/docs/week-${{ matrix.week }}/bestanden" ]; then
+            zip -r "$zipfile" static/docs/week-${{ matrix.week }}/bestanden >/dev/null 2>&1 || true
+            made=1
+          fi
+
+          # Voeg content MD-bestanden van de week toe
+          if compgen -G "content/docs/week-${{ matrix.week }}/*.md" > /dev/null 2>&1; then
+            zip -r "$zipfile" content/docs/week-${{ matrix.week }}/*.md >/dev/null 2>&1 || true
+            made=1
+          fi
+
+          # Voeg common config types uit de static folder (yaml, yml, Dockerfile, sh, tf)
+          if compgen -G "static/docs/week-${{ matrix.week }}/**/*.*" > /dev/null 2>&1; then
+            find static/docs/week-${{ matrix.week }} -type f \( -iname '*.yml' -o -iname '*.yaml' -o -iname 'Dockerfile*' -o -iname '*.sh' -o -iname '*.tf' -o -iname '*.tfvars' -o -iname '*.json' \) -print0 | xargs -0 -r zip -r "$zipfile" >/dev/null 2>&1 || true
+            made=1
+          fi
+
+          if [ "$made" -eq 0 ]; then
+            echo "Geen code/config bestanden gevonden voor week ${{ matrix.week }}; maak leeg zip"
+            zip -r "$zipfile" /dev/null >/dev/null 2>&1 || true
+          fi
+
+          ls -lh "$zipfile" || true
+
+      - name: Upload week code zip
+        uses: actions/upload-artifact@v7
+        with:
+          name: "Week-${{ matrix.week }}-Code"
+          path: "archives/Week-${{ matrix.week }}-Code.zip"
+          retention-days: 30
+
 
   bundle:
     name: Bundel alle uitwerkingen
@@ -119,10 +222,10 @@ jobs:
 
       # Download alle losse week-PDFs naar één map.
       # merge-multiple: true zet alle bestanden plat in de opgegeven map (geen submappen per artifact).
-      - name: Download alle week-PDFs
+      - name: Download alle week-artifacts (PDFs + code zips)
         uses: actions/download-artifact@v8
         with:
-          pattern: "Week-*-Uitwerking"
+          pattern: "Week-*"
           path: pdfs
           merge-multiple: true
 
@@ -132,4 +235,27 @@ jobs:
         with:
           name: public-cloud-concepts-uitwerkingen
           path: pdfs/
+          retention-days: 30
+      
+      - name: Maak gecombineerde code-zip
+        run: |
+          set -euo pipefail
+          mkdir -p combined_codes
+          # Pak alle Week-*-Code.zip bestanden uit in submappen
+          for z in pdfs/*-Code.zip; do
+            [ -f "$z" ] || continue
+            d="combined_codes/$(basename "$z" .zip)"
+            mkdir -p "$d"
+            unzip -qq "$z" -d "$d"
+          done
+
+          # Maak één zip met alle code
+          zip -r public-cloud-concepts-all-code.zip combined_codes >/dev/null 2>&1 || true
+          ls -lh public-cloud-concepts-all-code.zip || true
+
+      - name: Upload gecombineerde code zip
+        uses: actions/upload-artifact@v7
+        with:
+          name: public-cloud-concepts-code
+          path: public-cloud-concepts-all-code.zip
           retention-days: 30

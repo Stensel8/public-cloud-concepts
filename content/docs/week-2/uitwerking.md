@@ -53,7 +53,7 @@ first-deployment-5ffbd9444c-5hkzs   IP: 10.244.2.3   worker-london
 first-deployment-5ffbd9444c-pdrw0   IP: 10.244.2.4   worker-london
 ```
 
-Dit is precies waarom een Service nodig is: pods zijn wegwerpbaar en hun IPs veranderen.
+Dit is precies waarom een Service nodig is: pods zijn tijdelijk en hun IPs kunnen veranderen.
 
 ---
 
@@ -289,7 +289,7 @@ Elke metric zegt iets over hoe je werkt. Als je zelden deployt, betekent dat vaa
 
 Een hoge Change Failure Rate wijst op iets dat niet klopt in hoe je test of hoe je pipeline is ingericht. Teams die dit goed op orde hebben, deployen klein en vaak. Als er dan iets misgaat, is het snel gevonden en opgelost.
 
-DORA heeft ook aangetoond dat dit doorwerkt op het team zelf. Minder grote deploys betekent minder brandjes, minder crisismode, en minder stress. Dat is niet soft: het is gewoon het gevolg van goed ingericht werk.
+DORA heeft ook aangetoond dat dit doorwerkt op het team zelf. Minder grote deploys betekent minder brandjes, minder crisismode en minder stress. Dit levert minder incidenten en een lagere werkdruk op.
 
 ### Hoe pas ik dit toe?
 

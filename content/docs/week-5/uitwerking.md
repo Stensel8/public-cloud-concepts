@@ -45,13 +45,13 @@ Het originele script staat in [`static/docs/week-5/bestanden/opdracht/`](https:/
 {{< callout type="info" >}}
 **Waarom Standard en niet Autopilot?**
 
-Autopilot beperkt DaemonSets, blokkeert standaard privileged containers en vereist resource requests voor elke pod. Dat botst met de monitoring stack:
+Autopilot beperkt DaemonSets, blokkeert standaard containers met extra rechten en vereist resource requests voor elke pod. Dat botst met de monitoring stack:
 
 - **Alloy** draait als DaemonSet met toegang tot `/var/log/pods` op de host
-- **Prometheus node-exporter** heeft privileged toegang nodig tot host-metrics
+- **Prometheus node-exporter** heeft toegang met extra rechten nodig tot host-metrics
 - **ingress-nginx** vereist poortconfiguratie die Autopilot niet altijd toestaat
 
-Met Standard heb je gewoon volledige controle over node-configuratie, DaemonSets en privileged workloads.
+Met Standard heb je gewoon volledige controle over node-configuratie, DaemonSets en workloads met extra rechten.
 {{< /callout >}}
 
 {{< tabs >}}
@@ -395,7 +395,7 @@ In combinatie werkt het zo: SIEM detecteert een incident, SOAR reageert er geaut
 
 ITIL beschrijft processen voor IT-dienstverlening. Twee processen zijn hier direct relevant:
 
-**Incident Management** gaat over het zo snel mogelijk herstellen van een dienst. Een SIEM signaleert het incident, een SOAR-playbook schakelt de aanval automatisch in en maakt een ticket aan. Dat verkort de Mean Time to Detect (MTTD) en Mean Time to Respond (MTTR) direct.
+**Incident Management** gaat over het zo snel mogelijk herstellen van een dienst. Een SIEM signaleert het incident; een SOAR-playbook onderneemt automatisch actie en maakt een ticket aan. Dat verkort de Mean Time to Detect (MTTD) en Mean Time to Respond (MTTR) direct.
 
 **Problem Management** gaat een stap verder: wat is de onderliggende oorzaak? Uit SIEM-data kun je patronen halen die wijzen op een structureel probleem, zoals een applicatie die structureel te veel rechten vraagt of een endpoint dat regelmatig het doelwit is van brute-force.
 

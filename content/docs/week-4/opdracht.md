@@ -9,7 +9,7 @@ De opdracht voor week 4 bestaat uit twee onderdelen: het bestuderen van de packa
 
 ## 4.1 Helm
 
-Helm is de pakketbeheerder voor Kubernetes. In plaats van handmatig losse `deployment.yaml`- en `service.yaml`-bestanden toe te passen, bundelt Helm alles in een **chart**: één installeerbaar pakket.
+Helm is de package manager voor Kubernetes. In plaats van handmatig losse `deployment.yaml`- en `service.yaml`-bestanden toe te passen, bundelt Helm alles in een **chart**: één installeerbaar pakket.
 
 Er zijn drie belangrijke concepten in Helm:
 

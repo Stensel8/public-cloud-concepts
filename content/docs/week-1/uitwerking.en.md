@@ -101,7 +101,7 @@ master-amsterdam   Ready    control-plane   17m    v1.35.1
 
 **Dockerfile:** ([view on GitHub](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-1/bestanden/Dockerfile))
 
-- Alpine variant chosen deliberately: ~5 MB vs ~180 MB Debian, smaller attack surface.
+- Alpine variant chosen deliberately: ~5 MB vs ~180 MB Debian, reduced risk of vulnerabilities.
 - Copies the website to the nginx document root.
 - Starts nginx in the foreground so the container stays active.
 
