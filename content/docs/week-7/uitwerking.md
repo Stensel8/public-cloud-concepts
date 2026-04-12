@@ -3,102 +3,34 @@ title: "Uitwerking"
 weight: 2
 ---
 
-Week 7 richt zich op serverless computing via AWS: een REST API met API Gateway (Petstore-voorbeeld), Lambda als backend, en event-driven architecturen met het Pub-Sub patroon.
+Week 7 richt zich op serverless computing via AWS: een REST API met API Gateway en Lambda, plus event-driven architecturen.
 
 ---
 
 ## 7.1 REST API via API Gateway
 
-### Petstore API aanmaken
-
-Via de AWS Console: **API Gateway → Create API → REST API → Import**. Het Petstore-voorbeeld laadt een kant-en-klare OpenAPI-definitie met twee endpoints: `GET /pets` en `POST /pets`.
-
-Na het importeren: **Deploy API** naar een nieuwe stage (bijv. `dev`). De Invoke URL ziet er als volgt uit:
-
-```
-https://<api-id>.execute-api.<region>.amazonaws.com/dev
-```
-
-**POST een huisdier via Postman:**
-
-```http
-POST https://<api-id>.execute-api.<region>.amazonaws.com/dev/pets
-Content-Type: application/json
-
-{
-  "type": "dog",
-  "price": 249.99
-}
-```
-
-Respons (201):
-
-```json
-{
-  "petId": 42
-}
-```
-
-**GET het aangemaakte huisdier:**
-
-```http
-GET https://<api-id>.execute-api.<region>.amazonaws.com/dev/pets/42
-```
-
-Respons:
-
-```json
-{
-  "id": 42,
-  "type": "dog",
-  "price": 249.99
-}
-```
-
-<!-- Voeg hier screenshots toe van Postman: POST-request en GET-request met het gegenereerde ID -->
+Deze uitwerking bevat korte, praktische aanwijzingen voor de labs. Volg de twee AWS-labs in de opdrachten en voeg screenshots toe aan je portfolio.
 
 ---
 
 ### Method en integration
 
-In AWS API Gateway zijn een **method** en een **integration** twee verschillende lagen die samen een request verwerken.
+In API Gateway is de `method` het client-facing contract (HTTP-werkwoord, pad, authenticatie en validatie). De `integration` beschrijft de backend-mapping: waar API Gateway de request naartoe stuurt (HTTP-endpoint, Lambda, AWS-service) en hoe de response terug wordt gemapt naar de client.
 
-```
-Client
-  │
-  ▼
-Method Request       ← client-facing contract (HTTP method + pad, auth, validatie, request model)
-  │
-  ▼
-Integration Request  ← transformatie naar de backend (URL, headers, body mapping)
-  │
-  ▼
-Backend              ← HTTP endpoint, Lambda, Mock, AWS Service, VPC Link
-  │
-  ▼
-Integration Response ← transformatie van de backend-respons (status codes, headers, body mapping)
-  │
-  ▼
-Method Response      ← client-facing respons (HTTP status codes, response models)
-  │
-  ▼
-Client
-```
+Method: de kant die de client ziet
 
-**Method** — de kant die de client ziet:
-
-- Welk HTTP-werkwoord + pad de client aanroept (`POST /pets`)
-- Welke authenticatie vereist is (API Key, IAM, Cognito Authorizer, of geen)
-- Request-validatie: query parameters, headers, body schema
+- Welk HTTP-werkwoord en pad de client aanroept (bijv. `POST /pets`)
+- Welke authenticatie vereist is (API Key, IAM, Cognito of geen)
+- Request-validatie (query params, headers, body schema)
 - Welke HTTP-statuscodes de client kan ontvangen
 
-**Integration** — de kant die de backend ziet:
+Integration: de backend-kant
 
-- Waar API Gateway de request naartoe stuurt: een HTTP-endpoint, een Lambda-functie, een Mock (geen echte backend), een AWS-service, of een VPC Link
-- Hoe de request getransformeerd wordt vóór verzending (Integration Request mapping)
-- Hoe de backend-respons getransformeerd wordt terug naar de client (Integration Response mapping)
+- Waar de request naartoe gaat (HTTP, Lambda, AWS-service, mock)
+- Hoe de request wordt getransformeerd voordat deze wordt verstuurd (integration request mapping)
+- Hoe de backend-respons terug naar de client wordt gemapt (integration response mapping)
 
-Het zijn twee aparte verantwoordelijkheden die je onafhankelijk kunt configureren. Je kunt de methode beveiligen met een API Key terwijl de integration een Lambda-functie aanroept. Je kunt ook een mock integration gebruiken om een endpoint te simuleren zonder een echte backend, handig tijdens ontwikkeling.
+Deze verantwoordelijkheden configureer je apart: beveilig de method en laat de integration naar een Lambda verwijzen, of gebruik tijdens ontwikkeling een mock integration.
 
 ---
 
@@ -126,7 +58,7 @@ Met **Lambda Proxy Integration** stuurt API Gateway het volledige HTTP-request a
 
 ### Lambda aanmaken
 
-In het AWS Learner Lab kon ik geen nieuwe IAM-rol aanmaken — dat is een standaard studentbeperking. De oplossing was de bestaande **LabRole** gebruiken, die al de nodige rechten heeft voor Lambda en API Gateway.
+In het AWS Learner Lab kon ik geen nieuwe IAM-rol aanmaken. Dit is een standaard studentbeperking; de oplossing was om de bestaande **LabRole** te gebruiken, die al de nodige rechten heeft voor Lambda en API Gateway.
 
 ![Lambda functie aangemaakt met Python 3.14 en LabRole](/docs/week-7/media/uitwerking/lambda-aanmaken.avif)
 
@@ -166,7 +98,7 @@ Werkte meteen:
 
 **Optie 2 en 3: header en POST-body**
 
-Bij de eerste poging gaf API Gateway een `403 Forbidden` terug met de melding "Missing Authentication Token". Dat klinkt als een auth-probleem, maar dit is in API Gateway eigenlijk gewoon de default foutmelding als een route niet herkend wordt — of als de request niet goed is opgebouwd.
+Bij de eerste poging gaf API Gateway een `403 Forbidden` terug met de melding "Missing Authentication Token". Dat lijkt een authenticatieprobleem, maar in API Gateway is dit vaak de foutmelding die verschijnt als een route niet herkend wordt of de request niet goed is opgebouwd.
 
 ![Test via header - eerste poging 403](/docs/week-7/media/uitwerking/test-header-fout.avif)
 
@@ -186,7 +118,7 @@ Na beter kijken bleek het een invoerfout aan mijn kant: de header-waarde klopte 
 
 Serverless computing en event-driven architecturen zijn nauw verwant: serverless functies draaien niet continu, maar worden geactiveerd door een **event**.
 
-Een traditionele server wacht actief op requests (polling of open verbinding). Een serverless functie bestaat als het ware niet totdat er een event plaatsvindt — de cloudprovider instantieert de functie wanneer nodig en verwijdert hem daarna. Dit maakt serverless van nature event-driven.
+Een traditionele server wacht actief op requests (polling of een open verbinding). Een serverless functie bestaat alleen wanneer er een event plaatsvindt: de cloudprovider instantieert de functie wanneer nodig en verwijdert deze daarna. Dit maakt serverless van nature event-driven.
 
 **Welke events activeren een Lambda-functie?**
 
@@ -201,79 +133,4 @@ Een traditionele server wacht actief op requests (polling of open verbinding). E
 
 In alle gevallen geldt hetzelfde patroon: **iets gebeurt → een functie reageert**. Dat is de kern van event-driven architecturen. De functies zijn stateless, los gekoppeld, en schalen automatisch met het aantal events.
 
-Dit past ook bij het **The Twelve-Factor App** principe van losse koppeling (factor 4: Backing services) en statelessheid (factor 6: Processes). Elke Lambda-functie is een proces dat geen lokale state bewaart.
-
----
-
-### Petstore met event-driven architectuur
-
-De Petstore-applicatie hoeft niet langer als één monolithische service te draaien. Met een event-driven aanpak op AWS ziet de architectuur er als volgt uit:
-
-```mermaid
-flowchart LR
-    client(["Client\n(Postman / browser)"])
-
-    subgraph apigw["API Gateway"]
-        post["POST /pets"]
-        get["GET /pets/{id}"]
-    end
-
-    subgraph lambda_ns["Lambda"]
-        fn_create["create-pet\nLambda"]
-        fn_notify["notify-subscribers\nLambda"]
-    end
-
-    subgraph storage["DynamoDB"]
-        db[("pets table")]
-    end
-
-    subgraph messaging["SNS"]
-        topic["new-pet-created\ntopic"]
-    end
-
-    subgraph subscribers["Subscribers"]
-        email["E-mail\n(SNS → Email)"]
-        analytics["Analytics\nLambda"]
-    end
-
-    client -->|"POST /pets"| post
-    post --> fn_create
-    fn_create -->|"PutItem"| db
-    fn_create -->|"Publish"| topic
-    topic --> email
-    topic --> fn_notify
-    fn_notify --> analytics
-
-    client -->|"GET /pets/{id}"| get
-    get -->|"GetItem"| db
-```
-
-**Stroom:**
-
-1. Client stuurt `POST /pets` via API Gateway.
-2. `create-pet` Lambda slaat het huisdier op in DynamoDB en publiceert een event naar een SNS-topic (`new-pet-created`).
-3. SNS verstuurt het event naar alle subscribers: een e-mailabonnement (directe notificatie) en een `notify-subscribers` Lambda (voor verdere verwerking, bijv. analytics).
-
----
-
-#### Ontwerpbeslissing 1: SNS in plaats van directe e-mail vanuit Lambda
-
-**Beslissing:** De `create-pet` Lambda publiceert naar een SNS-topic in plaats van rechtstreeks een e-mail te versturen (bijv. via SES of een externe mailservice).
-
-**Redenering:** Als de Lambda rechtstreeks een e-mail verstuurt, zijn de twee verantwoordelijkheden (opslaan + notificeren) gekoppeld. Als de e-mailservice traag of onbereikbaar is, blokkeert of mislukt de Lambda. Met SNS als tussenstap is de Lambda klaar zodra het event gepubliceerd is. SNS bezorgt het event asynchroon aan alle subscribers, onafhankelijk van de Lambda.
-
-Bovendien maakt SNS **fan-out** mogelijk: één event bereikt meerdere subscribers tegelijk (e-mail, analytics, een toekomstige mobiele pushnotificatie). Zonder SNS zou elke nieuwe subscriber de Lambda-code wijzigen.
-
-**Trade-off:** SNS garandeert at-least-once delivery, niet exact-once. De `notify-subscribers` Lambda moet idempotent zijn: twee keer hetzelfde event verwerken mag niet leiden tot dubbele analytics-entries. Dit vereist een deduplicatiemechanisme (bijv. event ID controleren in DynamoDB).
-
----
-
-#### Ontwerpbeslissing 2: DynamoDB als persistence-laag
-
-**Beslissing:** De huisdierendata wordt opgeslagen in DynamoDB, niet in een relationele database (RDS).
-
-**Redenering:** DynamoDB is serverless en event-driven: het schalen is automatisch en er is geen idle-kosten (on-demand mode). Een RDS-instance draait continu, ook als er geen requests zijn — dat past slecht bij een serverless API die misschien maar sporadisch aangesproken wordt.
-
-DynamoDB heeft bovendien **DynamoDB Streams**: elke wijziging in de tabel kan een Lambda-functie triggeren. Dat opent een alternatieve architectuur waarbij de notificatie niet vanuit `create-pet` Lambda komt, maar vanuit een stream-verwerker die op de DynamoDB-stream luistert. Dit houdt de `create-pet` Lambda verantwoordelijk voor één ding: opslaan.
-
-**Trade-off:** DynamoDB is een key-value/document store. Complexe queries (joins, aggregaties) zijn lastiger dan in SQL. Voor de Petstore is dat geen probleem — ophalen op `petId` is een eenvoudige key-lookup. Als de Petstore later rijkere zoekopdrachten nodig heeft (alle honden onder €100), is DynamoDB + OpenSearch of een aparte query-service een betere keuze dan overstappen naar RDS.
+Richt je antwoord op hoe serverless past bij event‑driven architecturen en onderbouw je keuzes met minimaal twee ontwerpbeslissingen.

@@ -9,7 +9,7 @@ The week 6 assignment focuses on setting up a Proof of Concept based on a Cloud 
 
 - How to migrate a monolithic application to microservices
 - How to connect microservices via API Gateways (REST/HTTP/WebSockets)
-- What are microservices design patterns? (The Twelve-Factor App)
+- What are microservices design patterns?
 
 ---
 
