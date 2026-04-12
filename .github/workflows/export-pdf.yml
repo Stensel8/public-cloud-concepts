@@ -32,9 +32,6 @@ jobs:
 
     steps:
 
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
       # Installeer puppeteer-core in /tmp zodat het script (dat ook in /tmp staat)
       # de module kan vinden. Node zoekt node_modules relatief aan het script.
       # puppeteer-core downloadt geen extra Chromium — gebruikt de systeem-Chrome.
@@ -98,15 +95,17 @@ jobs:
             exit 0
           fi
 
-          # Installeer tools voor AVIF/beeldconversie en zip/unzip
+          # Installeer tools voor AVIF/beeldconversie
           sudo apt-get update -y
-          sudo apt-get install -y ffmpeg libavif-bin wget zip unzip
+          sudo apt-get install -y ffmpeg libavif-bin wget
 
           tmpdir=$(mktemp -d)
           echo "Downloading page into $tmpdir"
 
-          # Download pagina en alle benodigde resources (CSS, JS, afbeeldingen)
-          wget --no-verbose --page-requisites --adjust-extension --convert-links --span-hosts --no-parent -P "$tmpdir" "$REMOTE_URL"
+          # Download pagina en alle benodigde resources (CSS, JS, afbeeldingen).
+          # --no-span-hosts beperkt de download tot de eigen domein zodat externe
+          # CDNs (bijv. cdn.qwiklabs.com) niet worden gecrawld.
+          wget --no-verbose --page-requisites --adjust-extension --convert-links --no-parent -P "$tmpdir" "$REMOTE_URL"
 
           # Zoek het lokale index.html voor deze week
           local_index=$(find "$tmpdir" -type f -iname 'index.html' -path "*/nl/docs/week-${{ matrix.week }}/*" -print -quit || true)
@@ -122,16 +121,12 @@ jobs:
 
           echo "Gevonden lokale pagina: $local_index"
 
-          # Converteer alle AVIF bestanden naar PNG (robuuster)
-          while IFS= read -r -d '' f; do
-            png="${f%.*}.png"
-            echo "Converteer $f -> $png"
-            if [ -f "$f" ]; then
-              ffmpeg -y -loglevel error -i "$f" "$png" || echo "ffmpeg kon $f niet converteren"
-            else
-              echo "Bestand niet gevonden: $f"
-            fi
-          done < <(find "$tmpdir" -type f \( -iname '*.avif' -o -iname '*.AVIF' \) -print0)
+          # Converteer alle AVIF bestanden naar PNG via find -exec zodat paden
+          # altijd absoluut zijn (vermijdt pipe/nullbyte path-issues met while read).
+          find "$tmpdir" -type f -iname '*.avif' -exec sh -c '
+            png="${1%.*}.png"
+            ffmpeg -y -loglevel error -i "$1" "$png" || echo "ffmpeg kon $1 niet converteren"
+          ' _ {} \;
 
           # Wijzig verwijzingen .avif -> .png in alle gedownloade bestanden (HTML/CSS/JS)
           find "$tmpdir" -type f -exec sed -i 's/\.avif/\.png/gI' {} + || true
@@ -191,44 +186,6 @@ jobs:
           path: "pdfs/Week-${{ matrix.week }}-Uitwerking.pdf"
           retention-days: 30
 
-      # Maak per-week een zip met code/config bestanden die bij deze week horen
-      - name: Maak week code/config zip
-        run: |
-          set -euo pipefail
-          mkdir -p archives
-          zipfile="archives/Week-${{ matrix.week }}-Code.zip"
-
-          echo "Zoek en verzamel bestanden voor week ${{ matrix.week }}"
-
-          made=0
-          # Voeg de 'bestanden' directory toe als die bestaat
-          if [ -d "static/docs/week-${{ matrix.week }}/bestanden" ]; then
-            zip -r "$zipfile" static/docs/week-${{ matrix.week }}/bestanden >/dev/null 2>&1 || true
-            made=1
-          fi
-
-          # Voeg content MD-bestanden van de week toe
-          if compgen -G "content/docs/week-${{ matrix.week }}/*.md" > /dev/null 2>&1; then
-            zip -r "$zipfile" content/docs/week-${{ matrix.week }}/*.md >/dev/null 2>&1 || true
-            made=1
-          fi
-
-          # Voeg common config types uit de static folder (yaml, yml, Dockerfile, sh, tf)
-          if compgen -G "static/docs/week-${{ matrix.week }}/**/*.*" > /dev/null 2>&1; then
-            find static/docs/week-${{ matrix.week }} -type f \( -iname '*.yml' -o -iname '*.yaml' -o -iname 'Dockerfile*' -o -iname '*.sh' -o -iname '*.tf' -o -iname '*.tfvars' -o -iname '*.json' \) -print0 | xargs -0 -r zip -r "$zipfile" >/dev/null 2>&1 || true
-            made=1
-          fi
-
-          ls -lh "$zipfile" || true
-
-      - name: Upload week code zip
-        uses: actions/upload-artifact@v7
-        with:
-          name: "Week-${{ matrix.week }}-Code"
-          path: "archives/Week-${{ matrix.week }}-Code.zip"
-          if-no-files-found: ignore
-          retention-days: 30
-
 
   bundle:
     name: Bundel alle uitwerkingen
@@ -240,10 +197,10 @@ jobs:
 
       # Download alle losse week-PDFs naar één map.
       # merge-multiple: true zet alle bestanden plat in de opgegeven map (geen submappen per artifact).
-      - name: Download alle week-artifacts (PDFs + code zips)
+      - name: Download alle week-PDFs
         uses: actions/download-artifact@v8
         with:
-          pattern: "Week-*"
+          pattern: "Week-*-Uitwerking"
           path: pdfs
           merge-multiple: true
 
@@ -252,33 +209,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: public-cloud-concepts-uitwerkingen
-          path: pdfs/*.pdf
-          retention-days: 30
-      
-      - name: Install zip/unzip
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y zip unzip
-
-      - name: Maak gecombineerde code-zip
-        run: |
-          set -euo pipefail
-          mkdir -p combined_codes
-          # Pak alle Week-*-Code.zip bestanden uit in submappen
-          for z in pdfs/*-Code.zip; do
-            [ -f "$z" ] || continue
-            d="combined_codes/$(basename "$z" .zip)"
-            mkdir -p "$d"
-            unzip -qq "$z" -d "$d"
-          done
-
-          # Maak één zip met alle code
-          zip -r public-cloud-concepts-all-code.zip combined_codes >/dev/null 2>&1 || true
-          ls -lh public-cloud-concepts-all-code.zip || true
-
-      - name: Upload gecombineerde code zip
-        uses: actions/upload-artifact@v7
-        with:
-          name: public-cloud-concepts-code
-          path: public-cloud-concepts-all-code.zip
+          path: pdfs/
           retention-days: 30
