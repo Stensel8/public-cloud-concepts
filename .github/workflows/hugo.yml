@@ -36,7 +36,7 @@ jobs:
     name: Bouw de site
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.160.0
+      HUGO_VERSION: 0.160.1
 
     steps:
       # Download en installeer de opgegeven versie van Hugo.
