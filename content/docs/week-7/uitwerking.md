@@ -52,7 +52,7 @@ Geeft het eerder ingevoerde huisdier terug.
 
 Dit werkt meteen zonder extra configuratie, want de Petstore-API gebruikt een mock integration. API Gateway geeft een hardcoded response terug zonder dat er een echte backend aan te pas komt. Dat is handig voor het snel testen van een API-structuur voordat je de backend bouwt.
 
-### 7.2.3 Advies over de Petstore-architectuur
+### Advies over de Petstore-architectuur
 
 De Petstore zoals AWS hem levert is een mock: er is geen echte database, het geheugen is vluchtig en bij elke nieuwe deploy zijn de huisdieren weg. Dit is nuttig als demo, maar niet als je een echte applicatie wil bouwen.
 
@@ -71,8 +71,6 @@ De Petstore zoals AWS hem levert is een mock: er is geen echte database, het geh
 1. De POST `/pets` aanroep triggert een Lambda die de pet opslaat in DynamoDB met een gegenereerd ID.
 2. De GET `/pets/{petId}` aanroep triggert een Lambda die de pet ophaalt via het ID. Als de pet niet bestaat, geeft Lambda een `404` terug met een duidelijke foutmelding.
 3. API Gateway regelt authenticatie via een API Key: clients moeten een geldige key meesturen in de header `x-api-key`.
-
-Dit is precies het patroon dat ik in het tweede deel van de opdracht heb opgezet met de Lambda-proxy integration, maar dan met een echte database eronder.
 
 ---
 
@@ -187,14 +185,14 @@ Een traditionele server wacht actief op requests (polling of een open verbinding
 
 | Event source | Voorbeeld |
 |---|---|
-| HTTP request | API Gateway → POST /pets |
+| HTTP request | API Gateway (POST /pets) |
 | Message | SQS queue, SNS topic |
 | Bestandsupload | S3 PUT object |
 | Tijdschema | EventBridge Scheduler (cron) |
 | Databasewijziging | DynamoDB Streams |
 | Andere Lambda | Direct invocation |
 
-In alle gevallen geldt hetzelfde patroon: **iets gebeurt → een functie reageert**. Dat is de kern van event-driven architecturen. De functies zijn stateless, los gekoppeld, en schalen automatisch met het aantal events.
+In alle gevallen geldt hetzelfde patroon: **iets gebeurt, een functie reageert**. Dat is de kern van event-driven architecturen. De functies zijn stateless, los gekoppeld, en schalen automatisch met het aantal events.
 
 ---
 
@@ -212,41 +210,21 @@ In een event-driven Petstore reageert het systeem op events in plaats van dat he
 4. SNS stuurt dat bericht door naar alle abonnees: een e-mailadres, een SQS-wachtrij, een andere Lambda, of een webhook.
 
 ```
-Client → API Gateway → Lambda (opslaan + publiceren) → DynamoDB
-                                                      ↘ SNS → e-mail / SQS / webhook
+Client -> API Gateway -> Lambda -> DynamoDB
+                               -> SNS -> e-mail / SQS / webhook
 ```
 
-**Ontwerpbeslissing 1: SNS voor notificaties (fan-out)**
+**Ontwerpbeslissing 1: SNS voor notificaties**
 
-Ik gebruik Amazon SNS als berichtenbus. SNS ondersteunt meerdere abonnees tegelijkertijd: als er een nieuw huisdier is, ontvangen alle geregistreerde abonnees het bericht gelijktijdig. Dat heet fan-out. Dit is de juiste keuze als meerdere systemen of mensen op de hoogte moeten worden gesteld van hetzelfde event.
+Voor de notificaties zou ik Amazon SNS gebruiken. SNS stuurt een bericht naar alle abonnees tegelijk: bij een nieuwe pet ontvangen een e-mailadres, een SQS-wachtrij en een webhook het bericht gelijktijdig. Dat is handig als meerdere systemen op de hoogte moeten zijn van hetzelfde event.
 
-De Lambda publiceert na elke succesvolle opslag in DynamoDB een bericht naar het SNS-topic `pet-added`:
-
-```python
-import boto3, json, uuid
-
-dynamodb = boto3.resource('dynamodb')
-sns = boto3.client('sns')
-table = dynamodb.Table('pets')
-TOPIC_ARN = 'arn:aws:sns:us-east-1:123456789:pet-added'
-
-def handler(event, context):
-    body = json.loads(event['body'])
-    pet_id = str(uuid.uuid4())
-    table.put_item(Item={'petId': pet_id, **body})
-    sns.publish(
-        TopicArn=TOPIC_ARN,
-        Message=json.dumps({'petId': pet_id, **body}),
-        Subject='Nieuw huisdier toegevoegd'
-    )
-    return {'statusCode': 201, 'body': json.dumps({'petId': pet_id})}
-```
+Na elke succesvolle opslag in DynamoDB publiceert de Lambda een bericht naar een SNS-topic.
 
 **Ontwerpbeslissing 2: DynamoDB Streams voor verdere verwerking**
 
-Naast de directe SNS-publicatie zet ik DynamoDB Streams aan op de `pets`-tabel. Elke schrijfoperatie op de tabel genereert automatisch een stream-event. Een aparte Lambda luistert naar die stream en kan de data verder verwerken, bijvoorbeeld het aanmaken van een thumbnail, het bijwerken van statistieken, of het loggen naar CloudWatch.
+Daarnaast zou je DynamoDB Streams aanzetten op de `pets`-tabel. Bij elke schrijfoperatie genereert DynamoDB automatisch een stream-event. Een tweede Lambda luistert naar die stream en kan de data verder verwerken, bijvoorbeeld statistieken bijwerken of loggen naar CloudWatch.
 
-Het verschil met de SNS-aanpak: DynamoDB Streams werken op databaseniveau. Ook als de eerste Lambda vergeet te publiceren, vangt de stream-Lambda het event alsnog op. Dit maakt het systeem robuuster. De twee mechanismen vullen elkaar aan:
+Het verschil met SNS: Streams werken op databaseniveau. Ook als de eerste Lambda vergeet te publiceren, vangt de stream-Lambda het event op. De twee mechanismen vullen elkaar aan:
 
 | | SNS in Lambda | DynamoDB Streams |
 |---|---|---|

@@ -23,11 +23,11 @@ This repository is maintained by [Sten Tijhuis](https://github.com/Stensel8) and
 
 ## Modules
 
-| Module | EC | Quarter |
-|--------|-----|---------|
-| Public Cloud Concepts | 5 EC | Q3 |
+| Module |
+|--------|
+| Public Cloud Concepts |
 
-> [**Architecting the Cloud**](https://github.com/Stensel8/cloud-engineering/tree/main/architecting-the-cloud) and [**Cloud Automation Concepts**](https://github.com/Stensel8/cloud-engineering/tree/main/cloud-automation-concepts) (5 EC, Q3) are shared modules done in collaboration with [Wout Achterhuis](https://github.com/Hintenhaus04) and live in their own repository: [cloud-engineering](https://github.com/Stensel8/cloud-engineering).
+> [**Architecting the Cloud**](https://github.com/Stensel8/cloud-engineering/tree/main/architecting-the-cloud) and [**Cloud Automation Concepts**](https://github.com/Stensel8/cloud-engineering/tree/main/cloud-automation-concepts) are shared modules done in collaboration with [Wout Achterhuis](https://github.com/Hintenhaus04) and live in their own repository: [cloud-engineering](https://github.com/Stensel8/cloud-engineering).
 
 ## Course Overview
 
@@ -41,7 +41,8 @@ This repository is maintained by [Sten Tijhuis](https://github.com/Stensel8) and
 | 6 | Microservices | [Week 6](content/docs/week-6/) |
 | 7 | Serverless & API Gateway | [Week 7](content/docs/week-7/) |
 
-## Installing Google Cloud SDK
+<details>
+<summary>Installing Google Cloud SDK</summary>
 
 The assignments in this repository use the [Google Cloud CLI (`gcloud`)](https://cloud.google.com/sdk/docs/install). Install it once using the instructions below.
 
@@ -64,27 +65,10 @@ Verify the installation:
 gcloud version
 ```
 
-Expected output (version numbers may differ):
-
-```
-Google Cloud SDK 559.0.0
-bq 2.1.28
-core 2026.02.27
-gsutil 5.35
-```
-
 Then log in with your Google account:
 
 ```bash
 gcloud auth login
-```
-
-A browser tab will open automatically. After logging in you will see a confirmation in the terminal:
-
-```
-You are now logged in as [your-email-address].
-Your current project is [your-project-id].  You can change this setting by running:
-  $ gcloud config set project PROJECT_ID
 ```
 
 </details>
@@ -98,36 +82,26 @@ Via [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/):
 winget install -e --id Google.CloudSDK
 ```
 
-> More info: [winstall.app/apps/Google.CloudSDK](https://winstall.app/apps/Google.CloudSDK)
-
 Restart PowerShell or the command prompt after installation so that `gcloud` is available.
 
 </details>
 
-## Installing the GKE Auth Plugin
+</details>
 
-To use `kubectl` with Google Kubernetes Engine (GKE) clusters, the `gke-gcloud-auth-plugin` is required. Without it, `gcloud container clusters create` will show the following error:
+<details>
+<summary>Installing the GKE Auth Plugin</summary>
 
-```
-CRITICAL: ACTION REQUIRED: gke-gcloud-auth-plugin, which is needed for continued use of kubectl,
-was not found or is not executable.
-```
-
-Install the plugin once via:
+To use `kubectl` with GKE clusters, `gke-gcloud-auth-plugin` is required:
 
 ```bash
 gcloud components install gke-gcloud-auth-plugin
-```
-
-Then verify the installation:
-
-```bash
 gke-gcloud-auth-plugin --version
 ```
 
----
+</details>
 
-## Images
+<details>
+<summary>Images (AVIF)</summary>
 
 All images in this repository use the [AVIF](https://en.wikipedia.org/wiki/AVIF) format: open, royalty-free, and more efficient than PNG or JPEG at equivalent quality.
 
@@ -138,4 +112,6 @@ find . -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \) | while
 ```
 
 Install `avifenc` first via `sudo pacman -S libavif` (Arch/CachyOS) or `sudo apt install libavif-bin` (Debian/Ubuntu).
+
+</details>
 

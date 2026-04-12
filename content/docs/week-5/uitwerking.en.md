@@ -318,8 +318,8 @@ Set a DNS A record for `mywebsite.stijhuis.nl` pointing to the same Ingress IP a
 
 At first glance not much, but the monitoring stack automatically picks up the following:
 
-- **Loki + Alloy** reads the nginx access logs → HTTP status codes, request rate, 404s
-- **kube-state-metrics** (part of kube-prometheus-stack) → pod availability, restarts, CPU/memory
+- **Loki + Alloy** reads the nginx access logs: HTTP status codes, request rate, 404s
+- **kube-state-metrics** (part of kube-prometheus-stack): pod availability, restarts, CPU/memory
 
 In Grafana these logs and metrics are directly visible via the Loki and Prometheus datasources. That is exactly what the assignment demonstrates: not the complexity of the app, but the functioning of the monitoring stack.
 {{< /callout >}}
@@ -377,7 +377,7 @@ For a learning environment, the open-source stack is the better choice: you unde
 
 ---
 
-## Step 11: SIEM and SOAR
+## Step 12: SIEM and SOAR
 
 ### What is SIEM?
 
@@ -408,7 +408,7 @@ In DevOps you want to integrate security throughout the pipeline (DevSecOps). A 
 
 ---
 
-## Step 12: TerramEarth case study
+## Step 13: TerramEarth case study
 
 TerramEarth manufactures heavy machinery for mining and agriculture. They have 2 million vehicles in use that collect sensor data: critical data goes in real time, the rest is uploaded daily. That is 200-500 MB per vehicle per day. They run on Google Cloud but also have legacy systems on-premise.
 
@@ -435,60 +435,6 @@ Google Cloud Monitoring collects metrics, logs, and traces from all Google Cloud
 ### Product 2: Grafana + Prometheus (self-hosted or via Grafana Cloud)
 
 This is the same stack I use in Week 5. For TerramEarth this is interesting because alongside their Google Cloud environment they also have on-premise legacy systems. Grafana can combine datasources from both environments in one dashboard.
-
----
-
-## Step 13: Terraform as a tooling recommendation
-
-Terraform is an Infrastructure as Code (IaC) tool from HashiCorp. Instead of manually creating resources in a console or through loose scripts, you describe the desired infrastructure in `.tf` files. Terraform compares that description with the current state and only applies the necessary changes.
-
-### How does it work?
-
-You write resources in the HashiCorp Configuration Language (HCL). Terraform has providers for almost all cloud platforms. For Google Cloud you use the `google` provider, for AWS the `aws` provider.
-
-An example of creating a GKE cluster with Terraform would look like this:
-
-```hcl
-resource "google_container_cluster" "week5" {
-  name     = "week5-cluster"
-  location = "europe-west4"
-
-  initial_node_count = 2
-
-  node_config {
-    machine_type = "e2-medium"
-    disk_size_gb = 50
-  }
-}
-```
-
-Instead of clicking through the console manually or having to remember a `gcloud` command, the configuration now lives in a file that you can commit to Git.
-
-The three basic commands are:
-
-| Command | What it does |
-|---|---|
-| `terraform init` | Downloads the required providers |
-| `terraform plan` | Shows what will be created, changed, or deleted |
-| `terraform apply` | Applies the changes |
-
-### Why for TerramEarth?
-
-TerramEarth has a hybrid environment: Google Cloud for the data pipeline and on-premise systems for legacy. With Terraform they can describe both environments using the same tooling. The infrastructure then lives in Git, giving a complete overview of what is running, who changed what, and when.
-
-A concrete benefit for TerramEarth: they want to standardise their monitoring and observability. With Terraform you can describe the entire monitoring stack (GKE cluster, Loki, Prometheus, Grafana) as code. When a new project starts, you can reproduce the same setup in another region in minutes without manual steps.
-
-### Terraform versus manual scripts
-
-| | Manual scripts (`gcloud`, `kubectl`) | Terraform |
-|---|---|---|
-| State tracking | No, script does not know what already exists | Yes, Terraform keeps a state file |
-| Idempotent | No, script may create things twice | Yes, `terraform apply` only changes what is needed |
-| Version control | Script in Git, but no links to resources | State and code both in Git |
-| Collaboration | Everyone needs to know which script has already run | State is shared, everyone sees the current state |
-| Hybrid cloud | Separate scripts per platform | One workflow for multiple providers |
-
-For a company like TerramEarth that wants to standardise its tooling, Terraform is a logical choice: one way of working for all cloud resources, in Git, repeatable and auditable.
 
 **Problem Management:**
 
