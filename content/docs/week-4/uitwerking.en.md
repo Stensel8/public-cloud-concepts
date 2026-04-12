@@ -249,3 +249,47 @@ For EHR I would make this mandatory for all employees. MFA blocks the vast major
 Managed Identities are Azure-managed identities for applications and services. No password needed; Azure handles the credentials automatically. Service Principals are the manual variant where you manage credentials yourself.
 
 For cloud-native applications, Managed Identity is the better choice. No stored passwords in configuration files, automatic rotation, and direct integration with Azure RBAC. Service Principals are only used when an application runs outside Azure and needs to access Azure resources.
+
+---
+
+## 4.2.2 Helm on Azure (AKS)
+
+The Helm charts from Week 4 were developed on GKE, but they also work on Azure Kubernetes Service (AKS). Helm is Kubernetes-native and works platform-independently. There are a few practical differences though.
+
+### Storage classes
+
+GKE uses `standard-rwo` as the default storage class. On AKS that is `managed-csi` (Azure Disk). For charts that request persistent storage, such as WordPress, you need to set the storage class explicitly:
+
+```bash
+helm install my-wordpress bitnami/wordpress \
+  --set global.storageClass=managed-csi
+```
+
+This is exactly the same problem as with the monitoring stack in Week 5: the school script used `managed-csi` because it was written for Azure, which does not work on GKE.
+
+### Authentication to the container registry
+
+On GKE I use Artifact Registry with a service account key as a GitHub Secret. On Azure you use Azure Container Registry (ACR). AKS can be linked to an ACR without separate credentials via a managed identity:
+
+```bash
+az aks update --name <cluster> --resource-group <rg> --attach-acr <acr-name>
+```
+
+This is comparable to how I give the Compute Engine default service account `Artifact Registry Reader` permissions on GKE for the nodes.
+
+### Deploying Helm charts via a pipeline on Azure
+
+For EHR Healthcare I would use the same approach as in Week 3, but with Azure-specific steps:
+
+| Step | GKE (my setup) | AKS (Azure) |
+|------|----------------|-------------|
+| Authenticate | `google-github-actions/auth` with service account key | `azure/login` with service principal or OIDC |
+| Cluster credentials | `google-github-actions/get-gke-credentials` | `azure/aks-set-context` |
+| Image registry | Artifact Registry | Azure Container Registry |
+| Storage class | `standard-rwo` | `managed-csi` |
+
+The Helm charts themselves barely need changing. It is mainly the CI/CD pipeline and the storage class in `values.yaml` that are platform-specific.
+
+### Recommendation for EHR Healthcare
+
+Because EHR already works with Azure AD, I would choose AKS with Workload Identity. That links the Managed Identity of a pod directly to a Kubernetes service account, without separate credentials. The Helm charts stay the same; authentication is handled via Azure RBAC.

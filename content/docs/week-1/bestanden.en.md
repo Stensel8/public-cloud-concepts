@@ -23,7 +23,7 @@ All scripts and configuration files used for Week 1. The source code is on [GitH
 
 | File | Description |
 |------|-------------|
-| [Dockerfile](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-1/bestanden/Dockerfile) | Builds the static site based on `nginx:1-alpine-slim`. The Alpine variant was chosen deliberately: ~5 MB vs ~180 MB for Debian, smaller attack surface, and faster pull times. |
+| [Dockerfile](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-1/bestanden/Dockerfile) | Builds the static site based on `nginx:1-alpine-slim`. The Alpine variant was chosen deliberately: ~5 MB vs ~180 MB for Debian, reduced risk of vulnerabilities, and faster pull times. |
 | [nginx-default.conf](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-1/bestanden/nginx-default.conf) | Nginx configuration for the static site. |
 | [deployment.yml](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-1/bestanden/deployment.yml) | Kubernetes Deployment with 2 replicas of the container (`stensel8/public-cloud-concepts:latest`). |
 | [service.yml](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-1/bestanden/service.yml) | Kubernetes LoadBalancer Service on port 80. |

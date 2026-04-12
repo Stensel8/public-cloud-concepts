@@ -45,13 +45,13 @@ Het originele script staat in [`static/docs/week-5/bestanden/opdracht/`](https:/
 {{< callout type="info" >}}
 **Waarom Standard en niet Autopilot?**
 
-Autopilot beperkt DaemonSets, blokkeert standaard privileged containers en vereist resource requests voor elke pod. Dat botst met de monitoring stack:
+Autopilot beperkt DaemonSets, blokkeert standaard containers met extra rechten en vereist resource requests voor elke pod. Dat botst met de monitoring stack:
 
 - **Alloy** draait als DaemonSet met toegang tot `/var/log/pods` op de host
-- **Prometheus node-exporter** heeft privileged toegang nodig tot host-metrics
+- **Prometheus node-exporter** heeft toegang met extra rechten nodig tot host-metrics
 - **ingress-nginx** vereist poortconfiguratie die Autopilot niet altijd toestaat
 
-Met Standard heb je gewoon volledige controle over node-configuratie, DaemonSets en privileged workloads.
+Met Standard heb je gewoon volledige controle over node-configuratie, DaemonSets en workloads met extra rechten.
 {{< /callout >}}
 
 {{< tabs >}}
@@ -330,44 +330,7 @@ In Grafana zijn deze logs en metrics direct zichtbaar via de Loki- en Prometheus
 
 De monitoring stack bestaat uit vier lagen: **log-verzameling** (Alloy), **log-opslag** (Loki), **metrics** (Prometheus + exporters) en **visualisatie** (Grafana). Ingress-nginx verzorgt de externe toegang.
 
-```mermaid
-flowchart LR
-    browser(["Browser\ngrafana.stijhuis.nl"])
-
-    subgraph ingress_ns["ingress-nginx"]
-        nginx["ingress-nginx\nLoadBalancer"]
-    end
-
-    subgraph app_ns["mywebsite"]
-        app["nginx static site\nstensel8/public-cloud-concepts"]
-    end
-
-    subgraph alloy_ns["alloy"]
-        alloy["Grafana Alloy\nDaemonSet"]
-    end
-
-    subgraph loki_ns["loki"]
-        loki_gw["Loki Gateway"]
-        loki_pod[("Loki SingleBinary\nfilesystem storage")]
-        loki_gw --> loki_pod
-    end
-
-    subgraph prom_ns["prometheus — kube-prometheus-stack"]
-        node_exp["node-exporter\nDaemonSet"]
-        ksm["kube-state-metrics"]
-        prom[("Prometheus TSDB")]
-        grafana["Grafana"]
-        node_exp -->|"scrape /metrics"| prom
-        ksm -->|"scrape /metrics"| prom
-    end
-
-    browser -->|"HTTPS — Bunny DNS"| nginx
-    nginx --> grafana
-    app -->|"stdout/stderr"| alloy
-    alloy -->|"HTTP push"| loki_gw
-    prom -->|"PromQL"| grafana
-    loki_pod -->|"LogQL"| grafana
-```
+![Architectuurdiagram](/docs/week-5/media/mermaid-diagram-week-5.avif)
 
 | Component | Namespace | Rol |
 |-----------|-----------|-----|
@@ -432,7 +395,7 @@ In combinatie werkt het zo: SIEM detecteert een incident, SOAR reageert er geaut
 
 ITIL beschrijft processen voor IT-dienstverlening. Twee processen zijn hier direct relevant:
 
-**Incident Management** gaat over het zo snel mogelijk herstellen van een dienst. Een SIEM signaleert het incident, een SOAR-playbook schakelt de aanval automatisch in en maakt een ticket aan. Dat verkort de Mean Time to Detect (MTTD) en Mean Time to Respond (MTTR) direct.
+**Incident Management** gaat over het zo snel mogelijk herstellen van een dienst. Een SIEM signaleert het incident; een SOAR-playbook onderneemt automatisch actie en maakt een ticket aan. Dat verkort de Mean Time to Detect (MTTD) en Mean Time to Respond (MTTR) direct.
 
 **Problem Management** gaat een stap verder: wat is de onderliggende oorzaak? Uit SIEM-data kun je patronen halen die wijzen op een structureel probleem, zoals een applicatie die structureel te veel rechten vraagt of een endpoint dat regelmatig het doelwit is van brute-force.
 

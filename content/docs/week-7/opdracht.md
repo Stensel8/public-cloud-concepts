@@ -10,7 +10,7 @@ De opdracht voor week 7 richt zich op een Proof of Concept op basis van een Clou
 - Serverless concepten analyseren (Google Cloud Functions / AWS Lambda / Azure Functions)
 - API Gateways gebruiken
 - Werken met OpenAPI-definities
-- Event-driven architecturen verkennen (Pub-Sub)
+- Event-driven architecturen verkennen
 
 ---
 
@@ -34,9 +34,9 @@ De opdracht voor week 7 richt zich op een Proof of Concept op basis van een Clou
 
 ## 7.2 Event-driven architecturen
 
-3. Lees de bronnen over event-driven architecturen en het Pub-Sub patroon ter voorbereiding.
+3. Lees de bronnen over event-driven architecturen ter voorbereiding.
 
    - Leg uit hoe serverless computing past binnen het concept van event-driven architecturen.
-   - Hoe zou je de Petstore-applicatie kunnen hosten met een event-driven architectuur, zodat je op de hoogte wordt gesteld van elk nieuw huisdier?
+   - Hoe zou je een (voorbeeld)applicatie hosten met een event-driven architectuur, zodat je op de hoogte wordt gesteld van relevante nieuwe gebeurtenissen?
 
    Onderbouw je antwoord met minimaal **2 ontwerpbeslissingen**.

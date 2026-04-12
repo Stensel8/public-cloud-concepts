@@ -9,7 +9,7 @@ De opdracht voor week 6 richt zich op het opzetten van een Proof of Concept op b
 
 - Hoe maak je van een monolithische applicatie een microservice?
 - Hoe verbind je microservices via API Gateways (REST/HTTP/WebSockets)?
-- Wat zijn microservices design patterns? (The Twelve-Factor App)
+- Wat zijn microservices design patterns?
 
 ---
 

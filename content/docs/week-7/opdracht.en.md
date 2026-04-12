@@ -10,7 +10,7 @@ The week 7 assignment focuses on a Proof of Concept based on a Cloud reference a
 - Analyse serverless concepts (Google Cloud Functions / AWS Lambda / Azure Functions)
 - Use API Gateways
 - Work with OpenAPI definitions
-- Explore event-driven architectures (Pub-Sub)
+- Explore event-driven architectures
 
 ---
 
@@ -34,9 +34,9 @@ The week 7 assignment focuses on a Proof of Concept based on a Cloud reference a
 
 ## 7.2 Event-driven architectures
 
-3. Read the sources on event-driven architectures and the Pub-Sub pattern as preparation.
+3. Read the sources on event-driven architectures as preparation.
 
    - Explain how serverless computing fits within the concept of event-driven architectures.
-   - How could you host the Petstore application using an event-driven architecture so that you are notified of every new pet?
+   - How could you host an (example) application using an event-driven architecture so that you are notified of relevant new events?
 
    Support your answer with at least **2 design decisions**.

@@ -77,23 +77,101 @@ jobs:
 
       # Controleer eerst of de uitwerkingspagina bestaat (HTTP 200).
       # Als de pagina er niet is (bijv. week nog niet uitgewerkt), sla dan over.
-      # Als de pagina wel bestaat, genereer de PDF via Puppeteer en
-      # controleer daarna of het bestand niet leeg is (Puppeteer kan stil falen).
+      # Als de pagina wel bestaat, download de pagina en resources lokaal,
+      # converteer AVIF-afbeeldingen naar PNG (Ubuntu runner met ffmpeg/libavif),
+      # voeg een korte waarschuwing toe en genereer dan de PDF via Puppeteer.
       - name: Genereer PDF voor week ${{ matrix.week }}
         env:
-          PDF_URL: "https://public-cloud-concepts.stensel.nl/nl/docs/week-${{ matrix.week }}/uitwerking/"
+          REMOTE_URL: "https://public-cloud-concepts.stensel.nl/nl/docs/week-${{ matrix.week }}/uitwerking/"
           PDF_FILE: "pdfs/Week-${{ matrix.week }}-Uitwerking.pdf"
         run: |
+          set -euo pipefail
           mkdir -p pdfs
 
-          status=$(curl -s -o /dev/null -w "%{http_code}" "$PDF_URL")
+          status=$(curl -s -o /dev/null -w "%{http_code}" "$REMOTE_URL")
 
           if [ "$status" != "200" ]; then
             echo "Geen uitwerking voor week ${{ matrix.week }} (HTTP ${status}), overgeslagen."
             exit 0
           fi
 
+          # Installeer tools voor AVIF/beeldconversie
+          sudo apt-get update -y
+          sudo apt-get install -y ffmpeg libavif-bin wget
+
+          tmpdir=$(mktemp -d)
+          echo "Downloading page into $tmpdir"
+
+          # Download pagina en alle benodigde resources (CSS, JS, afbeeldingen).
+          # --no-span-hosts beperkt de download tot de eigen domein zodat externe
+          # CDNs (bijv. cdn.qwiklabs.com) niet worden gecrawld.
+          wget --no-verbose --page-requisites --adjust-extension --convert-links --no-parent -P "$tmpdir" "$REMOTE_URL"
+
+          # Zoek het lokale index.html voor deze week
+          local_index=$(find "$tmpdir" -type f -iname 'index.html' -path "*/nl/docs/week-${{ matrix.week }}/*" -print -quit || true)
+          if [ -z "$local_index" ]; then
+            # fallback: eerste index.html
+            local_index=$(find "$tmpdir" -type f -iname 'index.html' -print -quit)
+          fi
+
+          if [ -z "$local_index" ]; then
+            echo "Kon lokale pagina niet vinden na download"
+            exit 1
+          fi
+
+          echo "Gevonden lokale pagina: $local_index"
+
+          # Converteer alle AVIF bestanden naar PNG via find -exec zodat paden
+          # altijd absoluut zijn (vermijdt pipe/nullbyte path-issues met while read).
+          find "$tmpdir" -type f -iname '*.avif' -exec sh -c '
+            png="${1%.*}.png"
+            ffmpeg -y -loglevel error -i "$1" "$png" || echo "ffmpeg kon $1 niet converteren"
+          ' _ {} \;
+
+          # Wijzig verwijzingen .avif -> .png in alle gedownloade bestanden (HTML/CSS/JS)
+          find "$tmpdir" -type f -exec sed -i 's/\.avif/\.png/gI' {} + || true
+
+          # Voeg waarschuwing in na <body>
+          export LOCAL_INDEX="$local_index"
+          python3 - <<'PY'
+          import os, re
+          path = os.environ['LOCAL_INDEX']
+          html = open(path).read()
+          m = re.search(r'(<body[^>]*>)', html, re.I)
+          if not m:
+            raise SystemExit('Geen <body> tag gevonden')
+          warning = (
+            '<div style="border:1px solid #f39c12;padding:10px;background:#fff8e1;color:#000;margin:8px 0;font-weight:600">'
+            'Let op, dit is een export welke is gegenereerd uit GitHub. Deze export is gedraaid vanaf de github static pagina op: '
+            'https://public-cloud-concepts.stensel.nl/nl/. Het kan zijn dat er secties niet goed inladen of versprongen zijn. '
+            'Dit is een limitatie van de runner die markdown naar PDF heeft omgevormd.'
+            '</div>'
+          )
+          open(path, 'w').write(html[:m.end()] + warning + html[m.end():])
+          PY
+
+          # Start een lokale webserver vanuit de domain-submap zodat root-relative
+          # paden (/docs/...) correct resolven naar de gedownloade bestanden.
+          domain_dir=$(ls "$tmpdir" | head -1)
+          server_dir="$tmpdir/$domain_dir"
+          (cd "$server_dir" && python3 -m http.server 8000 >/dev/null 2>&1) &
+          server_pid=$!
+          sleep 1
+
+          # Bepaal relatieve pad voor de lokale index en stel de lokale URL in
+          relpath="${local_index#$server_dir/}"
+          LOCAL_URL="http://127.0.0.1:8000/$relpath"
+
+          echo "Gebruik lokale URL: $LOCAL_URL"
+
+          export PDF_URL="$LOCAL_URL"
+
+          # Genereer PDF via Puppeteer (script staat in /tmp/pdf.js)
           node /tmp/pdf.js
+
+          # Stop server en ruim op
+          kill "$server_pid" || true
+          rm -rf "$tmpdir"
 
           if [ ! -s "$PDF_FILE" ]; then
             echo "Fout: Puppeteer heeft geen geldig PDF-bestand aangemaakt."
