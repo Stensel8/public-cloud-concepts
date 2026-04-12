@@ -101,9 +101,22 @@ master-amsterdam   Ready    control-plane   17m    v1.35.1
 
 **Dockerfile:** ([bekijk op GitHub](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-1/bestanden/Dockerfile))
 
-- Alpine-variant bewust gekozen: ~5 MB vs ~180 MB Debian, minder kans op kwetsbaarheden.
-- Kopieert de website naar de nginx-documentroot.
-- Start nginx op de voorgrond zodat de container actief blijft.
+Een Dockerfile is een tekstbestand met instructies die Docker stap voor stap uitvoert om een image te bouwen. Elke instructie maakt een laag aan in het image. Docker kan lagen cachen: als een instructie niet veranderd is, gebruikt Docker de gecachede laag en hoeft hij die stap niet opnieuw uit te voeren. Dat maakt builds sneller.
+
+De Dockerfile voor deze applicatie werkt als volgt:
+
+```dockerfile
+FROM nginx:alpine
+COPY . /usr/share/nginx/html
+```
+
+**`FROM nginx:alpine`**
+Dit is de basis van het image. `nginx:alpine` is de officiele nginx-webserver op Alpine Linux. Alpine is een minimalistische Linux-distributie van ongeveer 5 MB, tegenover ~180 MB voor de Debian-variant. Kleiner betekent minder aanvalsvlak: er staan minder paketten op het systeem die kwetsbaarheden kunnen bevatten. Voor een webserver die alleen statische bestanden serveert is Alpine meer dan genoeg.
+
+**`COPY . /usr/share/nginx/html`**
+Kopieer alle bestanden uit de huidige map (dus `index.html` en eventuele andere assets) naar de nginx-documentroot. Dit is de map waar nginx standaard naar kijkt als er een request binnenkomt. Zo hoeft nginx niet geconfigureerd te worden en draait de statische site meteen.
+
+nginx start automatisch op de voorgrond als de container opstart, want dat is ingebouwd in het `nginx:alpine` image. Daardoor blijft de container actief zolang nginx draait.
 
 **GitHub Actions workflow:**
 

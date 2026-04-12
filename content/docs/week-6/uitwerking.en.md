@@ -41,3 +41,45 @@ gcloud api-gateway gateways create week6-gateway \
 Authentication is enabled by adding a `securityDefinitions` block to the OpenAPI definition. If someone sends a request without a valid API Key, the gateway immediately returns a 403 before the request even reaches the services.
 
 The main advantage is that you now have one place for everything related to access control. Adding a new service? Add a route to the OpenAPI definition and deploy a new config. Clients notice nothing because the gateway URL stays the same.
+
+---
+
+## 6.2 API Gateway: recommendations
+
+### When should you use an API Gateway?
+
+An API Gateway adds complexity. That is only worth it when you actually gain something from it. With a single service and a few endpoints, a Gateway is overkill: you can simply expose the service directly via a LoadBalancer or Ingress.
+
+The Gateway becomes useful when:
+
+- You have multiple microservices that you want to expose via one URL
+- You want to handle authentication or rate limiting in one place, not per service
+- You want to shield external clients (mobile apps, third-party integrations) from internal service structure
+- You want to be able to swap backend implementations without clients noticing
+
+### What belongs in the Gateway, what belongs in the service?
+
+| Responsibility | Where |
+|---|---|
+| Authentication (API keys, JWT, OAuth) | Gateway |
+| Rate limiting | Gateway |
+| Request routing based on path or hostname | Gateway |
+| Business logic | Service itself |
+| Database access | Service itself |
+| Caching of heavy queries | Service or separate cache layer |
+
+The rule of thumb: anything related to access control and routing belongs in the Gateway. Anything the application does belongs in the service.
+
+### Recommendation for the monolith-to-microservices migration
+
+For the monolith from the lab (orders, products, frontend) I would use the following structure:
+
+1. All three services get a `ClusterIP`, they are not directly reachable from outside.
+2. The API Gateway is the only external entry point. Routes:
+   - `/api/orders` to the orders service
+   - `/api/products` to the products service
+   - `/` to the frontend
+3. Require API keys for the orders and products API. The frontend is public.
+4. Set rate limiting on the orders route so external parties cannot overload the database.
+
+This gives you the flexibility to replace or split a service later without existing clients noticing anything. They keep using the same gateway URL.

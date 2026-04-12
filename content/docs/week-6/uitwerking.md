@@ -41,3 +41,45 @@ gcloud api-gateway gateways create week6-gateway \
 Authenticatie zet je in met een `securityDefinitions` blok in de OpenAPI-definitie. Als iemand dan een request stuurt zonder geldige API Key, krijg die direct een 403 terug van de gateway, nog voordat het de services bereikt.
 
 Het grote voordeel is dat je nu één plek hebt voor alles wat met toegang te maken heeft. Nieuwe service erbij? Voeg een route toe in de OpenAPI-definitie en deploy een nieuwe config. De clients merken niets, want de gateway-URL blijft hetzelfde.
+
+---
+
+## 6.2 API Gateway: aanbevelingen
+
+### Wanneer gebruik je een API Gateway?
+
+Een API Gateway voegt complexiteit toe. Dat is alleen de moeite waard als je er echt iets mee wint. Bij één service met een paar eindpunten is een Gateway overkill: je kunt de service gewoon direct bereikbaar maken via een LoadBalancer of Ingress.
+
+De Gateway wordt nuttig zodra:
+
+- Je meerdere microservices hebt die je via één URL wil aanbieden
+- Je authenticatie of rate limiting op één plek wil regelen, niet per service apart
+- Je externe clients (mobiele apps, third-party integraties) afschermt van interne service-structuur
+- Je wil kunnen wisselen van backend-implementatie zonder dat clients iets merken
+
+### Wat leg je in de Gateway, wat in de service?
+
+| Verantwoordelijkheid | Waar |
+|---|---|
+| Authenticatie (API keys, JWT, OAuth) | Gateway |
+| Rate limiting | Gateway |
+| Request routing op basis van pad of hostnaam | Gateway |
+| Business logic | Service zelf |
+| Databasetoegang | Service zelf |
+| Caching van zware queries | Service of apart cache-laag |
+
+De stelregel: alles wat met toegangscontrole en routing te maken heeft, hoort in de Gateway. Alles wat de applicatie doet, hoort in de service.
+
+### Aanbeveling voor de monoliet-naar-microservices migratie
+
+Bij de monoliet uit het lab (orders, products, frontend) zou ik de volgende opbouw kiezen:
+
+1. Alle drie services krijgen een `ClusterIP`, ze zijn niet direct van buiten bereikbaar.
+2. De API Gateway is het enige externe ingangspunt. Routes:
+   - `/api/orders` naar de orders-service
+   - `/api/products` naar de products-service
+   - `/` naar de frontend
+3. API-sleutels vereisen voor de orders- en products-API. De frontend is publiek.
+4. Rate limiting instellen op de orders-route zodat externe partijen de database niet kunnen overbelasten.
+
+Dit geeft je de flexibiliteit om later een service te vervangen of te splitsen zonder dat bestaande clients iets merken. Ze blijven gewoon dezelfde gateway-URL gebruiken.

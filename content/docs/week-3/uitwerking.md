@@ -313,17 +313,42 @@ Dit is ook zichtbaar in de Google Cloud Console. In de Cloud Shell terminal zijn
 
 ## Argo CD en Flux CD
 
-Voor de opdracht heb ik onderzocht hoe Argo CD en Flux CD zich verhouden tot GitHub Actions.
+### Wat is Argo CD?
 
-**Argo CD** biedt een visuele webinterface en synchroniseert actief vanuit Git naar het cluster.
-**Flux CD** werkt zonder UI en draait volledig als Kubernetes-controllers - meer geschikt voor volledig geautomatiseerde omgevingen.
+Argo CD is een GitOps-tool die continu het Kubernetes-cluster synchroniseert met wat er in een Git-repository staat. Het idee achter GitOps is dat Git de enige bron van waarheid is: de gewenste staat van het cluster staat in YAML-bestanden in Git. Argo CD bewaakt het cluster en vergelijkt het continu met die bestanden. Als er een verschil is, herstelt Argo CD dat automatisch.
 
-| | GitHub Actions | Argo CD / Flux CD |
-|---|---|---|
-| Model | Push: pipeline stuurt actief naar het cluster | Pull: tool haalt gewenste staat op uit Git |
-| Trigger | Event in GitHub (push, PR) | Continu polling van Git-repository |
-| Cluster-toegang | Runner heeft directe toegang nodig | Tool draait in het cluster zelf |
-| Drift detectie | Geen - pipeline runt alleen bij events | Automatisch - herstelt afwijkingen zonder trigger |
-| Geschikt voor | CI (bouwen, testen, pushen) | CD (deployen, synchroniseren, bewaken) |
+Argo CD heeft een webinterface waar je per applicatie kunt zien of het cluster overeenkomt met Git (Synced) of niet (OutOfSync). Je kunt handmatig synchroniseren of auto-sync aanzetten. Het geeft ook een boomstructuur van alle Kubernetes-resources die bij een applicatie horen, inclusief pods, services en deployments.
 
-In productie zou ik GitHub Actions en Argo CD/Flux CD combineren: Actions bouwt en pusht het image, Argo CD of Flux CD deployt het naar het cluster.
+Praktisch werkt het zo: je deployt Argo CD in je cluster, je maakt een Application-object aan dat verwijst naar een Git-repository en een pad daarin, en Argo CD houdt dat pad in de gaten. Als je een nieuw image-tag in een YAML-bestand commit, trekt Argo CD die wijziging op en past het cluster aan.
+
+### Wat is Flux CD?
+
+Flux CD doet hetzelfde als Argo CD (GitOps, pull-model), maar werkt heel anders van binnen. Flux bestaat uit een stel Kubernetes-controllers die je installeert in het cluster. Er is geen aparte webinterface. Alles wat Flux doet, is terug te zien via `kubectl`.
+
+Flux heeft losse controllers voor verschillende taken:
+
+- **Source Controller** let op Git-repositories, Helm-repositories en OCI-registries en downloadt nieuwe versies.
+- **Kustomize Controller** past Kustomize-overlays toe op wat de Source Controller ophaalt.
+- **Helm Controller** installeert of updatet Helm charts op basis van een HelmRelease-object in Git.
+- **Notification Controller** stuurt berichten naar Slack, Teams of webhooks bij events.
+
+Omdat alles via Kubernetes-objects gaat, is Flux goed te integreren in bestaande GitOps-workflows en makkelijk te beheren via CI/CD-tools die al met kubectl werken.
+
+### Vergelijking met GitHub Actions
+
+| | GitHub Actions | Argo CD | Flux CD |
+|---|---|---|---|
+| Model | Push: pipeline stuurt actief naar het cluster | Pull: Argo CD haalt wijzigingen op uit Git | Pull: Flux controllers halen wijzigingen op |
+| Trigger | Event in GitHub (push, PR) | Continu polling van Git, of webhook | Continu polling, of webhook |
+| Cluster-toegang | Runner buiten het cluster heeft directe toegang nodig | Argo CD draait in het cluster zelf | Flux draait in het cluster zelf |
+| Drift detectie | Geen, pipeline runt alleen bij events | Automatisch, herstelt zonder trigger | Automatisch, herstelt zonder trigger |
+| UI | Geen ingebouwde Kubernetes-UI | Uitgebreide webinterface | Geen UI, alles via kubectl |
+| Geschikt voor | CI: bouwen, testen, pushen van images | CD: deployen en bewaken van de staat | CD: volledig geautomatiseerde omgevingen |
+
+### Wanneer gebruik je wat?
+
+GitHub Actions is goed voor het bouwen van images, draaien van tests en pushen naar een registry. Dat is CI. Voor de deployment zelf (CD) zijn Argo CD en Flux CD beter geschikt, omdat ze het cluster continu in sync houden met Git en afwijkingen automatisch herstellen.
+
+In een typische productie-setup combineer je beide: GitHub Actions bouwt het image en schrijft de nieuwe tag terug naar een YAML-bestand in Git. Argo CD of Flux CD detecteert die wijziging en deployt de nieuwe versie naar het cluster.
+
+Argo CD kies je als je een visueel overzicht wil van wat er in het cluster draait en wat de staat is. Flux kies je als je een puur declaratieve aanpak wil zonder extra UI, of als je al werkt met Kustomize of complexe Helm-setups.

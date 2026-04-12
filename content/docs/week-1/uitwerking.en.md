@@ -101,9 +101,22 @@ master-amsterdam   Ready    control-plane   17m    v1.35.1
 
 **Dockerfile:** ([view on GitHub](https://github.com/Stensel8/public-cloud-concepts/blob/main/static/docs/week-1/bestanden/Dockerfile))
 
-- Alpine variant chosen deliberately: ~5 MB vs ~180 MB Debian, reduced risk of vulnerabilities.
-- Copies the website to the nginx document root.
-- Starts nginx in the foreground so the container stays active.
+A Dockerfile is a text file with instructions that Docker executes step by step to build an image. Each instruction creates a layer in the image. Docker can cache layers: if an instruction has not changed, Docker reuses the cached layer and does not re-run that step. This makes builds faster.
+
+The Dockerfile for this application works as follows:
+
+```dockerfile
+FROM nginx:alpine
+COPY . /usr/share/nginx/html
+```
+
+**`FROM nginx:alpine`**
+This is the base of the image. `nginx:alpine` is the official nginx web server on Alpine Linux. Alpine is a minimal Linux distribution of around 5 MB, compared to roughly 180 MB for the Debian variant. Smaller means a smaller attack surface: fewer packages on the system that could contain vulnerabilities. For a web server that only serves static files, Alpine is more than sufficient.
+
+**`COPY . /usr/share/nginx/html`**
+Copies all files from the current directory (so `index.html` and any other assets) to the nginx document root. This is the directory nginx looks in by default when a request comes in. That way nginx does not need to be configured and the static site runs immediately.
+
+nginx starts automatically in the foreground when the container starts, because that is built into the `nginx:alpine` image. This keeps the container running as long as nginx is running.
 
 **GitHub Actions workflow:**
 
