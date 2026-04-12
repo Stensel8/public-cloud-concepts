@@ -55,12 +55,48 @@ jobs:
 
             const page = await browser.newPage();
 
+            // Brede viewport zodat afbeeldingen niet te smal worden weergegeven.
+            await page.setViewport({ width: 1280, height: 900 });
+
             // networkidle2: wacht tot er max. 2 netwerkverzoeken actief zijn
             // gedurende 500ms — betrouwbaarder dan een vaste wachttijd.
             await page.goto(process.env.PDF_URL, {
               waitUntil: 'networkidle2',
-              timeout: 30000,
+              timeout: 60000,
             });
+
+            // Scroll door de hele pagina om lazy-loaded afbeeldingen te triggeren.
+            // Zonder dit blijven afbeeldingen met loading="lazy" leeg in de PDF.
+            await page.evaluate(async () => {
+              await new Promise((resolve) => {
+                let totalHeight = 0;
+                const distance = 400;
+                const timer = setInterval(() => {
+                  window.scrollBy(0, distance);
+                  totalHeight += distance;
+                  if (totalHeight >= document.body.scrollHeight) {
+                    clearInterval(timer);
+                    window.scrollTo(0, 0);
+                    resolve();
+                  }
+                }, 100);
+              });
+            });
+
+            // Wacht tot alle afbeeldingen volledig geladen zijn na het scrollen.
+            await page.evaluate(async () => {
+              const imgs = Array.from(document.images);
+              await Promise.all(imgs.map(img => {
+                if (img.complete) return Promise.resolve();
+                return new Promise((resolve) => {
+                  img.addEventListener('load', resolve);
+                  img.addEventListener('error', resolve);
+                });
+              }));
+            });
+
+            // Korte extra wachttijd voor eventuele resterende netwerkactiviteit.
+            await new Promise(r => setTimeout(r, 2000));
 
             await page.pdf({
               path: process.env.PDF_FILE,
