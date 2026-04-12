@@ -119,21 +119,44 @@ jobs:
 
           echo "Gevonden lokale pagina: $local_index"
 
-          # Converteer alle AVIF bestanden naar PNG
-          find "$tmpdir" -type f \( -iname '*.avif' -o -iname '*.AVIF' \) -print0 | while IFS= read -r -d '' f; do
+          # Converteer alle AVIF bestanden naar PNG (robuuster)
+          while IFS= read -r -d '' f; do
             png="${f%.*}.png"
             echo "Converteer $f -> $png"
-            ffmpeg -y -loglevel error -i "$f" "$png" || echo "ffmpeg kon $f niet converteren"
-          done
+            if [ -f "$f" ]; then
+              ffmpeg -y -loglevel error -i "$f" "$png" || echo "ffmpeg kon $f niet converteren"
+            else
+              echo "Bestand niet gevonden: $f"
+            fi
+          done < <(find "$tmpdir" -type f \( -iname '*.avif' -o -iname '*.AVIF' \) -print0)
 
           # Wijzig verwijzingen .avif -> .png in alle gedownloade bestanden (HTML/CSS/JS)
           find "$tmpdir" -type f -exec sed -i 's/\.avif/\.png/gI' {} + || true
 
-          # Voeg bovenaan de pagina een korte waarschuwing toe
-          warning='<div style="border:1px solid #f39c12;padding:10px;background:#fff8e1;color:#000;margin:8px 0;font-weight:600">Let op, dit is een export welke is gegenereerd uit Github. Deze export is gedraaid vanaf de github static pagina op; "https://public-cloud-concepts.stensel.nl/nl/". Het kan zijn dat er secties niet goed inladen of versprongen zijn. Dit is een limitatie van de github runner welke mijn markdown naar pdf heeft omgevormd.</div>'
-          # Gebruik perl om de warning direct na de <body> tag in te voegen
-          perl -0777 -pe "s/(<body[^>]*>)/\1
-          $warning/mi" -i "$local_index"
+          # Voeg bovenaan de pagina een korte waarschuwing toe (gebruik python om quoting issues te vermijden)
+            export LOCAL_INDEX="$local_index"
+            python3 - <<'PY'
+            import os, re
+            p = os.environ.get('LOCAL_INDEX')
+            if not p:
+              raise SystemExit('LOCAL_INDEX not set')
+            with open(p, 'r', encoding='utf-8') as f:
+              html = f.read()
+            m = re.search(r'(<body[^>]*>)', html, flags=re.I)
+            warning = (
+              '<div style="border:1px solid #f39c12;padding:10px;background:#fff8e1;color:#000;margin:8px 0;font-weight:600">'
+              'Let op, dit is een export welke is gegenereerd uit GitHub. Deze export is gedraaid vanaf de github static pagina op: '
+              'https://public-cloud-concepts.stensel.nl/nl/. Het kan zijn dat er secties niet goed inladen of versprongen zijn. '
+              'Dit is een limitatie van de runner die markdown naar PDF heeft omgevormd.'
+              '</div>'
+            )
+            if m:
+              html = html[:m.end()] + warning + html[m.end():]
+              with open(p, 'w', encoding='utf-8') as f:
+                f.write(html)
+            else:
+              print('No <body> tag found; skipping warning insertion')
+            PY
 
           # Start een lokale webserver om de pagina te serveren
           server_dir="$tmpdir"
