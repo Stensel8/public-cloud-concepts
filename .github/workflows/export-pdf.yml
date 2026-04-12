@@ -237,6 +237,11 @@ jobs:
           path: pdfs/
           retention-days: 30
       
+      - name: Install zip/unzip
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y zip unzip
+
       - name: Maak gecombineerde code-zip
         run: |
           set -euo pipefail
