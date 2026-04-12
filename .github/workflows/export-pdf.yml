@@ -154,7 +154,7 @@ jobs:
           # paden (/docs/...) correct resolven naar de gedownloade bestanden.
           domain_dir=$(ls "$tmpdir" | head -1)
           server_dir="$tmpdir/$domain_dir"
-          (cd "$server_dir" && python3 -m http.server 8000 >/dev/null 2>&1 &)
+          (cd "$server_dir" && python3 -m http.server 8000 >/dev/null 2>&1) &
           server_pid=$!
           sleep 1
 
