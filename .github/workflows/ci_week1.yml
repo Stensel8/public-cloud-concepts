@@ -12,8 +12,14 @@ name: CI Week 1
 on:
   push:
     branches: [main]
+    paths:
+      - '.github/workflows/ci_week1.yml'
+      - 'static/docs/week-1/bestanden/**'
   pull_request:
     branches: [main]
+    paths:
+      - '.github/workflows/ci_week1.yml'
+      - 'static/docs/week-1/bestanden/**'
   workflow_dispatch:
 
 permissions:

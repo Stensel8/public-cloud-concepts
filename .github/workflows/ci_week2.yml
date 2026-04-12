@@ -1,7 +1,9 @@
-# CI Week 2 - Bouw en push twee Docker images naar Docker Hub.
+# CI Week 2 - Dockerfile lint, image build, Trivy security scan en Docker Hub push.
 #
 # Stappen:
-#   1. build - Bouwt de images voor de bison- en brightspace-applicaties.
+#   1. lint  - Controleert beide Dockerfiles op stijl- en veiligheidsfouten met hadolint.
+#   2. build - Bouwt de images voor de bison- en brightspace-applicaties.
+#            - Scant beide images op CRITICAL kwetsbaarheden met Trivy.
 #            - Pusht de images naar Docker Hub, maar alleen bij een push naar main
 #              (niet bij pull requests).
 #
@@ -11,31 +13,68 @@ name: CI Week 2
 on:
   push:
     branches: [main]
+    paths:
+      - '.github/workflows/ci_week2.yml'
+      - 'static/docs/week-2/bestanden/**'
   pull_request:
     branches: [main]
+    paths:
+      - '.github/workflows/ci_week2.yml'
+      - 'static/docs/week-2/bestanden/**'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  build:
-    name: Build & push
+  lint:
+    name: Dockerfile lint
     runs-on: ubuntu-latest
 
     steps:
-      # Haal de broncode op uit de repository.
       - name: Haal broncode op
         uses: actions/checkout@v6
 
-      # Bouw beide Docker images zodat ze gecontroleerd kunnen worden.
+      - name: Installeer hadolint
+        run: |
+          wget -qO /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+          chmod +x /usr/local/bin/hadolint
+
+      - name: Lint de Dockerfiles
+        run: |
+          hadolint "static/docs/week-2/bestanden/bison/Dockerfile"
+          hadolint "static/docs/week-2/bestanden/brightspace/Dockerfile"
+
+  build:
+    name: Build, scan & push
+    runs-on: ubuntu-latest
+    needs: lint
+
+    steps:
+      - name: Haal broncode op
+        uses: actions/checkout@v6
+
       - name: Bouw Docker images
         run: |
           docker build -t stensel8/public-cloud-concepts:bison "./static/docs/week-2/bestanden/bison"
           docker build -t stensel8/public-cloud-concepts:brightspace "./static/docs/week-2/bestanden/brightspace"
 
-      # Log in bij Docker Hub met de opgeslagen secrets.
-      # Alleen bij een push naar main, niet bij pull requests.
+      - name: Scan bison image met Trivy
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: stensel8/public-cloud-concepts:bison
+          format: table
+          exit-code: "1"
+          severity: CRITICAL
+
+      - name: Scan brightspace image met Trivy
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: stensel8/public-cloud-concepts:brightspace
+          format: table
+          exit-code: "1"
+          severity: CRITICAL
+
       - name: Log in bij Docker Hub
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: docker/login-action@v4
@@ -43,8 +82,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PAT }}
 
-      # Push beide images naar Docker Hub.
-      # Zelfde voorwaarde als de login hierboven.
       - name: Push Docker images naar Docker Hub
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: |

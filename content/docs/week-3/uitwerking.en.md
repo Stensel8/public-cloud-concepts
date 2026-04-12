@@ -23,8 +23,8 @@ With a **Blue-Green deployment**, two versions of the application run simultaneo
 
 ### How the pipeline works
 
-- **Push to `main`** → CI workflow builds the `:blue` image and deploys to `deployment-blue`
-- **Push to `development`** → CI workflow builds the `:green` image and deploys to `deployment-green`
+- **Push to `main`**: CI workflow builds the `:blue` image and deploys to `deployment-blue`
+- **Push to `development`**: CI workflow builds the `:green` image and deploys to `deployment-green`
 
 **Both deployments run at the same time.** This makes it possible to develop new features on `development`, test them in the green slot, and then switch via the `switch-slot` workflow.
 
@@ -132,7 +132,7 @@ gcloud resource-manager org-policies disable-enforce iam.disableServiceAccountKe
 
 ## Step 4: Set GitHub Secrets
 
-The JSON key and project details as repository secrets via **Settings → Secrets and variables → Actions**:
+The JSON key and project details as repository secrets via **Settings > Secrets and variables > Actions**:
 
 ![GitHub Secrets partially configured](/docs/week-3/media/github-secrets-partial.avif)
 

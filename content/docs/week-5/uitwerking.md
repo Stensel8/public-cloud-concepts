@@ -318,8 +318,8 @@ Stel een DNS A-record in voor `mywebsite.stijhuis.nl` naar hetzelfde Ingress IP-
 
 Op het eerste gezicht weinig, maar de monitoring stack pikt automatisch het volgende op:
 
-- **Loki + Alloy** leest de nginx access logs uit → HTTP statuscodes, request rate, 404's
-- **kube-state-metrics** (onderdeel van kube-prometheus-stack) → pod availability, restarts, CPU/memory
+- **Loki + Alloy** leest de nginx access logs uit: HTTP statuscodes, request rate, 404's
+- **kube-state-metrics** (onderdeel van kube-prometheus-stack): pod availability, restarts, CPU/memory
 
 In Grafana zijn deze logs en metrics direct zichtbaar via de Loki- en Prometheus-databronnen. Dat is precies wat de opdracht aantoont: niet de complexiteit van de app, maar het functioneren van de monitoring stack.
 {{< /callout >}}
@@ -377,7 +377,7 @@ Voor een leeromgeving is de open-source stack de betere keuze: je begrijpt wat e
 
 ---
 
-## Stap 11: SIEM en SOAR
+## Stap 12: SIEM en SOAR
 
 ### Wat is SIEM?
 
@@ -408,7 +408,7 @@ In DevOps wil je security integreren in de hele pipeline (DevSecOps). Een SIEM/S
 
 ---
 
-## Stap 12: TerramEarth casestudy
+## Stap 13: TerramEarth casestudy
 
 TerramEarth maakt zware machines voor de mijnbouw en landbouw. Ze hebben 2 miljoen voertuigen in gebruik die sensortdata verzamelen: kritieke data gaat real-time, de rest wordt dagelijks geupload. Dat is per voertuig 200-500 MB per dag. Ze draaien op Google Cloud, maar hebben ook legacy-systemen on-premise.
 
@@ -435,60 +435,6 @@ Google Cloud Monitoring verzamelt metrics, logs en traces van alle Google Cloud-
 ### Product 2: Grafana + Prometheus (zelf te hosten of via Grafana Cloud)
 
 Dit is dezelfde stack als ik in Week 5 gebruik. Voor TerramEarth is dit interessant omdat ze naast hun Google Cloud omgeving ook on-premise legacy-systemen hebben. Grafana kan datasources van beide omgevingen combineren in één dashboard.
-
----
-
-## Stap 13: Terraform als tooling-aanbeveling
-
-Terraform is een Infrastructure as Code (IaC) tool van HashiCorp. In plaats van handmatig resources aanmaken in een console of via losse scripts, beschrijf je de gewenste infrastructuur in `.tf`-bestanden. Terraform vergelijkt die beschrijving met de huidige staat en voert alleen de benodigde wijzigingen door.
-
-### Hoe werkt het?
-
-Je schrijft resources in de HashiCorp Configuration Language (HCL). Terraform heeft providers voor bijna alle cloudplatformen. Voor Google Cloud gebruik je de `google`-provider, voor AWS de `aws`-provider.
-
-Een voorbeeld voor het aanmaken van een GKE-cluster met Terraform zou er zo uitzien:
-
-```hcl
-resource "google_container_cluster" "week5" {
-  name     = "week5-cluster"
-  location = "europe-west4"
-
-  initial_node_count = 2
-
-  node_config {
-    machine_type = "e2-medium"
-    disk_size_gb = 50
-  }
-}
-```
-
-In plaats van dit handmatig in de console in te klikken of een `gcloud`-commando te onthouden, staat de configuratie nu in een bestand dat je kunt committen in Git.
-
-De drie basiscommando's zijn:
-
-| Commando | Wat het doet |
-|---|---|
-| `terraform init` | Downloadt de benodigde providers |
-| `terraform plan` | Laat zien wat er aangemaakt, gewijzigd of verwijderd wordt |
-| `terraform apply` | Voert de wijzigingen door |
-
-### Waarom voor TerramEarth?
-
-TerramEarth heeft een hybride omgeving: Google Cloud voor de datapipeline en on-premise systemen voor legacy. Met Terraform kunnen ze beide omgevingen beschrijven in dezelfde tooling. De infrastructuur staat dan in Git, waardoor je een volledig overzicht hebt van wat er draait, wie wat heeft aangepast en wanneer.
-
-Een concreet voordeel voor TerramEarth: ze willen hun monitoring en observability standardiseren. Met Terraform kun je de hele monitoring stack (GKE-cluster, Loki, Prometheus, Grafana) beschrijven als code. Als er een nieuw project opgestart wordt, kun je dezelfde setup in een paar minuten reproduceren in een andere regio zonder handmatige stappen.
-
-### Terraform tegenover handmatige scripts
-
-| | Handmatige scripts (`gcloud`, `kubectl`) | Terraform |
-|---|---|---|
-| Staat bijhouden | Nee, script weet niet wat er al bestaat | Ja, Terraform houdt een state-bestand bij |
-| Idempotent | Nee, script kan dingen dubbel aanmaken | Ja, `terraform apply` verandert alleen wat nodig is |
-| Versiebeheer | Script in Git, maar geen koppelingen naar resources | Staat + code beide in Git |
-| Samenwerken | Iedereen moet weten welk script al gedraaid is | State is gedeeld, iedereen ziet de actuele staat |
-| Hybride cloud | Losse scripts per platform | Één workflow voor meerdere providers |
-
-Voor een bedrijf als TerramEarth, dat standaardisatie wil in hun tooling, is Terraform een logische keuze: één manier van werken voor alle cloudresources, in Git, herhaalbaar en controleerbaar.
 
 **Problem Management:**
 

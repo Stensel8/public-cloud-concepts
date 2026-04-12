@@ -34,7 +34,7 @@ jobs:
 
       # Installeer puppeteer-core in /tmp zodat het script (dat ook in /tmp staat)
       # de module kan vinden. Node zoekt node_modules relatief aan het script.
-      # puppeteer-core downloadt geen extra Chromium — gebruikt de systeem-Chrome.
+      # puppeteer-core downloadt geen extra Chromium - gebruikt de systeem-Chrome.
       - name: Installeer Puppeteer
         run: cd /tmp && npm install puppeteer-core
 
@@ -59,7 +59,7 @@ jobs:
             await page.setViewport({ width: 1280, height: 900 });
 
             // networkidle2: wacht tot er max. 2 netwerkverzoeken actief zijn
-            // gedurende 500ms — betrouwbaarder dan een vaste wachttijd.
+            // gedurende 500ms - betrouwbaarder dan een vaste wachttijd.
             await page.goto(process.env.PDF_URL, {
               waitUntil: 'networkidle2',
               timeout: 60000,
