@@ -330,44 +330,7 @@ In Grafana zijn deze logs en metrics direct zichtbaar via de Loki- en Prometheus
 
 De monitoring stack bestaat uit vier lagen: **log-verzameling** (Alloy), **log-opslag** (Loki), **metrics** (Prometheus + exporters) en **visualisatie** (Grafana). Ingress-nginx verzorgt de externe toegang.
 
-```mermaid
-flowchart LR
-    browser(["Browser\ngrafana.stijhuis.nl"])
-
-    subgraph ingress_ns["ingress-nginx"]
-        nginx["ingress-nginx\nLoadBalancer"]
-    end
-
-    subgraph app_ns["mywebsite"]
-        app["nginx static site\nstensel8/public-cloud-concepts"]
-    end
-
-    subgraph alloy_ns["alloy"]
-        alloy["Grafana Alloy\nDaemonSet"]
-    end
-
-    subgraph loki_ns["loki"]
-        loki_gw["Loki Gateway"]
-        loki_pod[("Loki SingleBinary\nfilesystem storage")]
-        loki_gw --> loki_pod
-    end
-
-    subgraph prom_ns["prometheus — kube-prometheus-stack"]
-        node_exp["node-exporter\nDaemonSet"]
-        ksm["kube-state-metrics"]
-        prom[("Prometheus TSDB")]
-        grafana["Grafana"]
-        node_exp -->|"scrape /metrics"| prom
-        ksm -->|"scrape /metrics"| prom
-    end
-
-    browser -->|"HTTPS — Bunny DNS"| nginx
-    nginx --> grafana
-    app -->|"stdout/stderr"| alloy
-    alloy -->|"HTTP push"| loki_gw
-    prom -->|"PromQL"| grafana
-    loki_pod -->|"LogQL"| grafana
-```
+![Architectuurdiagram](/docs/week-5/media/mermaid-diagram-week-5.avif)
 
 | Component | Namespace | Rol |
 |-----------|-----------|-----|

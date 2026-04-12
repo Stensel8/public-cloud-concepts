@@ -9,10 +9,6 @@ Week 7 richt zich op serverless computing via AWS: een REST API met API Gateway 
 
 ## 7.1 REST API via API Gateway
 
-Deze uitwerking bevat korte, praktische aanwijzingen voor de labs. Volg de twee AWS-labs in de opdrachten en voeg screenshots toe aan je portfolio.
-
----
-
 ### Method en integration
 
 In API Gateway is de `method` het client-facing contract (HTTP-werkwoord, pad, authenticatie en validatie). De `integration` beschrijft de backend-mapping: waar API Gateway de request naartoe stuurt (HTTP-endpoint, Lambda, AWS-service) en hoe de response terug wordt gemapt naar de client.
@@ -50,7 +46,7 @@ Lambda ontvangt een **proxy event** van API Gateway en retourneert een gestructu
 {
   "statusCode": 200,
   "headers": { "Content-Type": "application/json" },
-  "body": "{\"message\": \"Hello from Lambda!\"}"
+  "body": "{\"message\": \"Hello Sten\"}"
 }
 ```
 
@@ -132,5 +128,3 @@ Een traditionele server wacht actief op requests (polling of een open verbinding
 | Andere Lambda | Direct invocation |
 
 In alle gevallen geldt hetzelfde patroon: **iets gebeurt → een functie reageert**. Dat is de kern van event-driven architecturen. De functies zijn stateless, los gekoppeld, en schalen automatisch met het aantal events.
-
-Richt je antwoord op hoe serverless past bij event‑driven architecturen en onderbouw je keuzes met minimaal twee ontwerpbeslissingen.

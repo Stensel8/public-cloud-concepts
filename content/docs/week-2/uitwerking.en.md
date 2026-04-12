@@ -267,3 +267,43 @@ ingress-saxion   nginx   bison.mysaxion.nl,brightspace.mysaxion.nl   34.91.190.1
 **Why Ingress?**
 
 Without Ingress, each application needs its own `LoadBalancer` service (its own IP, its own cost). With Ingress, one load balancer routes traffic to the correct service based on the `Host` HTTP header.
+
+---
+
+## 2.3 DORA
+
+DORA stands for DevOps Research and Assessment. It is a multi-year research project that looks at what successful software teams do differently from teams that struggle to deliver software well. Four measurable metrics came out of it.
+
+### What are the DORA metrics?
+
+| Metric | What it measures |
+|--------|-----------------|
+| **Deployment Frequency** | How often do you successfully deploy to production? |
+| **Lead Time for Changes** | How long does it take from a commit to going live? |
+| **Change Failure Rate** | What percentage of your deploys go wrong? |
+| **Time to Restore Service** | How quickly are you back up after an incident? |
+
+### Why do they matter?
+
+Each metric says something about how you work. If you rarely deploy, that usually means your releases are large and risky. That makes every deploy tense, because a lot goes live at once.
+
+A high Change Failure Rate points to something wrong with how you test or how your pipeline is set up. Teams that have this under control deploy small and often. When something does go wrong, it is found and fixed quickly.
+
+DORA has also shown that this affects the team itself. Fewer big deploys means fewer fires, less crisis mode, and less stress.
+
+### How I apply this
+
+| Technique | How I apply it |
+|---|---|
+| **Continuous Integration** | Every push automatically triggers a Dockerfile lint, image build, and Trivy scan. Errors are immediately visible, not only at a big release. |
+| **Trunk-Based Development** | `main` is always deployable. `development` is used for new work that I test via the green slot before going live. |
+| **Deployment Automation** | On every push to `main` the pipeline automatically deploys to both Docker Hub and Google Artifact Registry, and from there to GKE. No manual steps. |
+| **Monitoring and Observability** | The monitoring stack from Week 5 keeps Time to Restore short: if something goes wrong I see it immediately in Grafana. |
+
+The blue-green strategy fits in well here. Switching back is easy, so the threshold to go live is low. You always know you can roll back quickly if something is not right.
+
+### Sources
+
+- [Atlassian: DORA Metrics](https://www.atlassian.com/devops/frameworks/dora-metrics)
+- [Google Cloud: DORA Research](https://cloud.google.com/blog/products/devops-sre/using-the-four-keys-to-measure-your-devops-performance)
+- [DORA State of DevOps Report](https://dora.dev/research/)

@@ -330,59 +330,120 @@ In Grafana these logs and metrics are directly visible via the Loki and Promethe
 
 The monitoring stack consists of four layers: **log collection** (Alloy), **log storage** (Loki), **metrics** (Prometheus + exporters) and **visualisation** (Grafana). Ingress-nginx handles external access.
 
-```mermaid
-flowchart LR
-    browser(["Browser\ngrafana.stijhuis.nl"])
+![Architecture diagram](/docs/week-5/media/mermaid-diagram-week-5.avif)
 
-    subgraph ingress_ns["ingress-nginx"]
-        nginx["ingress-nginx\nLoadBalancer"]
-    end
-
-    subgraph app_ns["mywebsite"]
-        app["nginx static site\nstensel8/public-cloud-concepts"]
-    end
-
-    subgraph alloy_ns["alloy"]
-        alloy["Grafana Alloy\nDaemonSet"]
-    end
-
-    subgraph loki_ns["loki"]
-        loki_gw["Loki Gateway"]
-        loki_pod[("Loki SingleBinary\nfilesystem storage")]
-        loki_gw --> loki_pod
-    end
-
-    subgraph prom_ns["prometheus — kube-prometheus-stack"]
-        node_exp["node-exporter\nDaemonSet"]
-        ksm["kube-state-metrics"]
-        prom[("Prometheus TSDB")]
-        grafana["Grafana"]
-        node_exp -->|"scrape /metrics"| prom
-        ksm -->|"scrape /metrics"| prom
-    end
-
-    browser -->|"HTTPS — Bunny DNS"| nginx
-    nginx --> grafana
-    app -->|"stdout/stderr"| alloy
-    alloy -->|"HTTP push"| loki_gw
-    prom -->|"PromQL"| grafana
-    loki_pod -->|"LogQL"| grafana
-```
+| Component | Namespace | Role |
+|-----------|-----------|------|
+| **ingress-nginx** | `ingress-nginx` | External access; exposes Grafana via HTTP Ingress |
+| **Grafana Alloy** | `alloy` | DaemonSet; reads pod logs via `loki.source.kubernetes` and forwards them to Loki |
+| **Loki Gateway** | `loki` | nginx reverse proxy for the Loki API |
+| **Loki SingleBinary** | `loki` | Log aggregation; stores logs as chunks on the filesystem |
+| **node-exporter** | `prometheus` | DaemonSet; exports host-level metrics (CPU, RAM, disk, network) |
+| **kube-state-metrics** | `prometheus` | Exports Kubernetes object status (pods, deployments, replicas) |
+| **Prometheus** | `prometheus` | Scrapes metrics from node-exporter and kube-state-metrics; stores as TSDB |
+| **Grafana** | `prometheus` | Visualises metrics (PromQL) and logs (LogQL) via datasources |
 
 ---
 
 ## Step 10: Other monitoring tools for Kubernetes
 
-<!-- Fill in -->
+The stack I use (Loki, Alloy, Prometheus, Grafana) is open-source and self-hosted. There are also commercial alternatives that offer more out-of-the-box.
+
+### Datadog
+
+Datadog is a cloud-native observability platform. You install a DaemonSet (the Datadog Agent) in your cluster, and it then automatically collects metrics, logs, and traces. No separate Helm charts for Prometheus, Loki, and Grafana; everything is in one platform.
+
+Advantage: fast setup, strong integrations, good APM (Application Performance Monitoring) for distributed tracing. Disadvantage: expensive at scale and you are fully dependent on Datadog as a vendor.
+
+### New Relic
+
+Similar to Datadog. New Relic also has a Kubernetes integration that automatically monitors cluster health. It has a generous free tier (100 GB/month), which makes it attractive for smaller environments.
+
+### Dynatrace
+
+Dynatrace goes further with AI-driven root cause analysis. Instead of just showing dashboards, it tries to automatically determine what is causing a problem. Useful in large, complex environments where manually scrolling through dashboards does not scale.
+
+### Comparison with my stack
+
+| | My stack | Datadog / New Relic / Dynatrace |
+|---|---|---|
+| Cost | Free (open-source) | Paid (per host or data volume) |
+| Setup | More configuration needed | Quick installation |
+| Vendor lock-in | None | High |
+| Flexibility | Fully customisable | Limited to platform capabilities |
+| APM / tracing | Set up yourself (Tempo) | Built-in |
+
+For a learning environment, the open-source stack is the better choice: you understand what happens under the hood. In a professional environment with a large cluster, I would consider Datadog or Dynatrace because of the low management overhead.
 
 ---
 
 ## Step 11: SIEM and SOAR
 
-<!-- Fill in: describe SIEM and SOAR, link to ITIL/DevOps and TerramEarth -->
+### What is SIEM?
+
+SIEM stands for Security Information and Event Management. A SIEM collects logs and events from all kinds of sources (servers, network devices, applications) and correlates them to detect suspicious behaviour. Well-known examples are Microsoft Sentinel, Splunk, and IBM QRadar.
+
+It is not just about storing logs, but about finding patterns: multiple failed login attempts from the same IP, an account downloading data in the middle of the night, or a new admin who suddenly has access to production.
+
+### What is SOAR?
+
+SOAR stands for Security Orchestration, Automation and Response. Where a SIEM detects, a SOAR handles the response. When a SIEM generates an alert, a SOAR can automatically execute a playbook: block the account, create a ticket, notify the administrator.
+
+In combination: SIEM detects an incident, SOAR responds to it automatically.
+
+### Link to ITIL
+
+ITIL describes processes for IT service management. Two processes are directly relevant here:
+
+**Incident Management** is about restoring a service as quickly as possible. A SIEM signals the incident, a SOAR playbook automatically responds and creates a ticket. This directly reduces Mean Time to Detect (MTTD) and Mean Time to Respond (MTTR).
+
+**Problem Management** goes a step further: what is the underlying cause? From SIEM data you can extract patterns that point to a structural problem, such as an application that consistently requests too many permissions or an endpoint that is regularly targeted by brute-force attacks.
+
+### Link to DevOps
+
+In DevOps you want to integrate security throughout the pipeline (DevSecOps). A SIEM/SOAR fits well here:
+
+- Alerts from the SIEM can automatically block a pipeline if suspicious activity has been detected.
+- SOAR playbooks can respond automatically without a manual intervention, which fits the DevOps philosophy of automation.
 
 ---
 
 ## Step 12: TerramEarth case study
 
-<!-- Fill in: analyse at least 2 products for Monitoring/Observability, give concrete examples for Problem Management and Monitoring & Event Management at tactical and operational level -->
+TerramEarth manufactures heavy machinery for mining and agriculture. They have 2 million vehicles in use that collect sensor data: critical data goes in real time, the rest is uploaded daily. That is 200-500 MB per vehicle per day. They run on Google Cloud but also have legacy systems on-premise.
+
+An explicit challenge from their executive statement: "improve and standardize tools necessary for application and network monitoring and troubleshooting." That is exactly the scope of the two products below.
+
+### Product 1: Google Cloud Monitoring (Operations Suite)
+
+Google Cloud Monitoring collects metrics, logs, and traces from all Google Cloud resources. Because TerramEarth already runs on Google Cloud, integration is minimal: Cloud Monitoring is available out-of-the-box.
+
+**Problem Management:**
+
+*Tactical level:* Cloud Monitoring can analyse trends over longer periods. If vehicle sensors of a certain model consistently report higher CPU load on the processing pipeline, that is a signal for a structural problem in the data processing code. A dashboard with historical trends makes this visible to management.
+
+*Operational level:* An administrator sees in real time that the ingest pipeline is falling behind. Via Cloud Monitoring Alerts they receive a notification when latency exceeds a threshold. They can immediately trace the cause via the associated logs in Cloud Logging.
+
+**Monitoring and Event Management:**
+
+*Tactical level:* Set SLOs (Service Level Objectives) for the data pipeline. TerramEarth can agree that 99.9% of real-time vehicle data must be processed within 5 seconds. Cloud Monitoring continuously monitors this SLO and reports the error budget to management.
+
+*Operational level:* Automatic alerts on deviations. If a zone suddenly stops receiving data from vehicles in a certain region, an alert fires immediately. This could indicate a network issue or a bug in the on-board firmware.
+
+---
+
+### Product 2: Grafana + Prometheus (self-hosted or via Grafana Cloud)
+
+This is the same stack I use in Week 5. For TerramEarth this is interesting because alongside their Google Cloud environment they also have on-premise legacy systems. Grafana can combine datasources from both environments in one dashboard.
+
+**Problem Management:**
+
+*Tactical level:* Grafana has annotations: you can mark events (such as software releases or firmware updates) on graphs. If a new firmware version coincides with a rise in error messages, the correlation is immediately visible. This helps identify the root cause.
+
+*Operational level:* Via Prometheus alerting, administrators can be automatically notified when a specific vehicle type falls outside normal bandwidth limits. This could indicate a faulty sensor or a network problem in the field.
+
+**Monitoring and Event Management:**
+
+*Tactical level:* Because TerramEarth has both Google Cloud and on-premise, a centralised Grafana dashboard is valuable. Prometheus scrapes metrics from both environments, Grafana visualises everything in one place. Management has a complete picture of the infrastructure status.
+
+*Operational level:* Grafana Alerting can automatically send a webhook to a ticketing system (such as PagerDuty or Jira) on an alert. This is comparable to SOAR: detection and the first step of response are automated.
