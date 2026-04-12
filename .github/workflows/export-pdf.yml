@@ -152,14 +152,16 @@ jobs:
           open(path, 'w').write(html[:m.end()] + warning + html[m.end():])
           PY
 
-          # Start een lokale webserver om de pagina te serveren
-          server_dir="$tmpdir"
-          (cd "$server_dir" && python3 -m http.server 8000 >/dev/null 2>&1 &) 
+          # Start een lokale webserver vanuit de domain-submap zodat root-relative
+          # paden (/docs/...) correct resolven naar de gedownloade bestanden.
+          domain_dir=$(ls "$tmpdir" | head -1)
+          server_dir="$tmpdir/$domain_dir"
+          (cd "$server_dir" && python3 -m http.server 8000 >/dev/null 2>&1 &)
           server_pid=$!
           sleep 1
 
           # Bepaal relatieve pad voor de lokale index en stel de lokale URL in
-          relpath="${local_index#$tmpdir/}"
+          relpath="${local_index#$server_dir/}"
           LOCAL_URL="http://127.0.0.1:8000/$relpath"
 
           echo "Gebruik lokale URL: $LOCAL_URL"
@@ -214,11 +216,6 @@ jobs:
             made=1
           fi
 
-          if [ "$made" -eq 0 ]; then
-            echo "Geen code/config bestanden gevonden voor week ${{ matrix.week }}; maak leeg zip"
-            zip -r "$zipfile" /dev/null >/dev/null 2>&1 || true
-          fi
-
           ls -lh "$zipfile" || true
 
       - name: Upload week code zip
@@ -226,6 +223,7 @@ jobs:
         with:
           name: "Week-${{ matrix.week }}-Code"
           path: "archives/Week-${{ matrix.week }}-Code.zip"
+          if-no-files-found: ignore
           retention-days: 30
 
 
